@@ -2,8 +2,8 @@
 title: "Picture Lite - tool cho HSSV Ngành CNTT"
 photo: "photo/thumbnail-post-picture-lite-mv2hh33b.webp"
 date: "10/10/2026"
-keywords: "Picture Lite, tải Picture Lite, Picture Lite download, PictureLite Portable, phần mềm nén ảnh, công cụ nén ảnh hàng loạt, nén ảnh PNG, nén ảnh JPEG, nén ảnh WebP, giảm dung lượng ảnh, tối ưu hình ảnh website, nén ảnh cho website, nén ảnh offline, nén ảnh trong thư mục website, phần mềm tối ưu ảnh, công cụ hỗ trợ lập trình web, phần mềm mã nguồn mở, công cụ cho sinh viên CNTT, Picture Lite Shinju Ch."
-description: "Picture Lite là công cụ mã nguồn mở giúp nén hàng loạt ảnh PNG, JPEG, WebP ngay trong thư mục website, giảm dung lượng và tối ưu tốc độ tải trang."
+keywords: "Picture Lite, nén ảnh, HSSV CNTT, Github Pages, tối ưu web"
+description: "Tải Picture Lite - công cụ nén ảnh miễn phí cho HSSV ngành CNTT"
 ---
 Chào mọi người! Nếu bạn cũng là một &cdeveloper&r HSSV giống mình và đang "cày" mấy dự án web cá nhân hay bài tập lớn, thì Github Pages chắc chắn là chân lý để host web miễn phí rồi đúng không? 
 
