@@ -22,7 +22,7 @@
           "label": "Vietcombank",
           "type": "qr",
           "qr": "/assets/donate/vietcombank-qr.png",
-          "visible": true
+          "visible": false
         }
       ]
     },
@@ -34,7 +34,7 @@
           "id": "momo",
           "type": "qr",
           "qr": "/assets/donate/momo-qr.jpg",
-          "visible": true
+          "visible": false
         }
       ]
     }
