@@ -5,7 +5,7 @@
      Hoạt động với mọi định dạng ảnh nền vì đọc đúng URL do getComputedStyle trả về.
    • Theme của màn hình chờ đổi theo cảm xúc đang đặt trong /status.json (sửa ở /admin → Trạng thái).
      Không có cảm xúc (hoặc đã hết hạn) → theme "hoàng hôn". Lần ghé sau dùng ngay theme đã nhớ.
-   • Nếu trang có .avatar-wrap thì hiện bong bóng trạng thái phía trên avatar.
+   • Ở trang chủ (có .avatar-wrap) hiện bong bóng trạng thái phía trên avatar; các trang khác không hiện.
    • Xem thử một theme: thêm ?loadpreview=<tên theme> vào địa chỉ trang chủ (màn hình chờ sẽ không tắt). */
 (function () {
     const overlay = document.getElementById("site-loading");
@@ -98,6 +98,7 @@
     });
 
     async function showBubble(status, moods) {
+        if (!/^\/(index\.html)?$/.test(location.pathname)) return; // bong bóng trạng thái chỉ hiện ở trang chủ
         const wrap = document.querySelector(".avatar-wrap");
         if (!wrap || !isActive(status) || wrap.querySelector(".status-bubble")) return;
         const mood = (moods.moods || []).find((x) => x.id === status.mood);
