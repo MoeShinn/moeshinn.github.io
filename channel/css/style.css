@@ -1,0 +1,383 @@
+:root {
+    --text-cream: #f4ecd8;
+    --dot-online: #3ddc3d;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+body {
+    min-height: 100vh;
+    font-family: "Baloo 2", "Comic Sans MS", "Segoe UI", sans-serif;
+    color: var(--text-cream);
+    overflow-x: hidden;
+    position: relative;
+    background-color: #120a26;
+    /* Same universe background as the main site, auto-swapped per device
+     below. background-size: cover scales without stretching/distorting —
+     it only crops overflow to match the screen's aspect ratio. */
+    background-image: url("/assets/bg/bgpc.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+@media (max-width: 600px) {
+    body {
+        background-image: url("/assets/bg/bgphone.png");
+    }
+}
+
+@media (min-width: 601px) and (max-width: 1024px) {
+    body {
+        background-image: url("/assets/bg/bgpad.png");
+    }
+}
+
+/* ---------------------------------------------------------------- */
+/* Enchant-table glow: sits on top of the background photo as a     */
+/* translucent, slowly pulsing purple overlay, plus small rising    */
+/* sparkle particles — keeps the "magic" feel without hiding the    */
+/* photo underneath.                                                */
+/* ---------------------------------------------------------------- */
+.enchant-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background: transparent;
+}
+
+    .enchant-bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse at 50% 20%, rgba(180, 120, 255, 0.35) 0%, rgba(0,0,0,0) 55%);
+        mix-blend-mode: screen;
+        animation: enchant-pulse 6s ease-in-out infinite;
+    }
+
+@keyframes enchant-pulse {
+    0%, 100% {
+        opacity: 0.55;
+    }
+
+    50% {
+        opacity: 0.9;
+    }
+}
+
+.sparkles {
+    position: absolute;
+    inset: 0;
+}
+
+.spark {
+    position: absolute;
+    bottom: -5%;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 0%, #c9a2ff 55%, rgba(201,162,255,0) 75%);
+    box-shadow: 0 0 8px 2px rgba(201, 162, 255, 0.7);
+    opacity: 0;
+    animation: rise 8s linear infinite;
+}
+
+@keyframes rise {
+    0% {
+        transform: translate(0, 0) scale(0.6);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0.9;
+    }
+
+    90% {
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: translate(var(--drift, 20px), -105vh) scale(1);
+        opacity: 0;
+    }
+}
+
+.spark:nth-child(1) {
+    left: 4%;
+    --drift: 30px;
+    width: 4px;
+    height: 4px;
+    animation-duration: 9s;
+    animation-delay: 0s;
+}
+
+.spark:nth-child(2) {
+    left: 12%;
+    --drift: -20px;
+    width: 6px;
+    height: 6px;
+    animation-duration: 11s;
+    animation-delay: 1.2s;
+}
+
+.spark:nth-child(3) {
+    left: 22%;
+    --drift: 15px;
+    width: 3px;
+    height: 3px;
+    animation-duration: 7.5s;
+    animation-delay: 2.4s;
+}
+
+.spark:nth-child(4) {
+    left: 33%;
+    --drift: -25px;
+    width: 5px;
+    height: 5px;
+    animation-duration: 10s;
+    animation-delay: 0.6s;
+}
+
+.spark:nth-child(5) {
+    left: 44%;
+    --drift: 20px;
+    width: 4px;
+    height: 4px;
+    animation-duration: 8.5s;
+    animation-delay: 3s;
+}
+
+.spark:nth-child(6) {
+    left: 55%;
+    --drift: -15px;
+    width: 6px;
+    height: 6px;
+    animation-duration: 12s;
+    animation-delay: 1.8s;
+}
+
+.spark:nth-child(7) {
+    left: 66%;
+    --drift: 25px;
+    width: 3px;
+    height: 3px;
+    animation-duration: 9.5s;
+    animation-delay: 4.1s;
+}
+
+.spark:nth-child(8) {
+    left: 74%;
+    --drift: -30px;
+    width: 5px;
+    height: 5px;
+    animation-duration: 7s;
+    animation-delay: 2.7s;
+}
+
+.spark:nth-child(9) {
+    left: 83%;
+    --drift: 18px;
+    width: 4px;
+    height: 4px;
+    animation-duration: 10.5s;
+    animation-delay: 0.9s;
+}
+
+.spark:nth-child(10) {
+    left: 91%;
+    --drift: -10px;
+    width: 6px;
+    height: 6px;
+    animation-duration: 8.8s;
+    animation-delay: 3.6s;
+}
+
+.spark:nth-child(11) {
+    left: 62%;
+    --drift: 12px;
+    width: 3px;
+    height: 3px;
+    animation-duration: 11.5s;
+    animation-delay: 5s;
+}
+
+.spark:nth-child(12) {
+    left: 8%;
+    --drift: -18px;
+    width: 4px;
+    height: 4px;
+    animation-duration: 9.2s;
+    animation-delay: 4.6s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .enchant-bg, .enchant-bg::before, .spark {
+        animation: none !important;
+    }
+}
+
+/* ---------- Layout ---------- */
+.page {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 24px 32px;
+}
+
+/* ---------- Avatar ---------- */
+.avatar-wrap {
+    position: relative;
+    width: 168px;
+    height: 168px;
+    margin-bottom: 22px;
+}
+
+    .avatar-wrap img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #fff;
+        box-shadow: 0 8px 26px rgba(0,0,0,0.5), 0 0 24px rgba(160, 110, 255, 0.35);
+    }
+
+.status-dot {
+    position: absolute;
+    right: 6px;
+    bottom: 8px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--dot-online);
+    border: 3px solid #120a26;
+}
+
+.display-name {
+    font-size: 28px;
+    font-weight: 800;
+    margin: 0 0 26px;
+    text-align: center;
+    color: var(--text-cream);
+    text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+}
+
+/* ---------- Link buttons ---------- */
+.link-list {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.link-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+    border: 2px solid rgba(255,255,255,0.15);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+    overflow: hidden;
+    transform: scale(1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+    .link-btn:hover,
+    .link-btn:focus-visible {
+        transform: scale(1.045);
+        box-shadow: 0 10px 26px rgba(0,0,0,0.55), 0 0 18px rgba(180, 130, 255, 0.35);
+        border-color: rgba(255,255,255,0.4);
+    }
+
+    /* Light sweep that glides across the button on hover */
+    .link-btn::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -60%;
+        width: 45%;
+        height: 100%;
+        background: linear-gradient( 115deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0) 100% );
+        transform: skewX(-20deg);
+        transition: left 0.05s;
+        pointer-events: none;
+    }
+
+    .link-btn:hover::after {
+        animation: sweep 0.85s ease forwards;
+    }
+
+@keyframes sweep {
+    from {
+        left: -60%;
+    }
+
+    to {
+        left: 130%;
+    }
+}
+
+.link-icon {
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+    .link-icon svg {
+        width: 100%;
+        height: 100%;
+    }
+
+.link-text {
+    flex: 1;
+    text-align: left;
+}
+
+/* ---------- Footer ---------- */
+.site-footer {
+    margin-top: auto;
+    padding-top: 64px;
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.6;
+    color: rgba(244, 236, 216, 0.75);
+}
+
+@media (max-width: 420px) {
+    .display-name {
+        font-size: 24px;
+    }
+
+    .link-btn {
+        font-size: 14px;
+        padding: 9px 14px;
+    }
+
+    .avatar-wrap {
+        width: 140px;
+        height: 140px;
+    }
+}
