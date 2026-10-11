@@ -43,28 +43,28 @@
     "pages": {
       "home": {
         "title": "Shinju Ch.",
-        "description": "Trang cá nhân của Shinju Ch. \nMạng xã hội, ủng hộ và các bài đăng mới.",
+        "description": "Trang cá nhân của Shinju Ch. Mạng xã hội, ủng hộ và các bài đăng mới.",
         "keywords": "Shinju Ch., ShinjuVNer, Shinju, mạng xã hội, blog"
       },
       "post": {
         "title": "Shinju Ch. — Blog",
-        "description": "Blog của Shinju Ch.: thông báo, hướng dẫn và các bài viết mới.",
+        "description": "Blog của Shinju Ch.: thông báo, hướng dẫn và các bài viết mới",
         "keywords": "blog, bài viết, hướng dẫn, Shinju Ch."
       },
       "download": {
         "title": "Tải xuống — Shinju Ch.",
-        "description": "Tải xuống các tệp và tài nguyên do Shinju Ch. chia sẻ.",
+        "description": "Tải xuống các tệp và tài nguyên do Shinju Ch. chia sẻ",
         "keywords": "tải xuống, download, Shinju Ch."
       },
       "channel": {
         "title": "Shinju Ch. Channel",
-        "description": "Các kênh mạng xã hội của Shinju Ch.\nYouTube và các nền tảng khác.",
+        "description": "Trang mạng xã hội cá nhân Shinju Ch.",
         "keywords": "Shinju Ch., ShinjuVNer, YouTube, mạng xã hội"
       },
       "donate": {
         "title": "Ủng Hộ — Shinju Ch.",
         "description": "Ủng hộ Shinju Ch. để duy trì và phát triển nội dung.",
-        "keywords": "ủng hộ, donate, Shinju Ch."
+        "keywords": "ủng hộ, đóng góp, Shinju Ch."
       }
     }
   },
