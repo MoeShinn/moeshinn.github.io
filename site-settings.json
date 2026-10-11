@@ -20,13 +20,15 @@
   "theme": {
     "default": "snow",
     "intensity": 0.7,
+    "wash": 0.6,
+    "dim": 0,
     "forceMotion": true,
     "pages": {
       "home": "stars",
       "post": "fireflies",
       "download": "aurora",
       "channel": "stars",
-      "donate": "stars"
+      "donate": "bubbles"
     }
   },
   "seo": {
