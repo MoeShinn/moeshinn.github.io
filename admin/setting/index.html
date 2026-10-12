@@ -19,7 +19,22 @@ const toSquare = (file, size) => new Promise((res, rej) => {
     c.getContext("2d").drawImage(im, (w - m) / 2, (h - m) / 2, m, m, 0, 0, size, size); URL.revokeObjectURL(u);
     const d = c.toDataURL("image/webp", 0.9), ok = d.startsWith("data:image/webp"); res({ b64: (ok ? d : c.toDataURL("image/png")).split(",")[1], ext: ok ? "webp" : "png" }); };
   im.onerror = () => rej(new Error("Không đọc được ảnh đại diện")); im.src = u; });
-const FAV = [["favicon-32.png", 32], ["favicon-180.png", 180], ["favicon-192.png", 192], ["favicon-512.png", 512]];
+// Favicon: "icon" (bo góc kiểu Android / tròn / vuông gốc), "apple" (vuông kín nền, iOS tự bo), "maskable" (vuông kín, ảnh thu vào vùng an toàn 66% để Android cắt hình tròn/giọt nước không mất ảnh)
+const FAV = [["favicon-32.png", 32, "icon"], ["favicon-180.png", 180, "apple"], ["favicon-192.png", 192, "icon"], ["favicon-512.png", 512, "icon"], ["maskable-512.png", 512, "maskable"]];
+const rr = (g, x, y, w, h, r) => { r = Math.min(r, w / 2, h / 2); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
+const toIcon = (file, size, kind, o) => new Promise((res, rej) => {
+  const u = URL.createObjectURL(file), im = new Image();
+  im.onload = () => {
+    const c = document.createElement("canvas"); c.width = c.height = size; const g = c.getContext("2d");
+    const w = im.naturalWidth || size, h = im.naturalHeight || size, m = Math.min(w, h);
+    const pad = kind === "maskable" ? 0.17 : kind === "apple" ? Math.max(o.pad, 0.08) : o.pad;
+    const r = kind !== "icon" ? 0 : o.style === "circle" ? size / 2 : o.style === "rounded" ? size * 0.225 : 0;
+    g.beginPath(); rr(g, 0, 0, size, size, r); g.clip();
+    if (kind !== "icon" || o.bgOn) { g.fillStyle = o.bg; g.fillRect(0, 0, size, size); }
+    const inner = size * (1 - 2 * pad); g.drawImage(im, (w - m) / 2, (h - m) / 2, m, m, size * pad, size * pad, inner, inner);
+    URL.revokeObjectURL(u); res(c.toDataURL("image/png").split(",")[1]); };
+  im.onerror = () => rej(new Error("Không đọc được ảnh favicon")); im.src = u; });
+const favOpts = () => ({ style: $("#fav_style").value, bgOn: $("#fav_bgon").checked, bg: $("#fav_bg").value, pad: $("#fav_pad").value / 100 });
 // Cắt ảnh vuông ở giữa rồi đổi sang PNG (base64) theo kích thước size.
 const toPng = (file, size) => new Promise((res, rej) => {
   const u = URL.createObjectURL(file), im = new Image();
@@ -37,6 +52,7 @@ const DEF = {
   theme: { default: "none", intensity: 0.7, wash: 0.6, dim: 0, forceMotion: false, pages: { home: "", post: "", download: "", channel: "", donate: "" } },
   seo: AdminSeo.DEFAULT,
   telegram: mergeTg(),
+  blog: { featuredCount: 10, featuredTitle: "", recentCount: 10 },
 };
 Admin.boot({ id: "setting", title: "Cài đặt", async render(main) {
   const { esc, $ } = Admin;
@@ -44,7 +60,7 @@ Admin.boot({ id: "setting", title: "Cài đặt", async render(main) {
   let S, D;
   try { [S, D] = await Promise.all([Admin.readJson("site-settings.json", DEF), Admin.readJson("data.json")]); }
   catch (e) { main.innerHTML = `<h2>Cài đặt</h2><p class="err">${esc(e.message)}</p>`; return; }
-  S = { ...DEF, ...S, seo: AdminSeo.merge(S.seo), telegram: mergeTg(S.telegram), giscus: { ...DEF.giscus, ...S.giscus }, announcement: { ...DEF.announcement, ...S.announcement }, maintenance: { ...DEF.maintenance, ...S.maintenance },
+  S = { ...DEF, ...S, seo: AdminSeo.merge(S.seo), telegram: mergeTg(S.telegram), blog: { ...DEF.blog, ...S.blog }, giscus: { ...DEF.giscus, ...S.giscus }, announcement: { ...DEF.announcement, ...S.announcement }, maintenance: { ...DEF.maintenance, ...S.maintenance },
     theme: { ...DEF.theme, ...S.theme, pages: { ...DEF.theme.pages, ...((S.theme || {}).pages) } } };
   const chk = (id, v, t) => `<label class="row"><input type="checkbox" id="${id}" ${v ? "checked" : ""}>${t}</label>`;
   main.innerHTML = `<h2>Cài đặt</h2>
@@ -59,6 +75,7 @@ Admin.boot({ id: "setting", title: "Cài đặt", async render(main) {
     <label class="row" style="margin-top:8px"><input type="checkbox" id="av_logo" ${(D.nav?.logo || "") === (D.profile?.avatar || "") ? "checked" : ""}>Dùng luôn ảnh này làm logo ở thanh menu</label></div>
   <div class="card"><h3>SEO từng trang &amp; favicon</h3>
     <label>Tên site<input id="seo_name" value="${esc(S.seo.siteName)}"></label>
+    <label>Độ dài mã link rút gọn tự sinh (4–24 ký tự: a-z, A-Z, 0-9). Chỉ áp dụng cho link tạo MỚI, link cũ giữ nguyên<input id="sl_len" type="number" min="4" max="24" value="${esc(S.seo.shortLength || 10)}"></label>
     <label>Ảnh chia sẻ mặc định (URL, tùy chọn)<input id="seo_og" value="${esc(S.seo.ogImage)}" placeholder="https://..."></label>
     ${Object.entries(PAGES).map(([k, l]) => `<details ${k === "home" ? "open" : ""}><summary>${l}</summary>
       <label>Tiêu đề (nên ≤ 60 ký tự)<input id="seo_${k}_t" value="${esc(S.seo.pages[k].title)}"></label>
@@ -66,8 +83,17 @@ Admin.boot({ id: "setting", title: "Cài đặt", async render(main) {
       <label>Từ khóa (cách nhau bằng dấu phẩy)<input id="seo_${k}_k" value="${esc(S.seo.pages[k].keywords)}"></label>
       <button type="button" class="ghost" data-ai="${k}">✨ Gợi ý mô tả và từ khóa bằng AI</button></details>`).join("")}
     <label style="margin-top:12px">Favicon mới (ảnh vuông, ≥ 512px là đẹp nhất)<input id="fav" type="file" accept="image/*"></label>
-    <img id="favprev" src="${esc(S.seo.favicon.icon)}" width="48" height="48" alt="" style="border-radius:8px;background:#0a1626">
+    <div class="cols"><label>Kiểu icon<select id="fav_style"><option value="rounded" ${(S.seo.favicon.style || "rounded") === "rounded" ? "selected" : ""}>Bo góc kiểu Android (khuyên dùng)</option><option value="circle" ${S.seo.favicon.style === "circle" ? "selected" : ""}>Tròn</option><option value="square" ${S.seo.favicon.style === "square" ? "selected" : ""}>Vuông gốc</option></select></label>
+      <label>Viền trống quanh ảnh: <b id="fav_pv">${Math.round((S.seo.favicon.pad ?? 0.08) * 100)}</b>%<input id="fav_pad" type="range" min="0" max="20" step="1" value="${Math.round((S.seo.favicon.pad ?? 0.08) * 100)}"></label>
+      <label class="row"><input type="checkbox" id="fav_bgon" ${S.seo.favicon.bgOn === false ? "" : "checked"}>Có nền màu sau ảnh</label>
+      <label>Màu nền<input id="fav_bg" type="color" value="${esc(S.seo.favicon.bg || "#ffffff")}" style="height:38px;padding:2px"></label></div>
+    <canvas id="favprev2" width="96" height="96" style="width:48px;height:48px;border-radius:8px;background:#0a1626"></canvas> <img id="favprev" src="${esc(S.seo.favicon.icon)}" width="48" height="48" alt="" style="border-radius:8px;background:#0a1626">
     <p class="hint">Khi lưu, tui tự tạo các cỡ 32 / 180 / 192 / 512 px và ghi thẳng vào thẻ &lt;head&gt; của 5 trang, nên Google và Zalo/Facebook đọc được ngay. Trình duyệt có thể giữ favicon cũ vài phút đến vài giờ.</p></div>
+  <div class="card"><h3>Trang bài đăng (/post)</h3>
+    <label>Số bài nổi bật hiển thị (0 = ẩn mục nổi bật)<input id="bl_f" type="number" min="0" max="30" value="${esc(S.blog.featuredCount)}"></label>
+    <label>Tiêu đề mục nổi bật (để trống: dùng "🔥 Top bài đăng nổi bật"), ví dụ: Top 3 bài được xem nhiều nhất<input id="bl_t" maxlength="60" value="${esc(S.blog.featuredTitle)}"></label>
+    <label>Số bài mới hiển thị trước khi bấm "Xem tất cả" (1–50)<input id="bl_r" type="number" min="1" max="50" value="${esc(S.blog.recentCount)}"></label>
+    <p class="hint">Để tiết kiệm dữ liệu cho người xem, danh sách chỉ hiện bài mới nhất; bấm "Xem tất cả bài đăng" mới hiện hết. Lượt xem chỉ được tải cho các bài mới nhất.</p></div>
   <div class="card"><h3>Giao diện / nền động</h3>
     <div id="fxprev" style="position:relative;height:170px;border-radius:10px;overflow:hidden;background:linear-gradient(#050b16,#10243f);margin-bottom:12px"></div>
     <label>Nền mặc định cho cả web<select id="th_def">${themeOpts(S.theme.default, false)}</select></label>
@@ -103,7 +129,9 @@ Admin.boot({ id: "setting", title: "Cài đặt", async render(main) {
   <p class="hint">Lưu ý: nền động và SEO có hiệu lực sau khi lưu (khoảng 1 phút). Các mục thông báo, bảo trì và bình luận đã được lưu vào <code>site-settings.json</code>, nhưng web công khai sẽ đọc chúng ở các giai đoạn sau.</p>
   <button id="save">Lưu thay đổi</button>`;
   $("#av_file").onchange = (e) => { const f = e.target.files[0]; if (f) $("#av_prev").src = URL.createObjectURL(f); };
-  $("#fav").onchange = (e) => { const f = e.target.files[0]; if (f) $("#favprev").src = URL.createObjectURL(f); };
+  const drawFav = async () => { const f = $("#fav").files[0]; if (!f) return; try { const d = await toIcon(f, 96, "icon", favOpts()); $("#favprev").src = "data:image/png;base64," + d; } catch (e) { /* bỏ qua */ } };
+  $("#fav").onchange = drawFav; ["fav_style", "fav_bgon", "fav_bg"].forEach((i) => ($("#" + i).onchange = drawFav)); $("#fav_pad").oninput = () => { $("#fav_pv").textContent = $("#fav_pad").value; drawFav(); };
+  $("#favprev2").style.display = "none";
   main.querySelectorAll("[data-ai]").forEach((b) => (b.onclick = async () => {
     const k = b.dataset.ai; b.disabled = true;
     try {
@@ -144,14 +172,18 @@ Admin.boot({ id: "setting", title: "Cài đặt", async render(main) {
     S.theme = { default: val("th_def"), intensity: $("#th_int").value / 100, wash: $("#th_wash").value / 100, dim: $("#th_dim").value / 100, forceMotion: $("#th_force").checked, pages: Object.fromEntries(Object.keys(PAGES).map((k) => [k, val("th_" + k)])) };
     const th = (id) => [...new Set($(id).value.split(/[,\s]+/).map(Number).filter((n) => n > 0))].sort((a, b) => a - b);
     S.telegram = { login: $("#tg_login").checked, loginFail: $("#tg_fail").checked, views: { enabled: $("#tg_v").checked, thresholds: th("#tg_vt") }, downloads: { enabled: $("#tg_d").checked, thresholds: th("#tg_dt") } };
+    const num = (id, d, lo, hi) => { const n = Math.round(Number($("#" + id).value)); return Number.isFinite(n) && $("#" + id).value !== "" ? Math.min(hi, Math.max(lo, n)) : d; };
+    S.seo.shortLength = num("sl_len", 10, 4, 24);
+    S.blog = { featuredCount: num("bl_f", 10, 0, 30), featuredTitle: val("bl_t"), recentCount: num("bl_r", 10, 1, 50) };
     S.seo.siteName = val("seo_name"); S.seo.ogImage = val("seo_og");
     for (const k of Object.keys(PAGES)) S.seo.pages[k] = { title: val(`seo_${k}_t`), description: val(`seo_${k}_d`), keywords: val(`seo_${k}_k`) };
     try {
       const files = [], favFile = $("#fav").files[0];
       if (favFile) {
         const v = Date.now().toString(36);
-        for (const [name, size] of FAV) files.push({ path: "assets/favicon/" + name, content: await toPng(favFile, size), encoding: "base64" });
-        S.seo.favicon = { icon: "/assets/favicon/favicon-32.png?v=" + v, apple: "/assets/favicon/favicon-180.png?v=" + v, v };
+        const fo = favOpts();
+        for (const [name, size, kind] of FAV) files.push({ path: "assets/favicon/" + name, content: await toIcon(favFile, size, kind, fo), encoding: "base64" });
+        S.seo.favicon = { icon: "/assets/favicon/favicon-32.png?v=" + v, apple: "/assets/favicon/favicon-180.png?v=" + v, v, maskable: true, style: fo.style, bg: fo.bg, bgOn: fo.bgOn, pad: fo.pad };
       }
       const deletes = [], avFile = $("#av_file").files[0];
       if (avFile) { // tên file có mã phiên bản → không bị cache cũ; xóa ảnh avatar cũ nằm trong assets/avatar/

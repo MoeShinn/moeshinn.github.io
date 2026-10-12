@@ -6,6 +6,8 @@
     ["dashboard", "Dashboard", "/admin/"],
     ["post", "Bài đăng", "/admin/post/"],
     ["download", "Download", "/admin/download/"],
+    ["channel", "Kênh", "/admin/channel/"],
+    ["donate", "Donate", "/admin/donate/"],
     ["links", "Link rút gọn", "/admin/links/"],
     ["ads", "Quảng cáo", "/admin/ads/"],
     ["stats", "Số liệu", "/admin/stats/"],

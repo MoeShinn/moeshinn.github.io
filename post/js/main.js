@@ -183,7 +183,9 @@ function renderCards(container, posts) {
             sessionStorage.setItem(CAME_FROM_HOME_KEY, "1");
         });
         const viewsHtml =
-            p.views != null
+            p.views === undefined
+                ? ""
+                : p.views != null
                 ? `${p.views} lượt xem`
                 : `<span class="views-loading" aria-label="Đang tải lượt xem">Đang tải<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></span>`;
         card.innerHTML = `
@@ -220,14 +222,14 @@ function homeTemplate() {
 
     <div data-default-sections>
       <section class="post-section">
-        <h2>🔥 Top bài đăng nổi bật</h2>
+        <h2 data-featured-title>🔥 Top bài đăng nổi bật</h2>
         <div class="post-grid" data-top10></div>
       </section>
 
       <section class="post-section">
         <h2>📝 Bài đăng gần đây</h2>
         <div class="post-grid" data-recent></div>
-        <button type="button" class="show-all-btn" data-show-all>Hiện toàn bộ bài đăng</button>
+        <button type="button" class="show-all-btn" data-show-all>Xem tất cả bài đăng</button>
       </section>
     </div>
   `;
@@ -241,6 +243,21 @@ async function renderHomePage() {
     // bg — let the loading screen close as soon as that's ready.
     if (window.SiteLoading) window.SiteLoading.ready();
 
+    // Cài đặt hiển thị (sửa ở /admin → Cài đặt → Bài đăng): số bài nổi bật, tiêu đề mục nổi bật, số bài mới hiển thị trước khi bấm "Xem tất cả".
+    let blog = {};
+    try {
+        const r = await fetch("/site-settings.json", { cache: "no-cache" });
+        if (r.ok) blog = (await r.json()).blog || {};
+    } catch (e) { /* dùng mặc định */ }
+    const clampInt = (v, d, lo, hi) => { const n = Number(v); return Number.isFinite(n) && v !== "" && v != null ? Math.min(hi, Math.max(lo, Math.round(n))) : d; };
+    const FEATURED = clampInt(blog.featuredCount, 10, 0, 30);
+    const RECENT = clampInt(blog.recentCount, 10, 1, 50);
+    const featuredTitle = document.querySelector("[data-featured-title]");
+    if (featuredTitle) {
+        if (FEATURED === 0) featuredTitle.closest("section").remove();
+        else if (String(blog.featuredTitle || "").trim()) featuredTitle.textContent = String(blog.featuredTitle).trim();
+    }
+
     let posts = [];
     try {
         posts = await loadPosts();
@@ -252,11 +269,12 @@ async function renderHomePage() {
     posts = posts.filter(isPublic);
 
     const today = new Date();
-    function computeScored(viewsMap) {
+    function computeScored(viewsMap, scanDone) {
         return posts.map((p) => {
             const days = Math.max(1, Math.floor((today - parseDate(p.date)) / 86400000));
             const known = viewsMap[p.id];
-            return { ...p, views: known == null ? null : known, score: (known || 0) / days };
+            // views: số (đã biết) | null (đang tải) | undefined (bài cũ, không hỏi lượt xem để tiết kiệm dữ liệu)
+            return { ...p, views: known == null ? (scanDone && !scanIds.has(p.id) ? undefined : null) : known, score: (known || 0) / days };
         });
     }
     function byNewest(list) {
@@ -267,12 +285,12 @@ async function renderHomePage() {
     //    a loading pulse — so the person sees the post list immediately
     //    instead of an empty page while Abacus is contacted.
     let scored = computeScored({});
-    renderCards(document.querySelector("[data-top10]"), byNewest(scored).slice(0, 10));
-    renderCards(document.querySelector("[data-recent]"), byNewest(scored).slice(0, 5));
+    renderCards(document.querySelector("[data-top10]"), byNewest(scored).slice(0, FEATURED));
+    renderCards(document.querySelector("[data-recent]"), byNewest(scored).slice(0, RECENT));
 
     const showAllBtn = document.querySelector("[data-show-all]");
     let showingAll = false;
-    if (posts.length <= 5) {
+    if (posts.length <= RECENT) {
         showAllBtn.remove();
     } else {
         showAllBtn.addEventListener("click", () => {
@@ -312,22 +330,24 @@ async function renderHomePage() {
     // 2) Fetch real view counts in the background (each request already
     //    has its own 4s timeout; this outer race is a second safety net),
     //    then refresh the view numbers and re-sort "nổi bật" by score.
+    // Chỉ hỏi lượt xem của các bài mới nhất (đủ để chọn "nổi bật"): đỡ tốn dữ liệu mạng khi có nhiều bài. Bài cũ hơn không hiện lượt xem ở danh sách.
     const viewsMap = {};
+    const scanIds = new Set(byNewest(posts).slice(0, Math.max(40, FEATURED * 3, RECENT)).map((p) => p.id));
     await Promise.race([
         Promise.all(
-            posts.map(async (p) => {
+            posts.filter((p) => scanIds.has(p.id)).map(async (p) => {
                 viewsMap[p.id] = await getViews(p.id);
             })
         ),
         new Promise((resolve) => setTimeout(resolve, 6000)),
     ]);
 
-    scored = computeScored(viewsMap);
-    const top10 = [...scored].sort((a, b) => b.score - a.score).slice(0, 10);
+    scored = computeScored(viewsMap, true);
+    const top10 = [...scored].filter((p) => scanIds.has(p.id)).sort((a, b) => b.score - a.score).slice(0, FEATURED);
     const newestFirst = byNewest(scored);
 
     renderCards(document.querySelector("[data-top10]"), top10);
-    renderCards(document.querySelector("[data-recent]"), showingAll ? newestFirst : newestFirst.slice(0, 5));
+    renderCards(document.querySelector("[data-recent]"), showingAll ? newestFirst : newestFirst.slice(0, RECENT));
     if (currentQuery) {
         renderCards(document.querySelector("[data-search-grid]"), filterPosts(scored, currentQuery));
     }

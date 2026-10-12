@@ -83,6 +83,7 @@ function render(data, overlayApi) {
     if (list) {
         list.innerHTML = "";
         (data.methods || []).forEach((method) => {
+            if (method.visible === false) return; // ẩn cả nhóm (đặt trong /admin → Donate)
             // visible: false hides that specific button (public/private
             // toggle); omitted or true means shown. A group with zero
             // visible buttons is skipped entirely, not shown empty.

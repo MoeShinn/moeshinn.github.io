@@ -4,7 +4,7 @@
   const URLS = { home: "/", post: "/post/", download: "/download/", channel: "/channel/", donate: "/donate/" };
   const FILE = { home: "index.html", post: "post/index.html", download: "download/index.html", channel: "channel/index.html", donate: "donate/index.html" };
   const DEFAULT = {
-    siteUrl: "https://shinjuvn.github.io", siteName: "Shinju Ch.", ogImage: "",
+    siteUrl: "https://shinjuvn.github.io", siteName: "Shinju Ch.", ogImage: "", shortLength: 10, // shortLength: số ký tự mã rút gọn /s/ tự sinh
     favicon: { icon: "/assets/favicon.png", apple: "", v: "" },
     pages: {
       home: { title: "Shinju Ch.", description: "Trang cá nhân của Shinju Ch. (@ShinjuVNer): mạng xã hội, ủng hộ và các bài đăng mới.", keywords: "Shinju Ch., ShinjuVNer, Shinju, mạng xã hội, blog" },
@@ -31,6 +31,7 @@
     if (seo.ogImage) L.push(`<meta property="og:image" content="${a(seo.ogImage)}" />`);
     L.push(`<meta name="twitter:card" content="${seo.ogImage ? "summary_large_image" : "summary"}" />`);
     L.push(`<link rel="icon" type="image/png" sizes="32x32" href="${a(f.icon)}" />`);
+    if (f.v) L.push(`<link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon/favicon-192.png?v=${a(f.v)}" />`);
     if (f.apple) L.push(`<link rel="apple-touch-icon" href="${a(f.apple)}" />`);
     L.push("<!-- seo:end -->");
     return L.join("\n  ");
@@ -40,7 +41,7 @@
   // manifest.webmanifest của PWA; biểu tượng 192/512 chỉ có sau khi đã tải favicon ở Cài đặt
   function manifest(seo) {
     const f = seo.favicon, name = seo.siteName;
-    const icons = f.v ? [{ src: "/assets/favicon/favicon-192.png", sizes: "192x192", type: "image/png" }, { src: "/assets/favicon/favicon-512.png", sizes: "512x512", type: "image/png" }] : [{ src: f.icon, sizes: "any", type: "image/png" }];
+    const icons = f.v ? [{ src: "/assets/favicon/favicon-192.png", sizes: "192x192", type: "image/png", purpose: "any" }, { src: "/assets/favicon/favicon-512.png", sizes: "512x512", type: "image/png", purpose: "any" }].concat(f.maskable ? [{ src: "/assets/favicon/maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" }] : []) : [{ src: f.icon, sizes: "any", type: "image/png" }];
     return JSON.stringify({ name, short_name: name.slice(0, 12), description: seo.pages.home.description, start_url: "/", scope: "/", display: "standalone", background_color: "#050b16", theme_color: "#050b16", lang: "vi", icons }, null, 2) + "\n";
   }
   return { PAGES, URLS, FILE, DEFAULT, merge, block, apply, manifest };

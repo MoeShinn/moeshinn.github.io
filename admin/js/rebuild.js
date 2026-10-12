@@ -9,7 +9,7 @@
     const dlIds = tree.map((p) => (p.match(/^download\/data\/([^/]+)\.json$/) || [])[1]).filter(Boolean);
     const dls = [];
     for (const id of dlIds) { const data = JSON.parse(await A.readText(`download/data/${id}.json`)); if (data.short) used.add(data.short); dls.push({ id, data }); }
-    const short = (o) => { if (!o.short) { o.short = PG.newShortCode(used); used.add(o.short); } return o.short; };
+    const short = (o) => { if (!o.short) { o.short = PG.newShortCode(used, seo.shortLength); used.add(o.short); } return o.short; };
     const files = [], keep = new Set(), total = posts.length + dls.length; let n = 0;
 
     for (const p of posts) {
@@ -47,7 +47,7 @@
       if (entry.short && has(`s/${entry.short}/index.html`)) deletes.push(`s/${entry.short}/index.html`);
     } else {
       const { meta, body } = render.parseFrontmatter(md);
-      if (!entry.short) { entry.short = PG.newShortCode(used); }
+      if (!entry.short) { entry.short = PG.newShortCode(used, seo.shortLength); }
       files.push({ path: `post/${id}/index.html`, content: PG.buildPostPage(shell, { id, meta, bodyMd: body, bodyHtml: render.renderPostBody(body), seo, updated: entry.updated, visibility: entry.visibility }) },
         { path: `s/${entry.short}/index.html`, content: PG.buildShortPage({ id, meta, desc: meta.description || PG.excerpt(body), seo }) });
     }
@@ -71,7 +71,7 @@
   async function saveDownload(A, { id, data, seo, message }) {
     const [shell, tree, posts] = await Promise.all([A.readText("download/index.html"), A.api("/tree").then((r) => r.files.map((f) => f.path)), A.readJson("post/data/posts.json", [])]);
     const used = new Set(tree.map((p) => (p.match(/^s\/([^/]+)\/index\.html$/) || [])[1]).filter(Boolean)); posts.forEach((p) => p.short && used.add(p.short));
-    if (!data.short) data.short = PG.newShortCode(used);
+    if (!data.short) data.short = PG.newShortCode(used, seo.shortLength);
     const files = [{ path: `download/data/${id}.json`, content: JSON.stringify(data, null, 2) + "\n" },
       { path: `download/${id}/index.html`, content: PG.buildDownloadPage(shell, { id, data, seo }) },
       { path: `s/${data.short}/index.html`, content: PG.buildShortPage({ id, base: "download", meta: { title: data.title || "Tải xuống", photo: data.photo }, desc: data.description || `Tải xuống ${data.title || id}`, seo }) }];

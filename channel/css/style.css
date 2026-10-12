@@ -255,13 +255,14 @@ body {
 
 .status-dot {
     position: absolute;
-    right: 6px;
-    bottom: 8px;
-    width: 22px;
-    height: 22px;
+    right: calc(14.645% - 14px);
+    bottom: calc(14.645% - 14px);
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
-    background: var(--dot-online);
-    border: 3px solid #120a26;
+    background: var(--dot, var(--dot-online));
+    border: 2px solid #120a26;
+    box-shadow: 0 0 10px var(--dot, var(--dot-online));
 }
 
 .display-name {
@@ -380,4 +381,13 @@ body {
         width: 140px;
         height: 140px;
     }
+}
+
+.link-section-title {
+    margin: 10px 0 -4px;
+    font-size: 18px;
+    font-weight: 800;
+    text-align: center;
+    color: #ffffff;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }

@@ -74,10 +74,16 @@
         const t = new Date(status.expires).getTime();
         return isNaN(t) || t > Date.now(); // hạn không đọc được thì coi như còn hạn
     }
+    // Danh sách cảm xúc = có sẵn (moods.json) + do bạn tự tạo (status.json → custom: [{id, icon, label, text, theme}])
+    function allMoods(moods, status) {
+        const own = ((status && status.custom) || []).filter((c) => c && c.id && c.icon)
+            .map((c) => ({ id: c.id, icon: c.icon, label: c.label || "", text: c.text || "", theme: c.theme || DEFAULT_THEME, custom: true }));
+        return (moods.moods || []).concat(own);
+    }
     function themeFor(status, moods) {
         if (status && THEMES.includes(status.loading)) return status.loading; // admin chọn cố định một theme
         if (isActive(status) && status.mood) {
-            const m = (moods.moods || []).find((x) => x.id === status.mood);
+            const m = allMoods(moods, status).find((x) => x.id === status.mood);
             if (m && THEMES.includes(m.theme)) return m.theme;
         }
         return DEFAULT_THEME;
@@ -101,21 +107,25 @@
         if (!/^\/(index\.html)?$/.test(location.pathname)) return; // bong bóng trạng thái chỉ hiện ở trang chủ
         const wrap = document.querySelector(".avatar-wrap");
         if (!wrap || !isActive(status) || wrap.querySelector(".status-bubble")) return;
-        const mood = (moods.moods || []).find((x) => x.id === status.mood);
+        const mood = allMoods(moods, status).find((x) => x.id === status.mood);
         let text = (status.text || "").trim();
-        if (!text && mood) { // có cảm xúc mà không có lời → "Tên đang cảm thấy …"
+        // Trạng thái tự tạo: lời trống thì KHÔNG tự thêm câu nào, chỉ hiện icon trong khung trắng.
+        if (!text && mood && mood.custom) text = (mood.text || "").trim();
+        else if (!text && mood) { // cảm xúc có sẵn mà không có lời → "Tên đang cảm thấy …"
             let name = "Shinju Ch.";
             try { const d = await (await fetch("/data.json")).json(); name = (d.profile && d.profile.name) || name; } catch (e) { /* dùng tên mặc định */ }
             text = `${name} ${mood.phrase}`;
         }
-        if (!text) return;
+        if (!text && !(mood && mood.custom)) return;
         const b = document.createElement("div");
-        b.className = "status-bubble";
+        b.className = "status-bubble" + (text ? "" : " icon-only");
         b.setAttribute("role", "status");
         if (mood) { const i = document.createElement("span"); i.className = "sb-icon"; i.textContent = mood.icon; b.appendChild(i); }
-        const t = document.createElement("span");
-        t.textContent = text; // textContent: không chèn HTML từ nội dung status
-        b.appendChild(t);
+        if (text) {
+            const t = document.createElement("span");
+            t.textContent = text; // textContent: không chèn HTML từ nội dung status
+            b.appendChild(t);
+        }
         wrap.classList.add("has-status");
         wrap.insertBefore(b, wrap.firstChild);
     }

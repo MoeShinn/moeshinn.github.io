@@ -13,7 +13,7 @@
   // id = slug tiêu đề + "-" + 9 chữ số ngẫu nhiên, không trùng id đang có
   const newPostId = (title, used = new Set()) => uniq(() => slugify(title) + "-" + Array.from({ length: 9 }, () => rndInt(10)).join(""), used);
   // mã rút gọn 10 ký tự a-z A-Z 0-9, không trùng
-  const newShortCode = (used = new Set()) => uniq(() => Array.from({ length: 10 }, () => ALNUM[rndInt(62)]).join(""), used);
+  const newShortCode = (used = new Set(), len = 10) => { const n = Math.min(24, Math.max(4, Math.round(Number(len)) || 10)); return uniq(() => Array.from({ length: n }, () => ALNUM[rndInt(62)]).join(""), used); };
 
   const excerpt = (md, max = 155) => {
     const s = String(md || "").replace(/<[^>]*>/g, " ").replace(/!\[[^\]]*\]\([^)]*\)/g, " ").replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
@@ -41,6 +41,7 @@
       `<meta property="og:title" content="${a(meta.title || title)}" />`, `<meta property="og:description" content="${a(desc)}" />`, `<meta property="og:url" content="${a(url)}" />`);
     if (img) L.push(`<meta property="og:image" content="${a(img)}" />`);
     L.push(`<meta name="twitter:card" content="${img ? "summary_large_image" : "summary"}" />`, `<link rel="icon" type="image/png" sizes="32x32" href="${a(f.icon)}" />`);
+    if (f.v) L.push(`<link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon/favicon-192.png?v=${a(f.v)}" />`);
     if (f.apple) L.push(`<link rel="apple-touch-icon" href="${a(f.apple)}" />`);
     L.push(`<script type="application/ld+json" id="post-jsonld">${jsonSafe(ld)}</script>`, "<!-- seo:end -->");
     const re = /<!-- seo:start -->[\s\S]*?<!-- seo:end -->/, mount = '<div id="app" class="page"></div>';
@@ -73,6 +74,7 @@
     L.push(`<link rel="canonical" href="${a(url)}" />`, `<meta property="og:type" content="website" />`, `<meta property="og:site_name" content="${a(name)}" />`, `<meta property="og:title" content="${a(title)}" />`, `<meta property="og:description" content="${a(desc)}" />`, `<meta property="og:url" content="${a(url)}" />`);
     if (img) L.push(`<meta property="og:image" content="${a(img)}" />`);
     L.push(`<meta name="twitter:card" content="${img ? "summary_large_image" : "summary"}" />`, `<link rel="icon" type="image/png" sizes="32x32" href="${a(f.icon)}" />`);
+    if (f.v) L.push(`<link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon/favicon-192.png?v=${a(f.v)}" />`);
     if (f.apple) L.push(`<link rel="apple-touch-icon" href="${a(f.apple)}" />`);
     L.push("<!-- seo:end -->");
     const re = /<!-- seo:start -->[\s\S]*?<!-- seo:end -->/, mount = '<div id="app" class="page"></div>';

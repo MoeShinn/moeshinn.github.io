@@ -218,3 +218,19 @@
 @media (prefers-reduced-motion: reduce) {
     .status-bubble { animation: none; }
 }
+
+/* Trạng thái tự tạo không có lời: khung trắng chỉ chứa icon */
+.status-bubble.icon-only {
+    min-width: 0;
+    padding: 8px 14px;
+    border-radius: 18px;
+}
+
+    .status-bubble.icon-only .sb-icon {
+        position: static;
+        width: auto;
+        height: auto;
+        background: none;
+        box-shadow: none;
+        font-size: 24px;
+    }
