@@ -24,7 +24,7 @@ Admin.boot({ id: "links", title: "Link rút gọn", async render(main) {
   const draw = () => {
     main.innerHTML = `<h2>Link rút gọn</h2>
     <div class="card"><h3 id="ft">${editing ? "Sửa link" : "Thêm link tự đặt"}</h3>
-      <label>ID (phần sau ${esc(site)}/s/)<input id="l_id" placeholder="musicboxplugin" value="${esc(editing ? editing.id : "")}"></label>
+      <label>ID (phần sau ${esc(site)}/s/) — để trống: tự sinh ngẫu nhiên ${esc(seo.shortLength || 10)} ký tự<input id="l_id" placeholder="musicboxplugin" value="${esc(editing ? editing.id : "")}"></label>
       <label>Đích: đường dẫn trong web (vd /post/ten-bai/) hoặc link đầy đủ (https://…)<input id="l_url" value="${esc(editing ? editing.url : "")}"></label>
       <label>Tiêu đề khi chia sẻ (tùy chọn)<input id="l_title" value="${esc(editing ? editing.title : "")}"></label>
       <label>Mô tả khi chia sẻ (tùy chọn)<input id="l_desc" value="${esc(editing ? editing.description : "")}"></label>
@@ -42,8 +42,10 @@ Admin.boot({ id: "links", title: "Link rút gọn", async render(main) {
     }));
     if (editing) $("#l_cancel").onclick = () => { editing = null; draw(); };
     $("#l_save").onclick = async () => {
-      const v = (i) => $("#" + i).value.trim(), id = v("l_id"), r = PostGen.resolveTarget(seo, v("l_url"));
+      const v = (i) => $("#" + i).value.trim(), r = PostGen.resolveTarget(seo, v("l_url")); let id = v("l_id");
       const taken = new Set([...sDirs, ...auto.map((a) => a[0]), ...links.map((l) => l.id)].map((x) => x.toLowerCase())); if (editing) taken.delete(editing.id.toLowerCase());
+      // ID để trống: tự sinh mã ngẫu nhiên (a-z, A-Z, 0-9) dài đúng số ký tự đặt trong Cài đặt, không trùng link nào (kể cả khác hoa/thường). Đang sửa mà xóa trống ID thì giữ ID cũ.
+      if (!id) { if (editing) id = editing.id; else do { id = PostGen.newShortCode(new Set(), seo.shortLength); } while (taken.has(id.toLowerCase())); }
       const err = PostGen.linkIdError(id, taken) || (!r.ok && r.error) || (r.url.replace(/\/$/, "").toLowerCase().endsWith("/s/" + id.toLowerCase()) && "Đích không được trỏ về chính link này");
       if (err) return Admin.toast(err, true);
       const link = { id, url: v("l_url"), ...(v("l_title") && { title: v("l_title") }), ...(v("l_desc") && { description: v("l_desc") }), ...(v("l_img") && { image: v("l_img") }) };
