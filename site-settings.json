@@ -35,6 +35,7 @@
     "siteUrl": "https://shinjuvn.github.io",
     "siteName": "Shinju Ch.",
     "ogImage": "../assets/avatar.png",
+    "shortLength": 6,
     "favicon": {
       "icon": "/assets/favicon/favicon-32.png?v=mv2ezum2",
       "apple": "/assets/favicon/favicon-180.png?v=mv2ezum2",
@@ -87,5 +88,10 @@
         1000
       ]
     }
+  },
+  "blog": {
+    "featuredCount": 5,
+    "featuredTitle": "",
+    "recentCount": 10
   }
 }
