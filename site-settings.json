@@ -19,9 +19,9 @@
   },
   "theme": {
     "default": "snow",
-    "intensity": 0.8,
-    "wash": 0.6,
-    "dim": 0.1,
+    "intensity": 0.85,
+    "wash": 0.1,
+    "dim": 0.2,
     "forceMotion": true,
     "pages": {
       "home": "stars",
