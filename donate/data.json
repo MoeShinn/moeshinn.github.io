@@ -3,38 +3,14 @@
   "methods": [
     {
       "id": "ganknow",
-      "label": "Ganknow",
+      "label": "Donate qua",
       "buttons": [
         {
           "id": "ganknow",
+          "label": "Zypage",
           "type": "link",
-          "url": "https://ganknow.com/ShinjuVNer",
+          "url": "https://zypage.com/shinjuch",
           "visible": true
-        }
-      ]
-    },
-    {
-      "id": "vn-banking",
-      "label": "Internet Banking VN",
-      "buttons": [
-        {
-          "id": "vietcombank",
-          "label": "Vietcombank",
-          "type": "qr",
-          "qr": "/assets/donate/vietcombank-qr.png",
-          "visible": false
-        }
-      ]
-    },
-    {
-      "id": "momo",
-      "label": "Ví điện tử MoMo",
-      "buttons": [
-        {
-          "id": "momo",
-          "type": "qr",
-          "qr": "/assets/donate/momo-qr.jpg",
-          "visible": false
         }
       ]
     }
