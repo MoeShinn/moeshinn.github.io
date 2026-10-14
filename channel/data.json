@@ -4,11 +4,5 @@
     "avatar": "../assets/avatar.png",
     "statusColor": "#3ddc3d"
   },
-  "links": [
-    {
-      "id": "youtube",
-      "label": "Shinju Ch. [VNer Team]",
-      "url": "https://www.youtube.com/@ShinjuVNer"
-    }
-  ]
+  "links": []
 }
