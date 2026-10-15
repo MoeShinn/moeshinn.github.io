@@ -23,7 +23,7 @@ Máy bạn yếu hơn thì giảm thêm thông số, mạnh hơn thì tăng lên
 &cLưu ý:&r chỉ tải từ trang chủ chính thức để tránh bản crack, bản chứa virus hoặc bản gắn quảng cáo.
 
 <ul>
-<li>Truy cập: [obsproject.com](https://obsproject.com/)</li>
+<li>Truy cập: <a href="https://obsproject.com">obsproject.com</a></li>
 
 <li>Chọn đúng hệ điều hành: &aWindows&r, &bmacOS&r hoặc &6Linux&r</li>
 
