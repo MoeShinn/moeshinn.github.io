@@ -2,6 +2,8 @@
 title: "Hướng dẫn cài Optimized.zip cho Launcher"
 photo: "photo/so-sanh-minecraft-vanilla-den-toi-uu-hoa-mv9nycwt.webp"
 date: "16/10/2026"
+keywords: "Tối ưu minecraft, sodium, Optimized Fabric, Fabric Launcher, Prism Launcher, Legacy Launcher"
+description: "Hướng dẫn cài Optimized Fabric cho Minecraft bằng Legacy Launcher, Fabric Launcher, Prism Launcher"
 ---
 &7Bài này dùng:&r 
 | &eLegacy Launcher&r &7
