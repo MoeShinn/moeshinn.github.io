@@ -14,8 +14,8 @@
     "expires": ""
   },
   "maintenance": {
-    "enabled": false,
-    "message": "Trang web đang được cập nhật, vui lòng quay lại sau."
+    "enabled": true,
+    "message": "Trang web đang được xây dựng, vui lòng quay lại sau nha :3"
   },
   "theme": {
     "default": "snow",
