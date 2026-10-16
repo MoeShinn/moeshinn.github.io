@@ -34,7 +34,7 @@
   "seo": {
     "siteUrl": "https://shinjuvn.github.io",
     "siteName": "Shinju Ch.",
-    "ogImage": "../assets/avatar.png",
+    "ogImage": "https://shinjuvn.github.io/assets/avatar.png",
     "shortLength": 6,
     "favicon": {
       "icon": "/assets/favicon/favicon-32.png?v=mv2ezum2",
