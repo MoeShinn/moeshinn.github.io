@@ -90,8 +90,8 @@
     }
   },
   "blog": {
-    "featuredCount": 5,
+    "featuredCount": 4,
     "featuredTitle": "",
-    "recentCount": 10
+    "recentCount": 12
   }
 }
