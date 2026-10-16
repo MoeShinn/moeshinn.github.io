@@ -22,14 +22,6 @@ function labelText(label) {
   return label || "";
 }
 
-// Chỉ cho phép link http(s), mailto, tel hoặc đường dẫn nội bộ; chặn javascript:, data:, vbscript:...
-function safeHref(url) {
-  const u = String(url || "").trim();
-  const probe = u.replace(/[\u0000-\u0020\u007f]/g, "");
-  if (/^[a-z][a-z0-9+.-]*:/i.test(probe) && !/^(https?|mailto|tel):/i.test(probe)) return "#";
-  return u;
-}
-
 function render(data) {
   // Avatar + name
   const avatarImg = document.querySelector("[data-avatar]");
@@ -48,17 +40,15 @@ function render(data) {
   // Buttons
   const list = document.querySelector("[data-link-list]");
   if (list) {
-    list.replaceChildren();
+    list.innerHTML = "";
     data.buttons.forEach((btn) => {
       const a = document.createElement("a");
       a.className = `link-btn ${btn.style}`;
-      a.href = safeHref(btn.url);
-      const iconEl = document.createElement("span");
-      iconEl.className = "link-icon";
-      iconEl.innerHTML = ICONS[btn.icon] || ""; // SVG tĩnh từ /js/icons.js (code của site), không phải dữ liệu người dùng
-      const labelEl = document.createElement("span");
-      labelEl.textContent = labelText(btn.label); // văn bản thuần, không hiểu là HTML
-      a.append(iconEl, labelEl);
+      a.href = btn.url;
+      a.innerHTML = `
+        <span class="link-icon">${ICONS[btn.icon] || ""}</span>
+        <span>${labelText(btn.label)}</span>
+      `;
       list.appendChild(a);
     });
   }
@@ -82,4 +72,3 @@ async function init() {
 }
 
 init();
-
