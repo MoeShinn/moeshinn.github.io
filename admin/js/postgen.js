@@ -107,10 +107,19 @@
     .filter(Boolean).join("\n") + "\n" + String(body).replace(/\r\n/g, "\n").trim() + "\n";
   const todayDMY = () => { const d = new Date(); return [d.getDate(), d.getMonth() + 1].map((n) => String(n).padStart(2, "0")).concat(d.getFullYear()).join("/"); };
 
+  // Trang không có ngày riêng (trang chủ, /post/, /channel/, /donate/, các mục download) dùng ngày
+  // "lùi 3 ngày so với bài công khai cũ nhất"; nếu chưa có bài nào thì dùng hôm nay.
+  function sitemapBaseDate(posts) {
+    const ds = posts.filter((p) => !p.visibility || p.visibility === "public").map((p) => isoDate(p.date)).filter(Boolean).sort();
+    const d = ds.length ? new Date(ds[0] + "T00:00:00Z") : new Date();
+    d.setUTCDate(d.getUTCDate() - (ds.length ? 3 : 0));
+    return d.toISOString().slice(0, 10);
+  }
   function buildSitemap(seo, posts, downloads = []) {
-    const u = [["/", ""], ["/post/", ""], ["/channel/", ""], ["/donate/", ""]]
-      .concat(downloads.map((id) => [`/download/${encodeURIComponent(id)}/`, ""]))
-      .concat(posts.filter((p) => !p.visibility || p.visibility === "public").map((p) => [`/post/${encodeURIComponent(p.id)}/`, isoDate(p.updated || p.date)]));
+    const base = sitemapBaseDate(posts);
+    const u = [["/", base], ["/post/", base], ["/channel/", base], ["/donate/", base]]
+      .concat(downloads.map((id) => [`/download/${encodeURIComponent(id)}/`, base]))
+      .concat(posts.filter((p) => !p.visibility || p.visibility === "public").map((p) => [`/post/${encodeURIComponent(p.id)}/`, isoDate(p.updated || p.date) || base]));
     return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
       u.map(([p, d]) => `  <url><loc>${t(site(seo) + p)}</loc>${d ? `<lastmod>${d}</lastmod>` : ""}</url>`).join("\n") + `\n</urlset>\n`;
   }
@@ -118,3 +127,4 @@
 
   return { slugify, newPostId, newShortCode, excerpt, isoDate, buildPostPage, buildDownloadPage, buildShortPage, buildMarkdown, todayDMY, resolveTarget, linkIdError, buildLinkPage, buildSitemap, buildRobots };
 });
+

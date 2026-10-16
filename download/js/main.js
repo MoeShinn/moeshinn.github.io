@@ -41,6 +41,14 @@ function getFileId() {
     return m ? decodeURIComponent(m[1]) : null;
 }
 
+// Chỉ cho phép link http(s), mailto, tel hoặc đường dẫn nội bộ; chặn javascript:, data:, vbscript:...
+function safeUrl(url) {
+    const u = String(url || "").trim();
+    const probe = u.replace(/[\u0000-\u0020\u007f]/g, "");
+    if (/^[a-z][a-z0-9+.-]*:/i.test(probe) && !/^(https?|mailto|tel):/i.test(probe)) return "about:blank";
+    return u;
+}
+
 function escapeHtml(str) {
     const div = document.createElement("div");
     div.textContent = str == null ? "" : String(str);
@@ -360,7 +368,7 @@ async function main() {
     }
 
     function renderButtonUI(btn) {
-        const el = document.querySelector(`[data-btn-id="${btn.id}"]`);
+        const el = document.querySelector(`[data-btn-id="${CSS.escape(String(btn.id))}"]`);
         if (!el) return;
         const s = state[btn.id];
         const statusEl = el.querySelector("[data-ad-status]");
@@ -453,14 +461,14 @@ async function main() {
 
             if (dl.mode === "direct") {
                 const a = document.createElement("a");
-                a.href = dl.url;
+                a.href = safeUrl(dl.url);
                 a.setAttribute("download", "");
                 document.body.appendChild(a);
                 a.click();
                 a.remove();
                 downloadNote.textContent = "Đang tải xuống...";
             } else {
-                window.open(dl.url, "_blank", "noopener,noreferrer");
+                window.open(safeUrl(dl.url), "_blank", "noopener,noreferrer");
             }
 
             // Count the actual download action (not the page view, not
@@ -474,3 +482,4 @@ async function main() {
 }
 
 main();
+

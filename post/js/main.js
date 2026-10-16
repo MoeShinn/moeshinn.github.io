@@ -40,6 +40,11 @@ const CAME_FROM_HOME_KEY = "shinjuvn_blog_from_home";
 // Ảnh trong bài ghi tương đối theo /post/ (vd "photo/a.png"); trang /post/<id>/ cần đường dẫn tuyệt đối.
 const assetUrl = (p) => (!p ? "" : /^(https?:)?\/\/|^\//.test(p) ? p : "/post/" + p);
 
+// Escape văn bản trước khi chèn vào chuỗi HTML (innerHTML / template literal).
+function escHtml(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
 /* ============================================================== */
 /* Self-hosted view counter (replaces the discontinued CountAPI, then  */
 /* Abacus) — see /counter-api-cf/README.md for how this is wired up   */
@@ -168,12 +173,16 @@ function filterPosts(posts, query) {
 
 function renderCards(container, posts) {
     if (!container) return;
-    container.innerHTML = "";
+    container.replaceChildren();
     if (!posts.length) {
-        container.innerHTML = '<p class="empty-msg">Không có bài đăng nào.</p>';
+        const empty = document.createElement("p");
+        empty.className = "empty-msg";
+        empty.textContent = "Không có bài đăng nào.";
+        container.appendChild(empty);
         return;
     }
     posts.forEach((p) => {
+        // Dựng bằng DOM + textContent: tiêu đề/ngày/ảnh lấy từ JSON nên không bao giờ được hiểu là HTML.
         const card = document.createElement("a");
         card.className = "post-card";
         card.href = `/post/${encodeURIComponent(p.id)}/`;
@@ -182,22 +191,51 @@ function renderCards(container, posts) {
             // can show "related posts" based on the last search term.
             sessionStorage.setItem(CAME_FROM_HOME_KEY, "1");
         });
-        const viewsHtml =
-            p.views === undefined
-                ? ""
-                : p.views != null
-                ? `${p.views} lượt xem`
-                : `<span class="views-loading" aria-label="Đang tải lượt xem">Đang tải<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></span>`;
-        card.innerHTML = `
-      <div class="post-card-photo"><img src="${assetUrl(p.photo)}" alt="${truncateTitle(p.title)}" loading="lazy" /></div>
-      <div class="post-card-body">
-        <h3 class="post-card-title">${truncateTitle(p.title)}</h3>
-        <div class="post-card-meta">
-          <span>${formatDate(p.date)}</span>
-          <span>${viewsHtml}</span>
-        </div>
-      </div>
-    `;
+
+        const title = truncateTitle(String(p.title || ""));
+
+        const photoWrap = document.createElement("div");
+        photoWrap.className = "post-card-photo";
+        const img = document.createElement("img");
+        const src = assetUrl(p.photo);
+        if (src) img.src = src;
+        img.alt = title;
+        img.loading = "lazy";
+        photoWrap.appendChild(img);
+
+        const body = document.createElement("div");
+        body.className = "post-card-body";
+
+        const h3 = document.createElement("h3");
+        h3.className = "post-card-title";
+        h3.textContent = title;
+
+        const meta = document.createElement("div");
+        meta.className = "post-card-meta";
+        const dateSpan = document.createElement("span");
+        dateSpan.textContent = formatDate(p.date);
+        const viewsSpan = document.createElement("span");
+        if (p.views === undefined) {
+            // bài cũ: không hiện lượt xem
+        } else if (p.views != null) {
+            viewsSpan.textContent = `${p.views} lượt xem`;
+        } else {
+            const loading = document.createElement("span");
+            loading.className = "views-loading";
+            loading.setAttribute("aria-label", "Đang tải lượt xem");
+            loading.append("Đang tải");
+            for (let i = 0; i < 3; i++) {
+                const dot = document.createElement("span");
+                dot.className = "dot";
+                dot.textContent = ".";
+                loading.appendChild(dot);
+            }
+            viewsSpan.appendChild(loading);
+        }
+        meta.append(dateSpan, viewsSpan);
+
+        body.append(h3, meta);
+        card.append(photoWrap, body);
         container.appendChild(card);
     });
 }
@@ -357,15 +395,16 @@ async function renderHomePage() {
 /* Single post view                                                 */
 /* ============================================================== */
 
+// Lưu ý: bodyHtml là HTML đã render từ markdown của chủ site nên cố ý KHÔNG escape; mọi trường khác (meta.*) đều được escape.
 function postTemplate(meta, bodyHtml, updated) {
     return `
     <div class="post-view">
       <button type="button" class="back-btn" data-back>&larr; Quay lại</button>
       <article class="post-article">
-        ${meta.photo ? `<img class="post-cover" src="${assetUrl(meta.photo)}" alt="${meta.title || ""}" />` : ""}
-        <h1 class="post-title">${meta.title || ""}</h1>
+        ${meta.photo ? `<img class="post-cover" src="${escHtml(assetUrl(meta.photo))}" alt="${escHtml(meta.title || "")}" />` : ""}
+        <h1 class="post-title">${escHtml(meta.title || "")}</h1>
         <div class="post-meta">
-          <span>${formatDate(meta.date)}${updated ? ` <em class="post-edited">(đã chỉnh sửa | ${formatDate(updated)})</em>` : ""}</span>
+          <span>${escHtml(formatDate(meta.date))}${updated ? ` <em class="post-edited">(đã chỉnh sửa | ${escHtml(formatDate(updated))})</em>` : ""}</span>
           <span><span data-views-wrap><span class="views-loading" aria-label="Đang tải lượt xem">Đang tải<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></span></span> lượt xem</span>
         </div>
         <div class="post-body">${bodyHtml}</div>
@@ -744,3 +783,4 @@ function main() {
 }
 
 main();
+
