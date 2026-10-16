@@ -14,7 +14,7 @@
     "expires": ""
   },
   "maintenance": {
-    "enabled": true,
+    "enabled": false,
     "message": "Trang web đang được xây dựng, vui lòng quay lại sau nha :3"
   },
   "theme": {
