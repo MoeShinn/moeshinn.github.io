@@ -9,6 +9,8 @@ description: "Music Box là plugin Minecraft cho phép người chơi lưu và p
 <hr>&l&dMusic Box&r là plugin &lphát nhạc cá nhân&r dành cho server Minecraft chạy Core Paper như &bPaper&r, &bPurpur&r, &bLeaf&r. Người chơi chỉ cần dán link file nhạc trực tiếp, đặt cho nó một ID ngắn rồi phát bất cứ lúc nào bằng một câu lệnh. Âm thanh được truyền qua &aSimple Voice Chat&r nên nghe như đang bật loa ngay trong game, người ở gần còn nghe được nếu họ cho phép.
 &7Tác giả: &f&lShinju Ch. [VNer]&r
 
+&cLướt xuống dưới cùng bấm Tải xuống rồi hẳn đọc nha! &d:3&r
+
 ![Plugin Music Box phát nhạc từ link trên server Minecraft Paper Purpur Leaf](/post/photo/tiec-am-nhac-ben-ho-luc-hoang-hon-mvaiq87t.webp)
 
 <h2>Điểm nổi bật</h2>
@@ -69,5 +71,7 @@ Các mục thường chỉnh trong &fconfig.yml&r:
 <blockquote>Plugin chỉ hỗ trợ định dạng mp3, ogg và wav. File FLAC, link trang web hoặc link yêu cầu đăng nhập sẽ không phát được.</blockquote>
 <blockquote>File config.yml cũ trên server không tự bị ghi đè khi nâng cấp, hãy so sánh với bản mới nếu muốn dùng các tùy chọn mới.</blockquote>
 <blockquote>Người chơi chưa cài mod Simple Voice Chat sẽ nhận thông báo và không nghe được nhạc.</blockquote>
+
+<a class="button-5s" data-seconds="30" href="https://shinjuvn.github.io/download/music-box-1-21-11/" target="_blank" rel="noopener noreferrer">Link tải plugin</a>
 
 &7Nếu gặp lỗi hoặc muốn đề xuất tính năng, hãy để lại bình luận bên dưới bài viết hoặc liên hệ trực tiếp qua các [liên hệ](../../channel) &7của tui nha. &cCảm ơn bạn đã sử dụng &d&lMusic Box&r&7!&r
