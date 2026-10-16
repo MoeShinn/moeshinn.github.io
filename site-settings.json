@@ -18,9 +18,9 @@
     "message": "Trang web đang được xây dựng, vui lòng quay lại sau nha :3"
   },
   "theme": {
-    "default": "snow",
-    "intensity": 0.85,
-    "wash": 0.1,
+    "default": "none",
+    "intensity": 0.75,
+    "wash": 0.15,
     "dim": 0.2,
     "forceMotion": true,
     "pages": {
@@ -28,7 +28,7 @@
       "post": "fireflies",
       "download": "aurora",
       "channel": "stars",
-      "donate": "bubbles"
+      "donate": "snow"
     }
   },
   "seo": {
