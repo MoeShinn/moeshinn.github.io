@@ -2,7 +2,7 @@
    Thêm data-manual vào thẻ <script> để KHÔNG tự chạy (dùng cho trang admin xem trước). */
 (() => {
   const manual = document.currentScript && document.currentScript.hasAttribute("data-manual");
-  const LIST = [["none", "Mặc định (ảnh nền hiện tại)"], ["stars", "Bầu trời sao + sao băng"], ["aurora", "Cực quang"], ["sakura", "Hoa anh đào rơi"], ["snow", "Tuyết rơi"], ["rain", "Mưa đêm"], ["fireflies", "Đom đóm"], ["bubbles", "Bong bóng"]];
+  const LIST = [["none", "Mặc định (nền tối, không hiệu ứng)"], ["stars", "Bầu trời sao + sao băng"], ["aurora", "Cực quang"], ["sakura", "Hoa anh đào rơi"], ["snow", "Tuyết rơi"], ["rain", "Mưa đêm"], ["fireflies", "Đom đóm"], ["bubbles", "Bong bóng"]];
   const osReduce = () => matchMedia("(prefers-reduced-motion: reduce)").matches; // thiết bị đang bật "giảm chuyển động"?
   const rnd = (a, b) => a + Math.random() * (b - a);
   const TAU = Math.PI * 2;

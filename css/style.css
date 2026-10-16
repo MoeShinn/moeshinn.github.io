@@ -29,36 +29,9 @@ body {
     position: relative;
 }
 
-/* ---------- Background image ----------
-   Uses a different image per device tier so each aspect ratio gets
-   art tailored to it. background-size: cover scales the image up
-   only as needed to fill the screen and crops the overflow — it
-   never stretches/distorts the picture, regardless of the device's
-   own aspect ratio.
-   Drop your real artwork in /assets/ using these same file names:
-   bgphone.png, bgpad.png, bgpc.png. */
-body {
-    background-image: url("/assets/bg/bgpc.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
-@media (max-width: 600px) {
-    body {
-        background-image: url("/assets/bg/bgphone.png");
-    }
-}
-
-@media (min-width: 601px) and (max-width: 1024px) {
-    body {
-        background-image: url("/assets/bg/bgpad.png");
-    }
-}
-
 /* Soft vignette that darkens the edges a touch and breathes very gently,
-   so text/buttons stay readable over a busier background image without
-   hiding the artwork. Sits above the bg image, below the page content. */
+   so text/buttons stay readable over the animated theme background
+   (js/theme.js). Sits above the theme layer, below the page content. */
 body::before {
     content: "";
     position: fixed;

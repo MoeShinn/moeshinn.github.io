@@ -2,7 +2,7 @@
    Chèn một lần cho mỗi trang, ngay sau markup #site-loading, trước main.js của trang.
 
    • Ẩn màn hình chờ khi mọi ảnh được báo (window.SiteLoading.waitFor) đã tải xong.
-     Hoạt động với mọi định dạng ảnh nền vì đọc đúng URL do getComputedStyle trả về.
+     Không còn chờ ảnh nền (nền giờ do js/theme.js vẽ bằng code); chỉ chờ ảnh trang đăng ký qua waitFor.
    • Theme của màn hình chờ đổi theo cảm xúc đang đặt trong /status.json (sửa ở /admin → Trạng thái).
      Không có cảm xúc (hoặc đã hết hạn) → theme "hoàng hôn". Lần ghé sau dùng ngay theme đã nhớ.
    • Ở trang chủ (có .avatar-wrap) hiện bong bóng trạng thái phía trên avatar; các trang khác không hiện.
@@ -157,15 +157,6 @@
             img.src = url;
         });
     }
-
-    // Ảnh nền mà CSS của trang đang dùng cho cỡ màn hình hiện tại (bgpc/bgpad/bgphone, mọi đuôi file)
-    function currentBackgroundUrl() {
-        const bg = getComputedStyle(document.body).backgroundImage;
-        const match = bg && bg.match(/url\(["']?([^"')]+)["']?\)/);
-        return match ? match[1] : null;
-    }
-
-    tasks.push(loadImage(currentBackgroundUrl()));
 
     window.SiteLoading = {
         // Trang gọi hàm này cho ảnh nạp động (ví dụ avatar, chỉ biết URL sau khi data.json về)
