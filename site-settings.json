@@ -18,7 +18,7 @@
     "message": "Trang web đang được xây dựng, vui lòng quay lại sau nha :3"
   },
   "theme": {
-    "default": "none",
+    "default": "stars",
     "intensity": 0.9,
     "wash": 0.2,
     "dim": 0.25,
