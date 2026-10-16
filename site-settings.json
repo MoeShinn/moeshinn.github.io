@@ -19,9 +19,9 @@
   },
   "theme": {
     "default": "none",
-    "intensity": 0.75,
-    "wash": 0.15,
-    "dim": 0.2,
+    "intensity": 0.9,
+    "wash": 0.2,
+    "dim": 0.25,
     "forceMotion": true,
     "pages": {
       "home": "stars",
