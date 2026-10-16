@@ -72,6 +72,8 @@ Các mục thường chỉnh trong &fconfig.yml&r:
 <blockquote>File config.yml cũ trên server không tự bị ghi đè khi nâng cấp, hãy so sánh với bản mới nếu muốn dùng các tùy chọn mới.</blockquote>
 <blockquote>Người chơi chưa cài mod Simple Voice Chat sẽ nhận thông báo và không nghe được nhạc.</blockquote>
 
+![Các phiên bản server plugin MusicBox hỗ trợ](/post/photo/screenshot-2026-10-16-123747-mvajdrk0.webp)
+
 <a class="button-5s" data-seconds="30" href="https://shinjuvn.github.io/download/music-box-1-21-11/" target="_blank" rel="noopener noreferrer">Link tải plugin</a>
 
 &7Nếu gặp lỗi hoặc muốn đề xuất tính năng, hãy để lại bình luận bên dưới bài viết hoặc liên hệ trực tiếp qua các [liên hệ](../../channel) &7của tui nha. &cCảm ơn bạn đã sử dụng &d&lMusic Box&r&7!&r
