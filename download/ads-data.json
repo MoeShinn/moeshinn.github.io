@@ -23,6 +23,13 @@
       "category": "direct_link_monetag",
       "url": "https://uplcm.com/4/11998734",
       "expires": "inf"
+    },
+    {
+      "id": "youtube-channel-1",
+      "category": "Youtube Channel",
+      "url": "https://www.youtube.com/channel/UCoZR9unQFHLfqoOQ22lPcGA",
+      "expires": "inf",
+      "note": "Kênh Youtube"
     }
   ]
 }
