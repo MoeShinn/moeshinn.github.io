@@ -1,4 +1,5 @@
-/* Tạo lại toàn bộ trang tĩnh: /post/<id>/, /download/<id>/, link rút gọn /s/<mã>/, sitemap.xml, robots.txt — gom trong MỘT commit. */
+/* Tạo lại toàn bộ trang tĩnh: /post/<id>/, /download/<id>/, link rút gọn /s/<mã>/, robots.txt — gom trong MỘT commit.
+   sitemap.xml do Worker (admin-api) tự cập nhật trong cùng commit nên không còn tạo ở đây. */
 (function (root, factory) { if (typeof module === "object" && module.exports) module.exports = factory(require("./postgen.js")); else root.Rebuild = factory(root.PostGen); })(typeof window !== "undefined" ? window : this, function (PG) {
   async function all(A, { posts, seo, render, onProgress = () => {} }) {
     const [postShell, dlShell, tree] = await Promise.all([A.readText("post/index.html"), A.readText("download/index.html"), A.api("/tree").then((r) => r.files.map((f) => f.path))]);
@@ -31,8 +32,8 @@
     for (const l of links) { files.push({ path: `s/${l.id}/index.html`, content: PG.buildLinkPage(l, seo) }); keep.add(`s/${l.id}/index.html`); }
     // Dọn trang tĩnh của bài/mục đã xóa hoặc đã chuyển sang riêng tư
     const deletes = tree.filter((p) => /^(post|download|s)\/[^/]+\/index\.html$/.test(p) && !keep.has(p));
-    files.push({ path: "post/data/posts.json", content: JSON.stringify(posts, null, 2) + "\n" }, { path: "sitemap.xml", content: PG.buildSitemap(seo, posts, dlIds) }, { path: "robots.txt", content: PG.buildRobots(seo) });
-    await A.commitFiles("Admin: tạo lại trang bài viết, trang download, link rút gọn và sitemap", files, deletes);
+    files.push({ path: "post/data/posts.json", content: JSON.stringify(posts, null, 2) + "\n" }, { path: "robots.txt", content: PG.buildRobots(seo) });
+    await A.commitFiles("Admin: tạo lại trang bài viết, trang download và link rút gọn", files, deletes);
     return { posts: posts.filter((p) => p.visibility !== "private").length, downloads: dls.length, links: links.length, deleted: deletes.length };
   }
 
@@ -60,9 +61,8 @@
     return commitCommon(A, { message, files: [], deletes, posts, seo, tree });
   }
   async function commitCommon(A, { message, files, deletes, posts, seo, tree, writePosts = true }) {
-    const dlIds = tree.map((p) => (p.match(/^download\/data\/([^/]+)\.json$/) || [])[1]).filter(Boolean);
     if (writePosts) files.push({ path: "post/data/posts.json", content: JSON.stringify(posts, null, 2) + "\n" });
-    files.push({ path: "sitemap.xml", content: PG.buildSitemap(seo, posts, dlIds) }, { path: "robots.txt", content: PG.buildRobots(seo) });
+    files.push({ path: "robots.txt", content: PG.buildRobots(seo) });
     await A.commitFiles(message, files, deletes);
     return { files: files.length, deletes: deletes.length };
   }
