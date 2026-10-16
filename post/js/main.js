@@ -80,6 +80,21 @@ function counterReadUrl(id) {
 }
 
 
+// Rút gọn số: 300000 -> 300K, 4160 -> 4.2K, 1234567 -> 1.2M (K=1e3, M=1e6, B=1e9, làm tròn 0.1)
+function formatCount(n) {
+    n = Number(n);
+    if (!Number.isFinite(n)) return "0";
+    const abs = Math.abs(n), sign = n < 0 ? "-" : "";
+    if (abs < 1000) return sign + Math.round(abs);
+    const units = [[1e9, "B"], [1e6, "M"], [1e3, "K"]];
+    let i = units.findIndex(([u]) => abs >= u);
+    let tenths = Math.round((abs * 10) / units[i][0]);
+    // làm tròn sát mốc (vd 999.95K) thì nhảy lên đơn vị lớn hơn
+    if (tenths >= 10000 && i > 0) { i--; tenths = Math.round((abs * 10) / units[i][0]); }
+    const whole = Math.floor(tenths / 10), dec = tenths % 10;
+    return sign + (dec ? `${whole}.${dec}` : `${whole}`) + units[i][1];
+}
+
 async function getViews(id) {
     try {
         // Straight to GitHub's raw-content CDN — no auth, not the
@@ -218,7 +233,7 @@ function renderCards(container, posts) {
         if (p.views === undefined) {
             // bài cũ: không hiện lượt xem
         } else if (p.views != null) {
-            viewsSpan.textContent = `${p.views} lượt xem`;
+            viewsSpan.textContent = `${formatCount(p.views)} lượt xem`;
         } else {
             const loading = document.createElement("span");
             loading.className = "views-loading";
@@ -522,7 +537,7 @@ async function renderPostPage(id) {
     const viewsEl = document.querySelector("[data-views-wrap]");
 
     getViews(id).then((v) => {
-        if (viewsEl) viewsEl.textContent = v;
+        if (viewsEl) viewsEl.textContent = formatCount(v);
     });
 
     setTimeout(() => {
@@ -532,7 +547,7 @@ async function renderPostPage(id) {
 
         localStorage.setItem(storageKey, String(Date.now()));
         hitViews(id).then((v) => {
-            if (viewsEl && v != null) viewsEl.textContent = v;
+            if (viewsEl && v != null) viewsEl.textContent = formatCount(v);
         });
     }, VIEW_DWELL_MS);
 
@@ -783,4 +798,3 @@ function main() {
 }
 
 main();
-

@@ -82,6 +82,21 @@ function counterReadUrl(id) {
 }
 
 
+// Rút gọn số: 300000 -> 300K, 4160 -> 4.2K, 1234567 -> 1.2M (K=1e3, M=1e6, B=1e9, làm tròn 0.1)
+function formatCount(n) {
+    n = Number(n);
+    if (!Number.isFinite(n)) return "0";
+    const abs = Math.abs(n), sign = n < 0 ? "-" : "";
+    if (abs < 1000) return sign + Math.round(abs);
+    const units = [[1e9, "B"], [1e6, "M"], [1e3, "K"]];
+    let i = units.findIndex(([u]) => abs >= u);
+    let tenths = Math.round((abs * 10) / units[i][0]);
+    // làm tròn sát mốc (vd 999.95K) thì nhảy lên đơn vị lớn hơn
+    if (tenths >= 10000 && i > 0) { i--; tenths = Math.round((abs * 10) / units[i][0]); }
+    const whole = Math.floor(tenths / 10), dec = tenths % 10;
+    return sign + (dec ? `${whole}.${dec}` : `${whole}`) + units[i][1];
+}
+
 async function getDownloadCount(id) {
     try {
         const res = await fetchWithTimeout(counterReadUrl(id), 4000, "default");
@@ -336,7 +351,7 @@ async function main() {
     // is really clicked, further down.
     const downloadCountEl = document.querySelector("[data-download-count]");
     getDownloadCount(fileId).then((count) => {
-        downloadCountEl.textContent = `⬇ ${count}`;
+        downloadCountEl.textContent = `⬇ ${formatCount(count)}`;
     });
 
     const adButtons = Array.isArray(config.adButtons) ? config.adButtons : [];
@@ -475,11 +490,10 @@ async function main() {
             // finishing the ads) — fire-and-forget, never blocks the
             // download itself if the counter API is slow/cold-starting.
             hitDownloadCount(fileId).then((count) => {
-                if (count != null) downloadCountEl.textContent = `⬇ ${count}`;
+                if (count != null) downloadCountEl.textContent = `⬇ ${formatCount(count)}`;
             });
         });
     });
 }
 
 main();
-
