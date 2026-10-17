@@ -12,10 +12,29 @@ Admin.boot({ id: "download", title: "Download", async render(main) {
   const { esc, $ } = Admin;
   main.innerHTML = `<h2>Download</h2><p class="hint">Đang tải…</p>`;
   let S, tree, pool, items = [];
+  const REPO_API = "https://api.github.com/repos/ShinjuVN/shinjuvn.github.io";
+  async function firstCommitDate(path) {
+    const key = "shinju_dl_created:" + path;
+    try { const c = localStorage.getItem(key); if (c) return c; } catch (e) { /* bỏ qua */ }
+    try {
+      let r = await fetch(`${REPO_API}/commits?path=${encodeURIComponent(path)}&per_page=1`);
+      if (!r.ok) return null;
+      let arr = await r.json();
+      const last = (r.headers.get("Link") || "").match(/<([^>]+)>;\s*rel="last"/); // trang cuối = commit cũ nhất
+      if (last) { r = await fetch(last[1]); if (!r.ok) return null; arr = await r.json(); }
+      const date = arr.length && arr[arr.length - 1].commit && arr[arr.length - 1].commit.committer.date;
+      if (date) { try { localStorage.setItem(key, date); } catch (e) { /* bỏ qua */ } }
+      return date || null;
+    } catch (e) { return null; }
+  }
   const load = async () => {
     [S, tree, pool] = await Promise.all([Admin.readJson("site-settings.json", {}), Admin.api("/tree").then((r) => r.files.map((f) => f.path)), Admin.readJson("download/ads-data.json", { adLinks: [] })]);
     const ids = tree.map((p) => (p.match(/^download\/data\/([^/]+)\.json$/) || [])[1]).filter(Boolean);
     items = await Promise.all(ids.map(async (id) => ({ id, d: await Admin.readJson(`download/data/${id}.json`) })));
+    // Thứ tự danh sách: ngày tạo mới nhất lên đầu. Mục mới lưu sẵn createdAt; mục cũ chưa có thì
+    // lấy ngày commit đầu tiên của file trên GitHub (lưu cache ở trình duyệt, lỗi thì xếp cuối).
+    await Promise.all(items.map(async (it) => { it.ts = Date.parse(it.d.createdAt || "") || Date.parse((await firstCommitDate(`download/data/${it.id}.json`)) || "") || 0; }));
+    items.sort((a, b) => b.ts - a.ts || a.id.localeCompare(b.id));
   };
   try { await load(); } catch (e) { main.innerHTML = `<h2>Download</h2><p class="err">${esc(e.message)}</p>`; return; }
   const seo = AdminSeo.merge(S.seo), site = seo.siteUrl.replace(/\/$/, "");
@@ -24,7 +43,7 @@ Admin.boot({ id: "download", title: "Download", async render(main) {
 
   /* ---------------- Danh sách ---------------- */
   function showList() {
-    const rows = items.map(({ id, d }) => `<tr style="border-top:1px solid var(--line)"><td style="padding:8px 0">${esc(d.title || id)}<br><small class="hint">${esc(id)} · ${(d.downloads || []).length} nút tải · ${(d.adButtons || []).length} nút quảng cáo</small></td>
+    const rows = items.map(({ id, d, ts }) => `<tr style="border-top:1px solid var(--line)"><td style="padding:8px 0">${esc(d.title || id)}<br><small class="hint">${esc(id)}${ts ? " · " + new Date(ts).toLocaleDateString("vi-VN") : ""} · ${(d.downloads || []).length} nút tải · ${(d.adButtons || []).length} nút quảng cáo</small></td>
       <td style="text-align:right;white-space:nowrap"><a href="/download/${encodeURIComponent(id)}/" target="_blank">Mở</a>${d.short ? ` · <a href="#" data-copy="${site}/s/${esc(d.short)}/">Chép link</a>` : ""} · <a href="#edit/${encodeURIComponent(id)}">Sửa</a> · <a href="#" data-del="${esc(id)}" style="color:#ff8b8f">Xóa</a></td></tr>`).join("");
     main.innerHTML = `<h2>Download</h2><p><a class="btn" href="#new">＋ Mục tải mới</a></p>
       <div class="card"><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">${rows || '<tr><td class="hint">Chưa có mục tải nào.</td></tr>'}</table></div></div>`;
@@ -100,6 +119,7 @@ Admin.boot({ id: "download", title: "Download", async render(main) {
       let id = editId; const used = new Set(tree.map((p) => (p.match(/^download\/data\/([^/]+)\.json$/) || [])[1]).filter(Boolean));
       if (!id) { const c = v("d_id") && PostGen.slugify(v("d_id")); if (c) { if (used.has(c)) return Admin.toast("ID này đã có mục tải dùng", true); id = c; } else id = PostGen.newPostId(title, used); }
       const data = { ...d, title: title.replace(/\s+/g, " ") };
+      if (!data.createdAt) { const old = editId && items.find((x) => x.id === editId); data.createdAt = new Date(old && old.ts ? old.ts : Date.now()).toISOString(); } // ngày tạo (mục cũ giữ ngày commit đầu), dùng để sắp xếp danh sách
       const put = (k, val) => (val ? (data[k] = val) : delete data[k]);
       put("description", v("d_desc")); put("keywords", v("d_kw"));
       const hm = $("#d_hm").value; if (hm === "hide") data.hint = ""; else if (hm === "custom" && v("d_hint")) data.hint = v("d_hint"); else delete data.hint;
@@ -119,3 +139,4 @@ Admin.boot({ id: "download", title: "Download", async render(main) {
   addEventListener("hashchange", () => location.reload()); show();
 }});
 </script></body></html>
+
