@@ -80,6 +80,36 @@ function counterReadUrl(id) {
 }
 
 
+// ---- Giới hạn lượt gọi Worker theo ngày ------------------------------
+// Worker n238 ghi số request trong ngày (UTC) vào api-usage.json ở repo
+// api-counters. Đọc file đó (qua raw, không tốn request Cloudflare) TRƯỚC khi
+// gọi /hit: nếu hôm nay đã chạm mức giới hạn thì web vẫn chạy bình thường nhưng
+// không gọi Worker nữa, để dành phần còn lại cho admin-api.
+// Lỗi đọc / chưa có file / file của ngày cũ -> coi như còn được phép (Worker
+// vẫn tự chặn ở phía nó, nên an toàn).
+const COUNTER_USAGE_FILE = "api-usage.json";
+let counterGateCache = null; // { at, promise }
+function counterApiAllowed() {
+    const now = Date.now();
+    if (counterGateCache && now - counterGateCache.at < COUNTER_READ_BUCKET_MS) return counterGateCache.promise;
+    const promise = (async () => {
+        try {
+            const bucket = Math.floor(now / COUNTER_READ_BUCKET_MS);
+            const res = await fetchWithTimeout(`${COUNTERS_RAW_BASE}/${COUNTER_USAGE_FILE}?t=${bucket}`, 3000, "default");
+            if (!res.ok) return true;
+            const u = await res.json();
+            if (u.date !== new Date().toISOString().slice(0, 10)) return true; // file của ngày hôm qua: Worker đã reset
+            const limit = Number(u.limit) || 0;
+            return !(u.blocked === true || (limit > 0 && Number(u.requests) >= limit));
+        } catch (e) {
+            return true;
+        }
+    })();
+    counterGateCache = { at: now, promise };
+    return promise;
+}
+
+
 // Rút gọn số: 300000 -> 300K, 4160 -> 4.2K, 1234567 -> 1.2M (K=1e3, M=1e6, B=1e9, làm tròn 0.1)
 function formatCount(n) {
     n = Number(n);
@@ -115,12 +145,15 @@ async function getViews(id) {
 
 async function hitViews(id) {
     try {
+        // Hôm nay đã chạm giới hạn lượt gọi Worker -> không gọi nữa (trang vẫn hiển thị bình thường).
+        if (!(await counterApiAllowed())) return null;
         const res = await fetchWithTimeout(
             `${COUNTER_API_BASE}/hit/${COUNTER_TYPE}/${encodeURIComponent(id)}`,
             4000
         );
         if (!res.ok) return null;
         const data = await res.json();
+        if (data.limited) return null; // Worker báo đã hết hạn mức trong ngày
         // The Worker batches writes to GitHub (about once a minute), so
         // this is its best-known total including this hit — or missing
         // when it can't know the total yet. null = "keep what's shown".
@@ -798,3 +831,4 @@ function main() {
 }
 
 main();
+

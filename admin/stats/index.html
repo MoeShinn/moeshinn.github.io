@@ -23,9 +23,12 @@ Admin.boot({ id: "stats", title: "Số liệu", async render(main) {
     } catch (e) { main.innerHTML = `<h2>Số liệu</h2><p class="err">${esc(e.message)}</p>`; return; }
     const bucket = Math.floor(Date.now() / 60000);
     const get = async (type, id, key) => { try { const r = await fetch(`${RAW}/${type}-${encodeURIComponent(id)}.json?t=${bucket}`); if (!r.ok) return { n: 0 }; const j = await r.json(); return { n: j[key] || 0, at: j.updatedAt }; } catch (e) { return { n: null }; } };
-    const [pv, dv, health] = await Promise.all([
+    const getUsage = async () => { try { const r = await fetch(`${RAW}/api-usage.json?t=${bucket}`); return r.ok ? await r.json() : null; } catch (e) { return null; } };
+    const [pv, dv, health, usage] = await Promise.all([
       Promise.all(posts.map((p) => get("view", p.id, "views"))), Promise.all(dls.map((d) => get("download", d.id, "downloads"))),
-      fetch(COUNTER_API + "/health").then((r) => r.ok).catch(() => false)]);
+      fetch(COUNTER_API + "/health").then((r) => r.ok).catch(() => false), getUsage()]);
+    const today = new Date().toISOString().slice(0, 10);
+    const usageTxt = !usage ? "chưa có dữ liệu lượt gọi Worker" : usage.date !== today ? `lượt gọi Worker hôm nay: 0 / ${fmt(usage.limit)} (file cũ ngày ${esc(usage.date)})` : `lượt gọi Worker hôm nay (UTC): ${fmt(usage.requests)} / ${fmt(usage.limit)}${usage.blocked ? " — <b>đã chạm giới hạn, web ngừng tăng view/tải</b>" : ""}`;
     const P = posts.map((p, i) => ({ key: "v:" + p.id, label: p.title, sub: p.visibility && p.visibility !== "public" ? p.visibility : "", n: pv[i].n, href: p.visibility === "private" ? "" : `/post/${encodeURIComponent(p.id)}/` }));
     const D = dls.map((d, i) => ({ key: "d:" + d.id, label: d.title, sub: "", n: dv[i].n, href: `/download/${encodeURIComponent(d.id)}/` }));
     // Mốc so sánh lưu trên trình duyệt này (bộ đếm chỉ lưu tổng, không lưu theo ngày)
@@ -42,7 +45,7 @@ Admin.boot({ id: "stats", title: "Số liệu", async render(main) {
       <div class="stat"><b>${fmt(sum(P))}</b><span>lượt xem bài${sumD(P) > 0 ? ` <span class="up">+${fmt(sumD(P))}</span>` : ""}</span></div>
       <div class="stat"><b>${fmt(sum(D))}</b><span>lượt tải${sumD(D) > 0 ? ` <span class="up">+${fmt(sumD(D))}</span>` : ""}</span></div>
       <div class="stat"><b>${posts.length}</b><span>bài đăng</span></div><div class="stat"><b>${dls.length}</b><span>mục tải</span></div></div>
-      <p class="hint" style="margin-bottom:0"><span class="dot ${health ? "ok" : "bad"}"></span>Bộ đếm ${health ? "đang hoạt động" : "không phản hồi"} · số “+n” là mức tăng từ ${esc(new Date(base.ts).toLocaleString("vi-VN"))} (mốc lưu trên máy này)</p></div>
+      <p class="hint" style="margin-bottom:0"><span class="dot ${health ? "ok" : "bad"}"></span>Bộ đếm ${health ? "đang hoạt động" : "không phản hồi"} · ${usageTxt} · số “+n” là mức tăng từ ${esc(new Date(base.ts).toLocaleString("vi-VN"))} (mốc lưu trên máy này)</p></div>
     ${section("Bài đăng — lượt xem", P, "bài đăng")}${section("Download — lượt tải", D, "mục tải")}
     <button id="s_re">Làm mới</button> <button class="ghost" id="s_base">Đặt mốc mới từ bây giờ</button>
     <p class="hint">Số liệu chậm vài phút so với thực tế: Worker gom ghi lên GitHub khoảng mỗi phút và GitHub lưu đệm tệp thêm một lúc. Bộ đếm chỉ lưu tổng, nên chưa có biểu đồ theo ngày.</p>`;
@@ -52,3 +55,4 @@ Admin.boot({ id: "stats", title: "Số liệu", async render(main) {
   load();
 }});
 </script></body></html>
+
