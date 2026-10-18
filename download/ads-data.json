@@ -1,30 +1,6 @@
 {
   "adLinks": [
     {
-      "id": "direct-link-monetag-1",
-      "category": "direct_link_monetag",
-      "url": "https://uplcm.com/4/11956866",
-      "expires": "inf"
-    },
-    {
-      "id": "direct-link-monetag-2",
-      "category": "direct_link_monetag",
-      "url": "https://uplcm.com/4/11998732",
-      "expires": "inf"
-    },
-    {
-      "id": "direct-link-monetag-3",
-      "category": "direct_link_monetag",
-      "url": "https://uplcm.com/4/11998733",
-      "expires": "inf"
-    },
-    {
-      "id": "direct-link-monetag-4",
-      "category": "direct_link_monetag",
-      "url": "https://uplcm.com/4/11998734",
-      "expires": "inf"
-    },
-    {
       "id": "youtube-channel-1",
       "category": "Youtube Channel",
       "url": "https://www.youtube.com/channel/UCoZR9unQFHLfqoOQ22lPcGA",
