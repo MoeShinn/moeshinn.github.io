@@ -4,16 +4,7 @@
   "keywords": "Source Tree Extractor, Picture Lite, tối ưu website, nén ảnh, thay ảnh đã nén, xuất mã nguồn website, trang tải xuống",
   "hint": "Bạn có thể xem tính năng bằng cách vô trang POST và search Picture Lite hoặc Extractor là ok nha",
   "requireAllAds": false,
-  "adButtons": [
-    {
-      "id": "ad1",
-      "label": "Xem quảng cáo 10s để ủng hộ mình",
-      "seconds": 10,
-      "categories": [
-        "direct_link_monetag"
-      ]
-    }
-  ],
+  "adButtons": [],
   "downloads": [
     {
       "id": "primary",
@@ -31,5 +22,6 @@
       "url": "https://github.com/ShinjuVN/Picture-Lite/releases/download/Picture-Lite-Install/PictureLite-Portable-v1.0.0-beta1.exe"
     }
   ],
-  "short": "rVpEXbwfmu"
+  "short": "rVpEXbwfmu",
+  "createdAt": "2026-10-10T14:06:41.000Z"
 }
