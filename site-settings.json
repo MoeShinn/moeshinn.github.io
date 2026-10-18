@@ -19,7 +19,7 @@
   },
   "theme": {
     "default": "stars",
-    "intensity": 0.9,
+    "intensity": 0.85,
     "wash": 0.2,
     "dim": 0.25,
     "forceMotion": true,
@@ -34,7 +34,7 @@
   "seo": {
     "siteUrl": "https://shinjuvn.github.io",
     "siteName": "Shinju Ch.",
-    "ogImage": "https:///shinjuvn.github.io/assets/avatar/avatar-mvdqth1t.webp",
+    "ogImage": "https://shinjuvn.github.io/assets/avatar/avatar-mvdqth1t.webp",
     "shortLength": 6,
     "favicon": {
       "icon": "/assets/favicon/favicon-32.png?v=mvdx4gck",
