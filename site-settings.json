@@ -37,9 +37,14 @@
     "ogImage": "https://github.com/ShinjuVN/shinjuvn.github.io/blob/main/assets/avatar/avatar-mvdqth1t.webp",
     "shortLength": 6,
     "favicon": {
-      "icon": "/assets/favicon/favicon-32.png?v=mv2ezum2",
-      "apple": "/assets/favicon/favicon-180.png?v=mv2ezum2",
-      "v": "mv2ezum2"
+      "icon": "/assets/favicon/favicon-32.png?v=mvdx4gck",
+      "apple": "/assets/favicon/favicon-180.png?v=mvdx4gck",
+      "v": "mvdx4gck",
+      "maskable": true,
+      "style": "rounded",
+      "bg": "#ffffff",
+      "bgOn": true,
+      "pad": 0.08
     },
     "pages": {
       "home": {
