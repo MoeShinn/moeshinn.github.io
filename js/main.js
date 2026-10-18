@@ -24,7 +24,8 @@ function labelText(label) {
 
 // Chỉ cho phép link http(s), mailto, tel hoặc đường dẫn nội bộ; chặn javascript:, data:, vbscript:...
 function safeHref(url) {
-  const u = String(url || "").trim();
+  let u = String(url || "").trim();
+  if (/^[a-z0-9][a-z0-9_-]*$/i.test(u)) u = "/" + u + "/"; // "channel" -> "/channel/" (khớp bản dựng sẵn trong HTML, tránh bị chuyển hướng)
   const probe = u.replace(/[\u0000-\u0020\u007f]/g, "");
   if (/^[a-z][a-z0-9+.-]*:/i.test(probe) && !/^(https?|mailto|tel):/i.test(probe)) return "#";
   return u;

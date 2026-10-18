@@ -29,22 +29,17 @@
   <script src="/js/pwa.js" defer></script>
 </head>
 <body>
-  <!-- Shared loading screen (same mechanism as the rest of the site) -->
-  <div id="site-loading" class="site-loading">
-    <div class="site-loading-inner">
-      <p class="site-loading-msg">Chờ xíu nhé!<br />Trang của bạn đang được tải</p>
-      <div class="site-loading-bar"><div class="site-loading-fill"></div></div>
-    </div>
-  </div>
+
+  
   <script src="/js/loading.js"></script>
 
   <header class="site-header">
-    <a href="/index.html" class="site-header-logo" data-nav-home aria-label="Về trang chủ">
-      <img src="/assets/avatar.png" alt="Logo" data-nav-logo />
+    <a href="/" class="site-header-logo" data-nav-home aria-label="Về trang chủ">
+      <img src="/assets/avatar.png" alt="Shinju Ch." data-nav-logo />
     </a>
     <div class="site-header-menu-wrap">
       <button type="button" class="site-header-menu-btn" data-nav-menu-toggle aria-haspopup="true" aria-expanded="false" aria-label="Menu">☰</button>
-      <nav class="site-header-menu" data-nav-menu role="menu"></nav>
+      <nav class="site-header-menu" data-nav-menu role="menu"><!--pre:nav--><a href="/" role="menuitem">Trang chủ</a><a href="/channel/" role="menuitem">Kênh</a><a href="/donate/" role="menuitem">Donate</a><a href="/post/" role="menuitem">Bài Đăng</a><!--/pre:nav--></nav>
     </div>
   </header>
   <script src="/js/site-chrome.js"></script>

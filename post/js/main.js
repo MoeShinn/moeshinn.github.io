@@ -821,6 +821,8 @@ function applySeoMeta(meta, body, id) {
 /* ============================================================== */
 
 function main() {
+    // Danh sách bài dựng sẵn trong HTML (cho bot không chạy JS, xem tools/prerender.js): JS sẽ tự dựng lại bản động nên bỏ bản tĩnh để khỏi bị lặp.
+    document.querySelectorAll("[data-prerender]").forEach((el) => el.remove());
     const pathMatch = window.location.pathname.match(/^\/post\/([^\/.]+)\/?$/);
     const postId = pathMatch && decodeURIComponent(pathMatch[1]); // chỉ nhận /post/<id>/
     if (postId) {

@@ -1,5 +1,5 @@
 /* loading.js — màn hình chờ dùng chung + trạng thái ("bong bóng" trên avatar).
-   Chèn một lần cho mỗi trang, ngay sau markup #site-loading, trước main.js của trang.
+   Chèn một lần cho mỗi trang (đầu <body>, trước main.js của trang). Overlay #site-loading do chính file này dựng bằng JS.
 
    • Ẩn màn hình chờ khi mọi ảnh được báo (window.SiteLoading.waitFor) đã tải xong.
      Không còn chờ ảnh nền (nền giờ do js/theme.js vẽ bằng code); chỉ chờ ảnh trang đăng ký qua waitFor.
@@ -8,8 +8,31 @@
    • Ở trang chủ (có .avatar-wrap) hiện bong bóng trạng thái phía trên avatar; các trang khác không hiện.
    • Xem thử một theme: thêm ?loadpreview=<tên theme> vào địa chỉ trang chủ (màn hình chờ sẽ không tắt). */
 (function () {
-    const overlay = document.getElementById("site-loading");
-    if (!overlay) return;
+    /* Màn hình chờ KHÔNG còn nằm trong HTML tĩnh. Lý do: bot/AI không chạy JS (Gemini, ChatGPT, Perplexity, …)
+       chỉ đọc HTML gốc, nếu overlay nằm sẵn trong HTML thì chúng chỉ thấy chữ "Trang của bạn đang được tải".
+       Giờ HTML gốc chứa sẵn nội dung thật; overlay chỉ được JS dựng cho người dùng bằng trình duyệt thật. */
+    const IS_BOT = /bot|crawl|spider|slurp|lighthouse|headless|facebookexternalhit|perplexity|claude|gemini|chatgpt|bytespider/i.test(navigator.userAgent || "") || navigator.webdriver === true;
+    if (IS_BOT) {
+        // Bot chạy JS: không dựng overlay, nội dung hiện ngay. Giữ API rỗng để main.js của từng trang không lỗi.
+        window.SiteLoading = { waitFor() {}, ready() {} };
+        window.SiteStatus = Promise.resolve({ status: {}, moods: { moods: [] } });
+        return;
+    }
+
+    let overlay = document.getElementById("site-loading"); // trang cũ vẫn còn markup sẵn thì dùng lại
+    if (!overlay) {
+        overlay = document.createElement("div");
+        overlay.id = "site-loading";
+        overlay.className = "site-loading";
+        overlay.setAttribute("aria-hidden", "true");
+        overlay.setAttribute("data-nosnippet", "");
+        overlay.innerHTML =
+            '<div class="site-loading-inner">' +
+            '<p class="site-loading-msg">Chờ xíu nhé!<br />Trang của bạn đang được tải</p>' +
+            '<div class="site-loading-bar"><div class="site-loading-fill"></div></div>' +
+            "</div>";
+        document.body.insertBefore(overlay, document.body.firstChild);
+    }
 
     const THEMES = ["sunset", "sunny", "rain", "night", "storm", "calm", "fog", "focus"];
     const DEFAULT_THEME = "sunset";

@@ -24,20 +24,23 @@
     pages: [{ label: "Trang chủ", url: "/index.html" }],
   };
 
+  // "/channel/index.html" -> "/channel/", "/index.html" -> "/": một nội dung chỉ nên có MỘT địa chỉ (tránh trùng lặp URL với canonical).
+  const cleanUrl = (u) => String(u || "").replace(/(^|\/)index\.html$/, "$1");
+
   function renderHeader(nav) {
     const homeLink = document.querySelector("[data-nav-home]");
     const logoImg = document.querySelector("[data-nav-logo]");
     const menu = document.querySelector("[data-nav-menu]");
     const toggle = document.querySelector("[data-nav-menu-toggle]");
 
-    if (homeLink) homeLink.href = nav.home || "/index.html";
+    if (homeLink) homeLink.href = cleanUrl(nav.home || "/");
     if (logoImg) logoImg.src = nav.logo || "/assets/avatar.png";
 
     if (menu) {
       menu.innerHTML = "";
       (nav.pages || []).forEach((p) => {
         const a = document.createElement("a");
-        a.href = p.url;
+        a.href = cleanUrl(p.url);
         a.textContent = p.label;
         a.setAttribute("role", "menuitem");
         menu.appendChild(a);
