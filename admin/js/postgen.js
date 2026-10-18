@@ -54,16 +54,17 @@
     return stripPrerender(shell).replace(re, () => L.join("\n  ")).replace(mount, () => `<div id="app" class="page">${article}</div>`);
   }
 
+  // Trang /s/<mã> chỉ để chuyển hướng: noindex và KHÔNG có canonical (noindex + canonical gửi tín hiệu mâu thuẫn cho Google).
   function buildShortPage({ id, meta, desc, seo, base = "post", target: custom }) {
     const target = custom || `${site(seo)}/${base}/${encodeURIComponent(id)}/`, img = imageUrl(seo, meta.photo);
     return `<!doctype html>
 <html lang="vi"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>${t(meta.title)}</title><meta name="robots" content="noindex" /><link rel="canonical" href="${a(target)}" />
+<title>${t(meta.title)}</title><meta name="robots" content="noindex" />
 <meta http-equiv="refresh" content="0;url=${a(target)}" />
 <meta property="og:type" content="article" /><meta property="og:title" content="${a(meta.title)}" /><meta property="og:description" content="${a(desc)}" /><meta property="og:url" content="${a(target)}" />${img ? `<meta property="og:image" content="${a(img)}" />` : ""}
 <meta name="twitter:card" content="${img ? "summary_large_image" : "summary"}" />
 <script>location.replace(${jsonSafe(target)});</script></head>
-<body><p><a href="${a(target)}">Đang chuyển đến bài viết…</a></p></body></html>
+<body><p>Đang chuyển hướng đến đích… Nếu trang không tự mở, <a href="${a(target)}">bấm vào đây</a>.</p></body></html>
 `;
   }
 
