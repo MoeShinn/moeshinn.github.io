@@ -1,8 +1,9 @@
 ---
 title: "Shinju Ch. [VNer] chính thức debut: Kênh YouTube Vtuber/PNGtuber Việt Nam gaming, reaction & stream 20h hằng ngày"
+photo: "photo/shinju-ch-ra-mat-neon-mvee385m.webp"
 date: "19/10/2026"
-keywords: "Shinju Ch, Shinju Ch VNer, Shinju Vtuber, Vtuber Việt Nam, VNer, PNGtuber Việt Nam, kênh YouTube Vtuber Việt Nam, Vtuber mới debut 2026, Vtuber gaming, Vtuber reaction, stream game 20h, livestream YouTube Việt Nam, kênh game giải trí Việt Nam, Vtuber VN, debut Vtuber 19/10/2026"
-description: "Kênh YouTube Shinju Ch. [VNer] ra mắt video đầu tiên lúc 00:00 ngày 19/10/2026. Vtuber/PNGtuber Việt Nam chuyên chơi game, trò chuyện, reaction và livestream lúc 20h mỗi tối. Theo dõi ngay!"
+keywords: "Shinju Ch, VNer, Vtuber, PNGtuber, VtuberDebut, LivestreamVN"
+description: "Kênh YouTube Vtuber/PNGtuber Việt Nam gaming, reaction & stream 20h hằng ngày"
 ---
 <hr>
 
