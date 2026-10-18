@@ -8,10 +8,10 @@
     "mapping": "pathname"
   },
   "announcement": {
-    "enabled": false,
-    "text": "",
-    "url": "",
-    "expires": ""
+    "enabled": true,
+    "text": "Shinju Ch. đã ra mắt trên Youtube",
+    "url": "https://www.youtube.com/channel/UCoZR9unQFHLfqoOQ22lPcGA",
+    "expires": "2026-11-19"
   },
   "maintenance": {
     "enabled": false,
