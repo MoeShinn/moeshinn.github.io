@@ -115,9 +115,11 @@ Admin.boot({ id: "setting", title: "Cài đặt", async render(main) {
   <div class="card"><h3>Thanh thông báo toàn site</h3>${chk("an_on", S.announcement.enabled, "Bật thanh thông báo")}
     <label>Nội dung<input id="an_text" value="${esc(S.announcement.text)}"></label>
     <label>Link khi bấm (tùy chọn)<input id="an_url" value="${esc(S.announcement.url)}"></label>
-    <label>Tự tắt sau ngày (để trống = không hết hạn)<input id="an_exp" type="date" value="${esc(S.announcement.expires)}"></label></div>
+    <label>Tự tắt sau ngày (để trống = không hết hạn)<input id="an_exp" type="date" value="${esc(S.announcement.expires)}"></label>
+    <p class="hint">Hiện thành thanh ở trên cùng mọi trang. Khách bấm × để ẩn (đổi nội dung thì hiện lại). Hết hạn sau hết ngày đã chọn.</p></div>
   <div class="card"><h3>Chế độ bảo trì</h3>${chk("mt_on", S.maintenance.enabled, "Bật chế độ bảo trì")}
-    <label>Thông báo hiển thị<textarea id="mt_msg" rows="2">${esc(S.maintenance.message)}</textarea></label></div>
+    <label>Thông báo hiển thị<textarea id="mt_msg" rows="2">${esc(S.maintenance.message)}</textarea></label>
+    <p class="hint">Khách sẽ thấy màn hình bảo trì thay cho trang. Trình duyệt đang đăng nhập admin vẫn xem được trang bình thường (hết khi đăng xuất/hết phiên); thiết bị khác thêm <code>?bypass=1</code> vào địa chỉ trang. Bot tìm kiếm không bị chặn.</p></div>
   <div class="card"><h3>Bình luận (Giscus)</h3>${chk("gc_on", S.giscus.enabled, "Bật bình luận mặc định cho bài mới")}
     <label>Repo<input id="gc_repo" value="${esc(S.giscus.repo)}"></label>
     <label>repo-id<input id="gc_rid" value="${esc(S.giscus.repoId)}"></label>

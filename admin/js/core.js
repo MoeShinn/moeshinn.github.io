@@ -2,6 +2,7 @@
 (() => {
   const API = "https://shinju-admin-api.git-api.workers.dev";
   const KEY = "shinju_admin_session";
+  const BYPASS = "shinju_bypass_until"; // localStorage: trình duyệt này đang đăng nhập admin → trang công khai bỏ qua màn hình bảo trì (hết hạn cùng phiên)
   const NAV = [
     ["dashboard", "Dashboard", "/admin/"],
     ["post", "Bài đăng", "/admin/post/"],
@@ -69,6 +70,7 @@
   }
 
   function showLogin(root, done) {
+    try { localStorage.removeItem(BYPASS); } catch {} // chưa/không còn đăng nhập → khách thường
     root.innerHTML = `<div class="login"><form id="lf"><h1>Quản trị · Shinju</h1>
       <label>Mật khẩu<input id="pw" type="password" autocomplete="current-password" autofocus required></label>
       <div class="err" id="le"></div><button>Đăng nhập</button></form></div>`;
@@ -86,6 +88,7 @@
     document.title = title + " · Admin";
     const root = $("#app");
     if (!session()) return showLogin(root, () => boot({ id, title, render }));
+    try { localStorage.setItem(BYPASS, String(session().exp * 1000)); } catch {}
     const nav = NAV.map(([k, label, url, soon]) =>
       soon ? `<span class="soon">${label}<small>sắp có</small></span>` : `<a href="${url}" class="${k === id ? "on" : ""}">${label}</a>`).join("");
     root.innerHTML = `<div class="layout"><nav class="side"><div class="brand">Shinju Admin</div>${nav}
