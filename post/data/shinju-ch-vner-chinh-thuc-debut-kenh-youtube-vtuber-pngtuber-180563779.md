@@ -29,7 +29,7 @@ description: "Kênh YouTube Shinju Ch. [VNer] ra mắt video đầu tiên lúc 0
 <h2>Thời gian ra mắt video đầu tiên</h2>
 &lVideo debut&r của Shinju Ch. [VNer] sẽ lên sóng lúc &n&c00:00 ngày 19/10/2026&r. Đừng quên bấm &lĐăng ký&r và bật &l&e🔔 chuông thông báo&r để không bỏ lỡ nhé!
 
-![Shinju Ch. [VNer] - Vtuber PNGtuber Việt Nam debut kênh YouTube game reaction stream 20h](thay bằng prompt cho AI tạo ra ảnh: nhân vật Vtuber/PNGtuber anime dễ thương, phong cách chibi, đang vẫy tay chào, nền neon xanh tím, chữ "Shinju Ch." phía trên, banner debut YouTube)
+![Shinju Ch. VNer - Vtuber PNGtuber Việt Nam debut kênh YouTube game reaction stream 20h](/post/photo/avatar-mve2v3bk.webp)
 
 <h3>Theo dõi Shinju Ch. [VNer]</h3>
 <ul>
