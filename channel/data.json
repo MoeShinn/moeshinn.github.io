@@ -18,6 +18,12 @@
       "label": "Discord 🔮",
       "url": "https://discord.gg/eR5eHsks",
       "group": "contact"
+    },
+    {
+      "id": "youtube-mvdxdf74",
+      "icon": "youtube",
+      "label": "YouTube",
+      "url": "https://www.youtube.com/channel/UCoZR9unQFHLfqoOQ22lPcGA"
     }
   ]
 }
