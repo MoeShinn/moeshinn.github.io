@@ -1,12 +1,12 @@
 {
   "profile": {
     "name": "Shinju Ch.",
-    "avatar": "/assets/avatar.png",
+    "avatar": "/assets/avatar/avatar-mvdqth1t.webp",
     "statusColor": "#3ddc3d",
     "showOnline": true
   },
   "nav": {
-    "logo": "/assets/avatar.png",
+    "logo": "/assets/avatar/avatar-mvdqth1t.webp",
     "home": "/index.html",
     "pages": [
       {
