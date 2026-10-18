@@ -7,9 +7,16 @@
       "buttons": [
         {
           "id": "ganknow",
-          "label": "Zypage",
+          "label": "ZYPAGE",
           "type": "link",
           "url": "https://zypage.com/shinjuch",
+          "visible": true
+        },
+        {
+          "id": "btn-mvdm95g3522",
+          "label": "GANK",
+          "type": "link",
+          "url": "https://ganknow.com/shinjuch",
           "visible": true
         }
       ]
