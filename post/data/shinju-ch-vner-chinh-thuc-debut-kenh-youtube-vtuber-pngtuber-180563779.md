@@ -27,8 +27,9 @@ description: "Kênh YouTube Vtuber/PNGtuber Việt Nam gaming, reaction & stream
 
 <hr>
 
-<h2>Thời gian ra mắt video đầu tiên</h2>
-&lVideo debut&r của Shinju Ch. [VNer] sẽ lên sóng lúc &n&c00:00 ngày 19/10/2026&r. Đừng quên bấm &lĐăng ký&r và bật &l&e🔔 chuông thông báo&r để không bỏ lỡ nhé!
+<h2>Khởi đầu của kênh</h2>
+
+<a class="btn" href="https://youtube.com/shorts/wUzWvpvYZ8k?si=23794EFnBLr7jUgY" target="_blank" rel="noopener noreferrer">Xem video ik nè</a>
 
 ![Shinju Ch. VNer - Vtuber PNGtuber Việt Nam debut kênh YouTube game reaction stream 20h](/post/photo/avatar-mve2v3bk.webp)
 
