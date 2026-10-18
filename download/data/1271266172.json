@@ -3,8 +3,8 @@
   "description": "Tải Source Tree Extractor và Picture Lite để nén ảnh, thay ảnh đã nén và xuất mã nguồn website ra TXT dễ đọc.",
   "keywords": "Source Tree Extractor, Picture Lite, tối ưu website, nén ảnh, thay ảnh đã nén, xuất mã nguồn website, trang tải xuống",
   "hint": "Bạn có thể xem tính năng bằng cách vô trang POST và search Picture Lite hoặc Extractor là ok nha",
-  "requireAllAds": false,
-  "adButtons": [],
+  "requireAllLinks": false,
+  "linkButtons": [],
   "downloads": [
     {
       "id": "primary",

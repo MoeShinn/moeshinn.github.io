@@ -1,11 +1,11 @@
 /* Shinju download page — download/js/main.js
    URL: /download/<id>/  ->  fetches /download/data/<id>.json for this file's
-   config, plus the shared /download/ads-data.json pool.
+   config, plus the shared /download/link-data.json pool.
    No id / fetch failure -> redirect to the site's 404.
 
-   Ad-watch mechanism (Page Visibility API):
-   Clicking an ad button opens a random matching, non-expired link
-   from ads-data.json in a NEW TAB, then marks that button "active".
+   Link-unlock mechanism (Page Visibility API):
+   Clicking a link button opens a random matching, non-expired link
+   from link-data.json in a NEW TAB, then marks that button "active".
    While this tab is hidden (document.hidden), time is NOT ticked live
    (the page can't repaint while hidden anyway) — instead, the elapsed
    hidden-time is added to that button's progress the moment the
@@ -17,7 +17,7 @@
 
    Download buttons: a file can have MORE THAN ONE (e.g. a primary
    link + a backup mirror) — see config.downloads below. All of them
-   share the same unlock condition (finish the required ads), and a
+   share the same unlock condition (finish the required links), and a
    click on ANY of them counts as one "download" for the counter.
 */
 
@@ -204,19 +204,19 @@ async function loadFileConfig(id) {
     return config;
 }
 
-async function loadAdPool() {
+async function loadLinkPool() {
     try {
-        const res = await fetch("/download/ads-data.json", { cache: "no-store" });
-        if (!res.ok) return { adLinks: [] };
+        const res = await fetch("/download/link-data.json", { cache: "no-store" });
+        if (!res.ok) return { links: [] };
         const data = await res.json();
-        return { adLinks: Array.isArray(data.adLinks) ? data.adLinks : [] };
+        return { links: Array.isArray(data.links) ? data.links : [] };
     } catch (e) {
-        return { adLinks: [] }; // shared pool unreachable -> every button falls back to "skip"
+        return { links: [] }; // shared pool unreachable -> every button falls back to "skip"
     }
 }
 
 /* ============================================================== */
-/* Ad link selection                                                */
+/* Link selection                                                   */
 /* ============================================================== */
 
 function isLinkValid(expires) {
@@ -240,9 +240,9 @@ function hasStarted(start) {
     return !m || Date.now() >= new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1])).getTime();
 }
 
-function pickAdLink(categories, pool) {
+function pickLink(categories, pool) {
     const wanted = new Set((categories || []).map((c) => c.toLowerCase()));
-    const matches = pool.adLinks.filter(
+    const matches = pool.links.filter(
         (link) => link.enabled !== false && hasStarted(link.start) && wanted.has(String(link.category || "").toLowerCase()) && isLinkValid(link.expires)
     );
     if (!matches.length) return null;
@@ -347,13 +347,13 @@ async function main() {
         return;
     }
 
-    const pool = await loadAdPool();
+    const pool = await loadLinkPool();
     const root = document.getElementById("app");
 
     // "hint" trong file json: chữ tự đặt; chuỗi rỗng = ẩn; không có = câu mặc định.
     const hintText = typeof config.hint === "string" ? config.hint
-        : config.requireAllAds === false ? "Bạn có thể tải ngay. Nếu muốn ủng hộ mình, hãy bấm các nút bên dưới nhé!"
-        : "Xem quảng cáo bên dưới để ủng hộ mình, sau đó bấm Tải Xuống nhé!";
+        : config.requireAllLinks === false ? "Bạn có thể tải ngay. Nếu muốn ủng hộ mình, hãy bấm các nút bên dưới nhé!"
+        : "Bấm vào các liên kết bên dưới để ủng hộ mình, sau đó bấm Tải Xuống nhé!";
     const downloadButtonsHtml = config.downloads
         .map(
             (dl, i) => `
@@ -367,7 +367,7 @@ async function main() {
     <div class="download-card">
       <h1 class="download-title">${escapeHtml(config.title || "Tải xuống")}</h1>
       ${hintText ? `<p class="download-hint">${escapeHtml(hintText)}</p>` : ""}
-      <div class="ad-button-list" data-ad-list></div>
+      <div class="link-button-list" data-link-list></div>
       <p class="download-count" data-download-count>⬇ …</p>
       <div class="download-btn-list" data-download-list>${downloadButtonsHtml}</div>
       <p class="download-note" data-download-note></p>
@@ -387,15 +387,15 @@ async function main() {
         downloadCountEl.textContent = `⬇ ${formatCount(count)}`;
     });
 
-    const adButtons = Array.isArray(config.adButtons) ? config.adButtons : [];
-    const requireAll = config.requireAllAds !== false; // default true unless explicitly false
-    const list = document.querySelector("[data-ad-list]");
+    const linkButtons = Array.isArray(config.linkButtons) ? config.linkButtons : [];
+    const requireAll = config.requireAllLinks !== false; // default true unless explicitly false
+    const list = document.querySelector("[data-link-list]");
     const downloadBtns = Array.from(document.querySelectorAll("[data-download-btn]"));
     const downloadNote = document.querySelector("[data-download-note]");
 
-    // in-memory view of each ad button's state, keyed by button id
+    // in-memory view of each link button's state, keyed by button id
     const state = {};
-    let activeButtonId = null; // the ad button currently "earning" hidden-time
+    let activeButtonId = null; // the link button currently "earning" hidden-time
     let hiddenSince = null;
 
     function isButtonDone(btn) {
@@ -403,7 +403,7 @@ async function main() {
     }
 
     function checkUnlock() {
-        const unlocked = !requireAll || adButtons.every(isButtonDone);
+        const unlocked = !requireAll || linkButtons.every(isButtonDone);
         downloadBtns.forEach((el) => {
             const i = Number(el.getAttribute("data-download-index"));
             const dl = config.downloads[i];
@@ -419,7 +419,7 @@ async function main() {
         const el = document.querySelector(`[data-btn-id="${CSS.escape(String(btn.id))}"]`);
         if (!el) return;
         const s = state[btn.id];
-        const statusEl = el.querySelector("[data-ad-status]");
+        const statusEl = el.querySelector("[data-link-status]");
 
         el.classList.remove("in-progress", "completed", "skipped");
         if (s.skipped) {
@@ -439,26 +439,26 @@ async function main() {
         }
     }
 
-    adButtons.forEach((btn) => {
+    linkButtons.forEach((btn) => {
         const saved = getProgress(fileId, btn.id);
         state[btn.id] = { seconds: saved.seconds || 0, completed: !!saved.completed, skipped: false };
 
         const item = document.createElement("button");
         item.type = "button";
-        item.className = "ad-btn";
+        item.className = "link-btn";
         item.setAttribute("data-btn-id", btn.id);
         item.innerHTML = `
-      <span class="ad-btn-label">${escapeHtml(btn.label || "Xem quảng cáo")}</span>
-      <span class="ad-btn-status" data-ad-status></span>
+      <span class="link-btn-label">${escapeHtml(btn.label || "Mở liên kết")}</span>
+      <span class="link-btn-status" data-link-status></span>
     `;
 
         item.addEventListener("click", () => {
             if (state[btn.id].completed || state[btn.id].skipped) return;
 
-            // type "custom": mở đúng link đã đặt; còn lại: chọn ngẫu nhiên trong nhóm quảng cáo.
-            const link = btn.type === "custom" ? (/^https?:\/\//i.test(btn.url || "") ? { url: btn.url } : null) : pickAdLink(btn.categories, pool);
+            // type "custom": mở đúng link đã đặt; còn lại: chọn ngẫu nhiên trong nhóm liên kết.
+            const link = btn.type === "custom" ? (/^https?:\/\//i.test(btn.url || "") ? { url: btn.url } : null) : pickLink(btn.categories, pool);
             if (!link) {
-                // No valid ad available for this button's categories -> per
+                // No valid link available for this button's categories -> per
                 // site policy, auto-skip it rather than blocking the download.
                 state[btn.id].completed = true;
                 state[btn.id].skipped = true;
@@ -488,7 +488,7 @@ async function main() {
         }
         if (hiddenSince && activeButtonId && state[activeButtonId] && !state[activeButtonId].completed) {
             const elapsedSec = (Date.now() - hiddenSince) / 1000;
-            const btn = adButtons.find((b) => b.id === activeButtonId);
+            const btn = linkButtons.find((b) => b.id === activeButtonId);
             const s = state[activeButtonId];
             s.seconds = Math.min(btn.seconds, s.seconds + elapsedSec);
             if (s.seconds >= btn.seconds) s.completed = true;
@@ -520,7 +520,7 @@ async function main() {
             }
 
             // Count the actual download action (not the page view, not
-            // finishing the ads) — fire-and-forget, never blocks the
+            // finishing the links) — fire-and-forget, never blocks the
             // download itself if the counter API is slow/cold-starting.
             hitDownloadCount(fileId).then((count) => {
                 if (count != null) downloadCountEl.textContent = `⬇ ${formatCount(count)}`;

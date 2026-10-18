@@ -206,3 +206,15 @@ body::before {
         height: 140px;
     }
 }
+
+/* ---------- Câu giới thiệu dưới tên (dựng sẵn trong HTML để bot/AI hiểu trang là gì; xem tools/prerender.js) ---------- */
+.site-tagline {
+    max-width: 360px;
+    margin: -16px 0 26px;
+    font-size: 15px;
+    line-height: 1.45;
+    text-align: center;
+    color: var(--text-cream);
+    opacity: 0.78;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}

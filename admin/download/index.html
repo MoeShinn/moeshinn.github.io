@@ -28,7 +28,7 @@ Admin.boot({ id: "download", title: "Download", async render(main) {
     } catch (e) { return null; }
   }
   const load = async () => {
-    [S, tree, pool] = await Promise.all([Admin.readJson("site-settings.json", {}), Admin.api("/tree").then((r) => r.files.map((f) => f.path)), Admin.readJson("download/ads-data.json", { adLinks: [] })]);
+    [S, tree, pool] = await Promise.all([Admin.readJson("site-settings.json", {}), Admin.api("/tree").then((r) => r.files.map((f) => f.path)), Admin.readJson("download/link-data.json", { links: [] })]);
     const ids = tree.map((p) => (p.match(/^download\/data\/([^/]+)\.json$/) || [])[1]).filter(Boolean);
     items = await Promise.all(ids.map(async (id) => ({ id, d: await Admin.readJson(`download/data/${id}.json`) })));
     // Thứ tự danh sách: ngày tạo mới nhất lên đầu. Mục mới lưu sẵn createdAt; mục cũ chưa có thì
@@ -38,12 +38,12 @@ Admin.boot({ id: "download", title: "Download", async render(main) {
   };
   try { await load(); } catch (e) { main.innerHTML = `<h2>Download</h2><p class="err">${esc(e.message)}</p>`; return; }
   const seo = AdminSeo.merge(S.seo), site = seo.siteUrl.replace(/\/$/, "");
-  const cats = [...new Set([...(pool.adLinks || []).map((l) => l.category).filter(Boolean), "Youtube", "Social Media", "Image"])];
-  const DEF_HINT = "Xem quảng cáo bên dưới để ủng hộ mình, sau đó bấm Tải Xuống nhé!";
+  const cats = [...new Set([...(pool.links || []).map((l) => l.category).filter(Boolean), "Youtube", "Social Media", "Image"])];
+  const DEF_HINT = "Bấm vào các liên kết bên dưới để ủng hộ mình, sau đó bấm Tải Xuống nhé!";
 
   /* ---------------- Danh sách ---------------- */
   function showList() {
-    const rows = items.map(({ id, d, ts }) => `<tr style="border-top:1px solid var(--line)"><td style="padding:8px 0">${esc(d.title || id)}<br><small class="hint">${esc(id)}${ts ? " · " + new Date(ts).toLocaleDateString("vi-VN") : ""} · ${(d.downloads || []).length} nút tải · ${(d.adButtons || []).length} nút quảng cáo</small></td>
+    const rows = items.map(({ id, d, ts }) => `<tr style="border-top:1px solid var(--line)"><td style="padding:8px 0">${esc(d.title || id)}<br><small class="hint">${esc(id)}${ts ? " · " + new Date(ts).toLocaleDateString("vi-VN") : ""} · ${(d.downloads || []).length} nút tải · ${(d.linkButtons || []).length} nút liên kết</small></td>
       <td style="text-align:right;white-space:nowrap"><a href="/download/${encodeURIComponent(id)}/" target="_blank">Mở</a>${d.short ? ` · <a href="#" data-copy="${site}/s/${esc(d.short)}/">Chép link</a>` : ""} · <a href="#edit/${encodeURIComponent(id)}">Sửa</a> · <a href="#" data-del="${esc(id)}" style="color:#ff8b8f">Xóa</a></td></tr>`).join("");
     main.innerHTML = `<h2>Download</h2><p><a class="btn" href="#new">＋ Mục tải mới</a></p>
       <div class="card"><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">${rows || '<tr><td class="hint">Chưa có mục tải nào.</td></tr>'}</table></div></div>`;
@@ -60,9 +60,9 @@ Admin.boot({ id: "download", title: "Download", async render(main) {
     const old = editId ? items.find((x) => x.id === editId)?.d : null;
     if (editId && !old) { location.hash = ""; return; }
     const d = old || {};
-    let ads = (d.adButtons || []).map((b) => ({ ...b, type: b.type === "custom" ? "custom" : "ads", categories: b.categories || [] }));
+    let lbs = (d.linkButtons || []).map((b) => ({ ...b, type: b.type === "custom" ? "custom" : "group", categories: b.categories || [] }));
     let dls = (d.downloads || (d.download ? [d.download] : [])).map((x) => ({ ...x }));
-    if (!editId) { ads = [{ id: "ad1", label: "Xem quảng cáo 10s để ủng hộ mình", seconds: 10, type: "ads", categories: ["Youtube"] }]; dls = [{ id: "primary", label: "Tải Xuống", url: "" }]; }
+    if (!editId) { lbs = [{ id: "link1", label: "Mở liên kết 10s để ủng hộ mình", seconds: 10, type: "group", categories: ["Youtube"] }]; dls = [{ id: "primary", label: "Tải Xuống", url: "" }]; }
     const hintMode = typeof d.hint === "string" ? (d.hint === "" ? "hide" : "custom") : "default";
     main.innerHTML = `<h2>${editId ? "Sửa mục tải" : "Mục tải mới"} <a href="#" style="font-size:14px;margin-left:8px">← Danh sách</a></h2>
     <div class="card">
@@ -76,34 +76,34 @@ Admin.boot({ id: "download", title: "Download", async render(main) {
     <div class="card"><h3>Câu hướng dẫn trên trang</h3>
       <label><select id="d_hm"><option value="default" ${hintMode === "default" ? "selected" : ""}>Dùng câu mặc định</option><option value="custom" ${hintMode === "custom" ? "selected" : ""}>Tự viết câu riêng</option><option value="hide" ${hintMode === "hide" ? "selected" : ""}>Ẩn câu hướng dẫn</option></select></label>
       <label id="d_hl">Nội dung câu<input id="d_hint" placeholder="${esc(DEF_HINT)}" value="${esc(hintMode === "custom" ? d.hint : "")}"></label></div>
-    <div class="card"><h3>Nút quảng cáo</h3><label class="row"><input type="checkbox" id="d_req" ${d.requireAllAds === false ? "" : "checked"}>Bắt buộc xem hết các nút quảng cáo mới được tải <small class="hint">(bỏ tick: ai cũng tải được ngay, nút quảng cáo chỉ để ủng hộ nếu muốn)</small></label><div id="adl"></div><button type="button" class="ghost" id="ad_add">＋ Thêm nút quảng cáo</button></div>
+    <div class="card"><h3>Nút liên kết</h3><label class="row"><input type="checkbox" id="d_req" ${d.requireAllLinks === false ? "" : "checked"}>Bắt buộc mở hết các nút liên kết mới được tải <small class="hint">(bỏ tick: ai cũng tải được ngay, nút liên kết chỉ để ủng hộ nếu muốn)</small></label><div id="lbl"></div><button type="button" class="ghost" id="lb_add">＋ Thêm nút liên kết</button></div>
     <div class="card"><h3>Nút tải xuống</h3><div id="dll"></div><button type="button" class="ghost" id="dl_add">＋ Thêm nút tải</button></div>
     <button id="d_save">${editId ? "Lưu thay đổi" : "Đăng mục tải"}</button> <span class="hint" id="d_st"></span>`;
     $("#d_hm").onchange = () => ($("#d_hl").style.display = $("#d_hm").value === "custom" ? "" : "none"); $("#d_hm").onchange();
     const move = (arr, i, k) => { const j = i + k; if (j < 0 || j >= arr.length) return; [arr[i], arr[j]] = [arr[j], arr[i]]; };
     const ctl = (kind, i, n) => `<span style="white-space:nowrap"><button type="button" class="ghost" data-mv="${kind}:${i}:-1" ${i === 0 ? "disabled" : ""}>↑</button> <button type="button" class="ghost" data-mv="${kind}:${i}:1" ${i === n - 1 ? "disabled" : ""}>↓</button> <button type="button" class="ghost" data-rm="${kind}:${i}">✕</button></span>`;
     function draw() {
-      $("#adl").innerHTML = ads.map((b, i) => `<div class="card" style="background:#0a1626"><div class="cols">
-        <label>Chữ trên nút<input data-f="ads:${i}:label" value="${esc(b.label)}"></label>
-        <label>Số giây phải xem<input type="number" min="1" max="300" data-f="ads:${i}:seconds" value="${esc(b.seconds)}"></label></div>
-        <label>Loại<select data-f="ads:${i}:type"><option value="ads" ${b.type === "ads" ? "selected" : ""}>Quảng cáo theo nhóm (chọn ngẫu nhiên trong kho)</option><option value="custom" ${b.type === "custom" ? "selected" : ""}>Link tự chọn (vd: video bạn muốn cho xem)</option></select></label>
-        ${b.type === "custom" ? `<label>Link cần mở<input data-f="ads:${i}:url" placeholder="https://…" value="${esc(b.url || "")}"></label>`
-          : `<div class="hint">Nhóm quảng cáo:</div><div style="display:flex;flex-wrap:wrap;gap:12px;margin:6px 0">${cats.map((c) => `<label class="row" style="margin:0"><input type="checkbox" data-cat="${i}" value="${esc(c)}" ${b.categories.map((x) => x.toLowerCase()).includes(c.toLowerCase()) ? "checked" : ""}>${esc(c)}</label>`).join("")}</div>`}
-        <div style="text-align:right">${ctl("ads", i, ads.length)}</div></div>`).join("") || '<p class="hint">Chưa có nút quảng cáo (người dùng tải ngay).</p>';
+      $("#lbl").innerHTML = lbs.map((b, i) => `<div class="card" style="background:#0a1626"><div class="cols">
+        <label>Chữ trên nút<input data-f="lbs:${i}:label" value="${esc(b.label)}"></label>
+        <label>Số giây phải xem<input type="number" min="1" max="300" data-f="lbs:${i}:seconds" value="${esc(b.seconds)}"></label></div>
+        <label>Loại<select data-f="lbs:${i}:type"><option value="group" ${b.type === "group" ? "selected" : ""}>Liên kết theo nhóm (chọn ngẫu nhiên trong kho)</option><option value="custom" ${b.type === "custom" ? "selected" : ""}>Link tự chọn (vd: video bạn muốn cho xem)</option></select></label>
+        ${b.type === "custom" ? `<label>Link cần mở<input data-f="lbs:${i}:url" placeholder="https://…" value="${esc(b.url || "")}"></label>`
+          : `<div class="hint">Nhóm liên kết:</div><div style="display:flex;flex-wrap:wrap;gap:12px;margin:6px 0">${cats.map((c) => `<label class="row" style="margin:0"><input type="checkbox" data-cat="${i}" value="${esc(c)}" ${b.categories.map((x) => x.toLowerCase()).includes(c.toLowerCase()) ? "checked" : ""}>${esc(c)}</label>`).join("")}</div>`}
+        <div style="text-align:right">${ctl("lbs", i, lbs.length)}</div></div>`).join("") || '<p class="hint">Chưa có nút liên kết (người dùng tải ngay).</p>';
       $("#dll").innerHTML = dls.map((x, i) => `<div class="card" style="background:#0a1626"><div class="cols">
         <label>Chữ trên nút<input data-f="dls:${i}:label" value="${esc(x.label)}"></label>
         <label>Link tải<input data-f="dls:${i}:url" placeholder="https://…" value="${esc(x.url)}"></label></div>
         <div style="text-align:right">${ctl("dls", i, dls.length)}</div></div>`).join("");
     }
-    const arr = (k) => (k === "ads" ? ads : dls);
+    const arr = (k) => (k === "lbs" ? lbs : dls);
     main.addEventListener("input", (e) => { const f = e.target.dataset.f; if (!f) return; const [k, i, p] = f.split(":"); const v = e.target.value; arr(k)[+i][p] = p === "seconds" ? +v : v; });
     main.addEventListener("change", (e) => { const t = e.target;
-      if (t.dataset.f && t.dataset.f.endsWith(":type")) { ads[+t.dataset.f.split(":")[1]].type = t.value; draw(); }
-      if (t.dataset.cat !== undefined) { const b = ads[+t.dataset.cat]; b.categories = [...main.querySelectorAll(`[data-cat="${t.dataset.cat}"]:checked`)].map((c) => c.value); } });
+      if (t.dataset.f && t.dataset.f.endsWith(":type")) { lbs[+t.dataset.f.split(":")[1]].type = t.value; draw(); }
+      if (t.dataset.cat !== undefined) { const b = lbs[+t.dataset.cat]; b.categories = [...main.querySelectorAll(`[data-cat="${t.dataset.cat}"]:checked`)].map((c) => c.value); } });
     main.addEventListener("click", (e) => { const t = e.target;
       if (t.dataset.mv) { const [k, i, s] = t.dataset.mv.split(":"); move(arr(k), +i, +s); draw(); }
       if (t.dataset.rm) { const [k, i] = t.dataset.rm.split(":"); arr(k).splice(+i, 1); draw(); } });
-    $("#ad_add").onclick = () => { const n = Math.max(0, ...ads.map((b) => parseInt(String(b.id).replace(/\D/g, "")) || 0)) + 1; ads.push({ id: "ad" + n, label: "Xem quảng cáo để ủng hộ mình", seconds: 10, type: "ads", categories: [] }); draw(); };
+    $("#lb_add").onclick = () => { const n = Math.max(0, ...lbs.map((b) => parseInt(String(b.id).replace(/\D/g, "")) || 0)) + 1; lbs.push({ id: "link" + n, label: "Mở liên kết để ủng hộ mình", seconds: 10, type: "group", categories: [] }); draw(); };
     $("#dl_add").onclick = () => { dls.push({ id: "dl" + (dls.length + 1), label: `Link dự phòng ${dls.length}`, url: "" }); draw(); };
     $("#d_ai").onclick = async () => { const b = $("#d_ai"); b.disabled = true;
       try { const r = await Admin.api("/ai/seo", { title: $("#d_title").value, body: `Trang tải xuống. ${$("#d_desc").value} ${$("#d_kw").value}` }); if (r.description) $("#d_desc").value = r.description; if (r.keywords) $("#d_kw").value = [].concat(r.keywords).join(", "); Admin.toast("AI đã điền gợi ý, xem lại rồi đăng."); }
@@ -112,9 +112,9 @@ Admin.boot({ id: "download", title: "Download", async render(main) {
       const v = (i) => $("#" + i).value.trim(), title = v("d_title"), isUrl = (u) => /^https?:\/\//i.test(String(u || "").trim());
       if (!title) return Admin.toast("Cần nhập tiêu đề", true);
       if (!dls.length || dls.some((x) => !isUrl(x.url))) return Admin.toast("Mỗi nút tải cần một link http(s)://", true);
-      for (const [i, b] of ads.entries()) {
-        if (!(b.seconds >= 1 && b.seconds <= 300)) return Admin.toast(`Nút quảng cáo ${i + 1}: số giây phải từ 1 đến 300`, true);
-        if (b.type === "custom" ? !isUrl(b.url) : !b.categories.length) return Admin.toast(`Nút quảng cáo ${i + 1}: ${b.type === "custom" ? "cần link http(s)://" : "hãy chọn ít nhất một nhóm"}`, true);
+      for (const [i, b] of lbs.entries()) {
+        if (!(b.seconds >= 1 && b.seconds <= 300)) return Admin.toast(`Nút liên kết ${i + 1}: số giây phải từ 1 đến 300`, true);
+        if (b.type === "custom" ? !isUrl(b.url) : !b.categories.length) return Admin.toast(`Nút liên kết ${i + 1}: ${b.type === "custom" ? "cần link http(s)://" : "hãy chọn ít nhất một nhóm"}`, true);
       }
       let id = editId; const used = new Set(tree.map((p) => (p.match(/^download\/data\/([^/]+)\.json$/) || [])[1]).filter(Boolean));
       if (!id) { const c = v("d_id") && PostGen.slugify(v("d_id")); if (c) { if (used.has(c)) return Admin.toast("ID này đã có mục tải dùng", true); id = c; } else id = PostGen.newPostId(title, used); }
@@ -124,8 +124,8 @@ Admin.boot({ id: "download", title: "Download", async render(main) {
       put("description", v("d_desc")); put("keywords", v("d_kw"));
       const hm = $("#d_hm").value; if (hm === "hide") data.hint = ""; else if (hm === "custom" && v("d_hint")) data.hint = v("d_hint"); else delete data.hint;
       if ($("#d_cm").checked) delete data.comments; else data.comments = false;
-      if ($("#d_req").checked) delete data.requireAllAds; else data.requireAllAds = false;
-      data.adButtons = ads.map((b) => ({ id: b.id, label: b.label.trim() || "Xem quảng cáo", seconds: b.seconds, ...(b.type === "custom" ? { type: "custom", url: b.url.trim() } : { categories: b.categories }) }));
+      if ($("#d_req").checked) delete data.requireAllLinks; else data.requireAllLinks = false;
+      data.linkButtons = lbs.map((b) => ({ id: b.id, label: b.label.trim() || "Mở liên kết", seconds: b.seconds, ...(b.type === "custom" ? { type: "custom", url: b.url.trim() } : { categories: b.categories }) }));
       data.downloads = dls.map((x, i) => ({ ...x, id: x.id || "dl" + (i + 1), label: (x.label || "").trim() || (i === 0 ? "Tải Xuống" : `Link dự phòng ${i}`), url: x.url.trim() }));
       delete data.download;
       const b = $("#d_save"); b.disabled = true; $("#d_st").textContent = "Đang đăng…";

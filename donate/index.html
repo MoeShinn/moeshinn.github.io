@@ -13,7 +13,7 @@
   <meta property="og:title" content="Ủng Hộ — Shinju Ch." />
   <meta property="og:description" content="Ủng hộ Shinju Ch. để duy trì và phát triển nội dung." />
   <meta property="og:url" content="https://shinjuvn.github.io/donate/" />
-  <meta property="og:image" content="https://github.com/ShinjuVN/shinjuvn.github.io/blob/main/assets/avatar/avatar-mvdqth1t.webp" />
+  <meta property="og:image" content="https://shinjuvn.github.io/assets/avatar.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32.png?v=mv2ezum2" />
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon/favicon-192.png?v=mv2ezum2" />
@@ -28,21 +28,16 @@
   <script src="/js/pwa.js" defer></script>
 </head>
 <body>
-  <div id="site-loading" class="site-loading">
-    <div class="site-loading-inner">
-      <p class="site-loading-msg">Chờ xíu nhé!<br />Trang của bạn đang được tải</p>
-      <div class="site-loading-bar"><div class="site-loading-fill"></div></div>
-    </div>
-  </div>
+
   <script src="/js/loading.js"></script>
 
   <header class="site-header">
-    <a href="/index.html" class="site-header-logo" data-nav-home aria-label="Về trang chủ">
-      <img src="/assets/avatar.png" alt="Logo" data-nav-logo />
+    <a href="/" class="site-header-logo" data-nav-home aria-label="Về trang chủ">
+      <img src="/assets/avatar.png" alt="Shinju Ch." data-nav-logo />
     </a>
     <div class="site-header-menu-wrap">
       <button type="button" class="site-header-menu-btn" data-nav-menu-toggle aria-haspopup="true" aria-expanded="false" aria-label="Menu">☰</button>
-      <nav class="site-header-menu" data-nav-menu role="menu"></nav>
+      <nav class="site-header-menu" data-nav-menu role="menu"><!--pre:nav--><a href="/" role="menuitem">Trang chủ</a><a href="/channel/" role="menuitem">Kênh</a><a href="/donate/" role="menuitem">Donate</a><a href="/post/" role="menuitem">Bài Đăng</a><!--/pre:nav--></nav>
     </div>
   </header>
   <script src="/js/site-chrome.js"></script>
@@ -50,7 +45,7 @@
   <main class="page">
     <h1 class="page-title" data-title>Ủng Hộ Shinju Ch.</h1>
 
-    <div class="method-list" data-method-list></div>
+    <div class="method-list" data-method-list><!--pre:methods--><div class="method"><div class="method-label">Donate qua</div><div class="donate-btn-row"><a class="donate-btn" href="https://zypage.com/shinjuch" target="_blank" rel="noopener noreferrer">Zypage</a></div></div><!--/pre:methods--></div>
 
     <footer class="site-footer" data-global-footer>© 2026 Shinju Ch. (@ShinjuVNer). All rights reserved.</footer>
   </main>

@@ -88,15 +88,15 @@ body::before {
   line-height: 1.6;
 }
 
-/* ---------- Ad-watch buttons ---------- */
-.ad-button-list {
+/* ---------- Link buttons ---------- */
+.link-button-list {
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.ad-btn {
+.link-btn {
   width: 100%;
   display: flex;
   align-items: center;
@@ -116,28 +116,28 @@ body::before {
   transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
 }
 
-.ad-btn:hover:not(:disabled),
-.ad-btn:focus-visible:not(:disabled) {
+.link-btn:hover:not(:disabled),
+.link-btn:focus-visible:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 10px 22px rgba(0,0,0,0.4);
 }
 
-.ad-btn:active:not(:disabled) {
+.link-btn:active:not(:disabled) {
   transform: translateY(0);
 }
 
-.ad-btn.in-progress {
+.link-btn.in-progress {
   background: linear-gradient(180deg, var(--amber-1), var(--amber-2));
   color: #2a1a00;
 }
 
-.ad-btn.completed {
+.link-btn.completed {
   background: linear-gradient(180deg, var(--green-1), var(--green-2));
   color: #f4fff0;
   cursor: default;
 }
 
-.ad-btn.skipped {
+.link-btn.skipped {
   background: rgba(255,255,255,0.08);
   color: rgba(244, 236, 216, 0.6);
   border-color: rgba(244, 236, 216, 0.15);
@@ -145,11 +145,11 @@ body::before {
   box-shadow: none;
 }
 
-.ad-btn:disabled {
+.link-btn:disabled {
   cursor: default;
 }
 
-.ad-btn-status {
+.link-btn-status {
   font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
@@ -228,7 +228,7 @@ body::before {
 
 @media (max-width: 420px) {
   .download-title { font-size: 19px; }
-  .ad-btn { font-size: 14px; padding: 12px 14px; }
+  .link-btn { font-size: 14px; padding: 12px 14px; }
 }
 
 .download-share{display:flex;justify-content:center;margin-top:14px}

@@ -4,6 +4,9 @@
   const ALNUM = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   const a = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const t = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  // Danh sách bài dựng sẵn trong shell post/index.html (khối pre:postlist, do tools/prerender.js tạo) KHÔNG được lọt vào trang từng bài.
+  // Các khối khác (menu pre:nav…) vẫn giữ lại để trang con cũng có menu tĩnh.
+  const stripPrerender = (html) => String(html).replace(/<!--pre:postlist-->[\s\S]*?<!--\/pre:postlist-->/g, "");
   const jsonSafe = (o) => JSON.stringify(o).replace(/</g, "\\u003c");
   const rndInt = (n) => { const b = new Uint32Array(1), lim = 4294967296 - (4294967296 % n); let x; do { C.getRandomValues(b); x = b[0]; } while (x >= lim); return x % n; };
 
@@ -48,7 +51,7 @@
     if (!re.test(shell)) throw new Error("post/index.html thiếu cặp <!-- seo:start --> / <!-- seo:end -->");
     if (!shell.includes(mount)) throw new Error('post/index.html không có <div id="app" class="page"></div>');
     const article = `<article class="post-article"><h1 class="post-title">${t(meta.title)}</h1><div class="post-body">${bodyHtml}</div></article>`;
-    return shell.replace(re, () => L.join("\n  ")).replace(mount, () => `<div id="app" class="page">${article}</div>`);
+    return stripPrerender(shell).replace(re, () => L.join("\n  ")).replace(mount, () => `<div id="app" class="page">${article}</div>`);
   }
 
   function buildShortPage({ id, meta, desc, seo, base = "post", target: custom }) {
@@ -81,7 +84,7 @@
     if (!re.test(shell)) throw new Error("download/index.html thiếu cặp <!-- seo:start --> / <!-- seo:end -->");
     if (!shell.includes(mount)) throw new Error('download/index.html không có <div id="app" class="page"></div>');
     const pre = `<div class="download-card"><h1 class="download-title">${t(heading)}</h1><p class="download-hint">${t(desc)}</p></div>`;
-    return shell.replace(re, () => L.join("\n  ")).replace(mount, () => `<div id="app" class="page">${pre}</div>`);
+    return stripPrerender(shell).replace(re, () => L.join("\n  ")).replace(mount, () => `<div id="app" class="page">${pre}</div>`);
   }
 
   // ---- Link rút gọn tự đặt: /s/<id> -> bất kỳ đường dẫn trong web hoặc link ngoài ----

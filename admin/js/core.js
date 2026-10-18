@@ -10,7 +10,7 @@
     ["donate", "Donate", "/admin/donate/"],
     ["links", "Link rút gọn", "/admin/links/"],
     ["images", "Kho ảnh", "/admin/images/"],
-    ["ads", "Quảng cáo", "/admin/ads/"],
+    ["linkpool", "Kho liên kết", "/admin/linkpool/"],
     ["stats", "Số liệu", "/admin/stats/"],
     ["status", "Trạng thái", "/admin/status/"],
     ["setting", "Cài đặt", "/admin/setting/"],

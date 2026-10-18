@@ -34,7 +34,7 @@ const toIcon = (file, size, kind, o) => new Promise((res, rej) => {
     const inner = size * (1 - 2 * pad); g.drawImage(im, (w - m) / 2, (h - m) / 2, m, m, size * pad, size * pad, inner, inner);
     URL.revokeObjectURL(u); res(c.toDataURL("image/png").split(",")[1]); };
   im.onerror = () => rej(new Error("Không đọc được ảnh favicon")); im.src = u; });
-const favOpts = () => ({ style: $("#fav_style").value, bgOn: $("#fav_bgon").checked, bg: $("#fav_bg").value, pad: $("#fav_pad").value / 100 });
+const favOpts = () => { const $ = Admin.$; return { style: $("#fav_style").value, bgOn: $("#fav_bgon").checked, bg: $("#fav_bg").value, pad: $("#fav_pad").value / 100 }; };
 // Cắt ảnh vuông ở giữa rồi đổi sang PNG (base64) theo kích thước size.
 const toPng = (file, size) => new Promise((res, rej) => {
   const u = URL.createObjectURL(file), im = new Image();
