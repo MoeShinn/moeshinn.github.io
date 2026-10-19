@@ -11,13 +11,13 @@
 <script src="/admin/js/rebuild.js"></script>
 <script>
 const PAGES = AdminSeo.PAGES;
-// Cắt vuông ở giữa, đổi cỡ size×size, ưu tiên WebP (nhẹ hơn, giữ nền trong suốt); trả về { b64, ext }
+// Cắt vuông ở giữa, đổi cỡ size×size, xuất WebP (nhẹ, giữ nền trong suốt); trả về { b64, ext }
 const toSquare = (file, size) => new Promise((res, rej) => {
   const u = URL.createObjectURL(file), im = new Image();
   im.onload = () => { const c = document.createElement("canvas"); c.width = c.height = size;
     const w = im.naturalWidth || size, h = im.naturalHeight || size, m = Math.min(w, h);
     c.getContext("2d").drawImage(im, (w - m) / 2, (h - m) / 2, m, m, 0, 0, size, size); URL.revokeObjectURL(u);
-    const d = c.toDataURL("image/webp", 0.9), ok = d.startsWith("data:image/webp"); res({ b64: (ok ? d : c.toDataURL("image/png")).split(",")[1], ext: ok ? "webp" : "png" }); };
+    const d = c.toDataURL("image/webp", 0.9); if (!d.startsWith("data:image/webp")) return rej(new Error("Trình duyệt này không xuất được WebP, hãy dùng Chrome/Edge/Firefox")); res({ b64: d.split(",")[1], ext: "webp" }); };
   im.onerror = () => rej(new Error("Không đọc được ảnh đại diện")); im.src = u; });
 // Favicon: "icon" (bo góc kiểu Android / tròn / vuông gốc), "apple" (vuông kín nền, iOS tự bo), "maskable" (vuông kín, ảnh thu vào vùng an toàn 66% để Android cắt hình tròn/giọt nước không mất ảnh)
 const FAV = [["favicon-32.png", 32, "icon"], ["favicon-180.png", 180, "apple"], ["favicon-192.png", 192, "icon"], ["favicon-512.png", 512, "icon"], ["maskable-512.png", 512, "maskable"]];
@@ -68,7 +68,7 @@ Admin.boot({ id: "setting", title: "Cài đặt", async render(main) {
   <div class="card"><h3>Trang chủ</h3>
     <label>Tên hiển thị<input id="name" value="${esc(D.profile?.name)}"></label>
     <label>Chân trang (footer)<input id="footer" value="${esc(D.footer)}"></label>
-    <label>Ảnh đại diện (avatar) mới — ảnh vuông càng tốt, tự cắt giữa và thu về 512 px<input id="av_file" type="file" accept="image/*"></label>
+    <label>Ảnh đại diện (avatar) mới — ảnh vuông càng tốt, tự cắt giữa, thu về 512 px và ghi đè lên /assets/avatar/avatar.webp<input id="av_file" type="file" accept="image/*"></label>
     <img id="av_prev" src="${esc(D.profile?.avatar || "")}" width="72" height="72" alt="" style="border-radius:50%;object-fit:cover;background:#0a1626">
     <label class="row" style="margin-top:8px"><input type="checkbox" id="pf_online" ${D.profile?.showOnline === false ? "" : "checked"}>Hiện chấm tròn "đang online" ở góc avatar</label>
     <label>Màu chấm online<input id="pf_color" type="color" value="${esc(D.profile?.statusColor || "#3ddc3d")}" style="height:38px;padding:2px"></label>
@@ -199,14 +199,14 @@ Admin.boot({ id: "setting", title: "Cài đặt", async render(main) {
         S.seo.favicon = { icon: "/assets/favicon/favicon-32.png?v=" + v, apple: "/assets/favicon/favicon-180.png?v=" + v, v, maskable: true, style: fo.style, bg: fo.bg, bgOn: fo.bgOn, pad: fo.pad };
       }
       const deletes = [], avFile = $("#av_file").files[0];
-      if (avFile) { // tên file có mã phiên bản → không bị cache cũ; xóa ảnh avatar cũ nằm trong assets/avatar/
-        const { b64, ext } = await toSquare(avFile, 512), path = `assets/avatar/avatar-${Date.now().toString(36)}.${ext}`;
-        const old = [D.profile?.avatar, D.nav?.logo].filter((x) => x && x.startsWith("/assets/avatar/")).map((x) => x.slice(1));
+      if (avFile) { // luôn ghi đè lên MỘT file cố định /assets/avatar/avatar.webp → mọi trang (kể cả HTML tĩnh) tự dùng ảnh mới, không phải sửa trang nào
+        const { b64 } = await toSquare(avFile, 512), path = "assets/avatar/avatar.webp", url = "/" + path;
+        const old = [D.profile?.avatar, D.nav?.logo].filter((x) => x && x.startsWith("/assets/avatar/")).map((x) => x.split("?")[0].slice(1));
         files.push({ path, content: b64, encoding: "base64" });
-        D.profile = { ...D.profile, avatar: "/" + path }; D.nav = D.nav || {};
-        if ($("#av_logo").checked) D.nav.logo = "/" + path;
+        D.profile = { ...D.profile, avatar: url }; D.nav = D.nav || {};
+        if ($("#av_logo").checked || (D.nav.logo || "").startsWith("/assets/avatar/")) D.nav.logo = url;
         const have = new Set((await Admin.api("/tree")).files.map((f) => f.path));
-        old.filter((x) => have.has(x) && x !== path && ![D.profile.avatar, D.nav.logo].includes("/" + x)).forEach((x) => deletes.push(x));
+        [...new Set(old)].filter((x) => have.has(x) && x !== path).forEach((x) => deletes.push(x)); // dọn ảnh avatar kiểu cũ (có mã phiên bản trong tên)
       } else if ($("#av_logo").checked && D.profile?.avatar) { D.nav = D.nav || {}; D.nav.logo = D.profile.avatar; } // chỉ đồng bộ logo với avatar hiện tại
       files.push({ path: "manifest.webmanifest", content: AdminSeo.manifest(S.seo) }); // PWA: tên + biểu tượng theo cài đặt
       files.unshift({ path: "site-settings.json", content: JSON.stringify(S, null, 2) + "\n" }, { path: "data.json", content: JSON.stringify(D, null, 2) + "\n" });

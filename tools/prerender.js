@@ -65,7 +65,7 @@ const seo = settings.seo || {};
 const SITE = String(seo.siteUrl || "https://shinjuvn.github.io").replace(/\/$/, "");
 const SITE_NAME = seo.siteName || (data.profile && data.profile.name) || "Shinju Ch.";
 const profile = data.profile || {};
-const avatar = profile.avatar || "/assets/avatar.png";
+const avatar = profile.avatar || "/assets/avatar/avatar.webp";
 const homeDesc = (seo.pages && seo.pages.home && seo.pages.home.description) || "";
 
 // js/icons.js gán window.MEDIA_ICONS → chạy trong sandbox để lấy màu nền từng nền tảng

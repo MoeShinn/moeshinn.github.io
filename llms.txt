@@ -11,6 +11,7 @@
 
 ## Bài đăng
 
+- [Shinju Ch. [VNer] chính thức debut: Kênh YouTube Vtuber/PNGtuber Việt Nam gaming, reaction & stream 20h hằng ngày](https://shinjuvn.github.io/post/shinju-ch-vner-chinh-thuc-debut-kenh-youtube-vtuber-pngtuber-180563779/) (2026-10-19): Kênh YouTube Vtuber/PNGtuber Việt Nam gaming, reaction & stream 20h hằng ngày
 - [Music Box – Plugin phát nhạc ngay trong server minecraft của bạn](https://shinjuvn.github.io/post/music-box-plugin-phat-nhac-ngay-trong-server-minecraft-cua-b-072268664/) (2026-10-16): Music Box là plugin Minecraft cho phép người chơi lưu và phát nhạc từ link mp3, ogg, wav qua Simple Voice Chat. Hỗ trợ Paper, Purpur, Leaf 1.21+.
 - [Hướng dẫn cài Optimized.zip cho Launcher](https://shinjuvn.github.io/post/huong-dan-cai-optimized-zip-cho-launcher-699363013/) (2026-10-16): Hướng dẫn cài Optimized Fabric cho Minecraft bằng Legacy Launcher, Fabric Launcher, Prism Launcher
 - [HƯỚNG DẪN TẢI, CÀI ĐẶT VÀ SỬ DỤNG OBS TỐI ƯU CHO MÁY YẾU (2026)](https://shinjuvn.github.io/post/huong-dan-tai-cai-dat-va-su-dung-obs-toi-uu-cho-may-yeu-2026-948192262/) (2026-10-15): Hướng dẫn tải, cài đặt và sử dụng OBS tối ưu cho máy yếu để quay và stream mượt mà, ổn định dù máy chỉ có cấu hình thấp. Thông số chuẩn để quay video và stream mượt, không giật, không rớt frame.

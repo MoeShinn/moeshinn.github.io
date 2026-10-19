@@ -19,7 +19,7 @@
 (function () {
   // Used if /data.json can't be reached, so the header still works.
   const DEFAULT_NAV = {
-    logo: "/assets/avatar.png",
+    logo: "/assets/avatar/avatar.webp",
     home: "/index.html",
     pages: [{ label: "Trang chủ", url: "/index.html" }],
   };
@@ -34,7 +34,7 @@
     const toggle = document.querySelector("[data-nav-menu-toggle]");
 
     if (homeLink) homeLink.href = cleanUrl(nav.home || "/");
-    if (logoImg) logoImg.src = nav.logo || "/assets/avatar.png";
+    if (logoImg) logoImg.src = nav.logo || "/assets/avatar/avatar.webp";
 
     if (menu) {
       menu.innerHTML = "";

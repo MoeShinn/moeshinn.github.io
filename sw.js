@@ -29,6 +29,7 @@ self.addEventListener("fetch", (e) => {
   const p = u.pathname;
   if (p.startsWith("/admin") || p.startsWith("/s/") || p === "/sw.js") return;
   if (req.mode === "navigate") { e.respondWith(networkFirst(req, PAGES).catch(() => caches.match(OFFLINE))); return; }
+  if (p.startsWith("/assets/avatar/")) { e.respondWith(networkFirst(req, STATIC)); return; } // avatar ghi đè cùng tên file → lấy bản mới trước
   if (/\.(png|jpe?g|webp|gif|svg|ico|woff2?)$/i.test(p)) { e.respondWith(staleWhileRevalidate(req, STATIC)); return; }
   e.respondWith(networkFirst(req, PAGES));
 });

@@ -38,7 +38,7 @@ Admin.boot({ id: "download", title: "Download", async render(main) {
   };
   try { await load(); } catch (e) { main.innerHTML = `<h2>Download</h2><p class="err">${esc(e.message)}</p>`; return; }
   const seo = AdminSeo.merge(S.seo), site = seo.siteUrl.replace(/\/$/, "");
-  const cats = [...new Set([...(pool.links || []).map((l) => l.category).filter(Boolean), "Youtube", "Social Media", "Image"])];
+  const cats = [...new Set((pool.links || []).map((l) => l.category).filter(Boolean))]; // chỉ các nhóm đang có trong Kho liên kết
   const DEF_HINT = "Bấm vào các liên kết bên dưới để ủng hộ mình, sau đó bấm Tải Xuống nhé!";
 
   /* ---------------- Danh sách ---------------- */
@@ -62,7 +62,7 @@ Admin.boot({ id: "download", title: "Download", async render(main) {
     const d = old || {};
     let lbs = (d.linkButtons || []).map((b) => ({ ...b, type: b.type === "custom" ? "custom" : "group", categories: b.categories || [] }));
     let dls = (d.downloads || (d.download ? [d.download] : [])).map((x) => ({ ...x }));
-    if (!editId) { lbs = [{ id: "link1", label: "Mở liên kết 10s để ủng hộ mình", seconds: 10, type: "group", categories: ["Youtube"] }]; dls = [{ id: "primary", label: "Tải Xuống", url: "" }]; }
+    if (!editId) { lbs = [{ id: "link1", label: "Mở liên kết 10s để ủng hộ mình", seconds: 10, type: "group", categories: cats.slice(0, 1) }]; dls = [{ id: "primary", label: "Tải Xuống", url: "" }]; }
     const hintMode = typeof d.hint === "string" ? (d.hint === "" ? "hide" : "custom") : "default";
     main.innerHTML = `<h2>${editId ? "Sửa mục tải" : "Mục tải mới"} <a href="#" style="font-size:14px;margin-left:8px">← Danh sách</a></h2>
     <div class="card">
@@ -88,7 +88,7 @@ Admin.boot({ id: "download", title: "Download", async render(main) {
         <label>Số giây phải xem<input type="number" min="1" max="300" data-f="lbs:${i}:seconds" value="${esc(b.seconds)}"></label></div>
         <label>Loại<select data-f="lbs:${i}:type"><option value="group" ${b.type === "group" ? "selected" : ""}>Liên kết theo nhóm (chọn ngẫu nhiên trong kho)</option><option value="custom" ${b.type === "custom" ? "selected" : ""}>Link tự chọn (vd: video bạn muốn cho xem)</option></select></label>
         ${b.type === "custom" ? `<label>Link cần mở<input data-f="lbs:${i}:url" placeholder="https://…" value="${esc(b.url || "")}"></label>`
-          : `<div class="hint">Nhóm liên kết:</div><div style="display:flex;flex-wrap:wrap;gap:12px;margin:6px 0">${cats.map((c) => `<label class="row" style="margin:0"><input type="checkbox" data-cat="${i}" value="${esc(c)}" ${b.categories.map((x) => x.toLowerCase()).includes(c.toLowerCase()) ? "checked" : ""}>${esc(c)}</label>`).join("")}</div>`}
+          : `<div class="hint">Nhóm liên kết:</div><div style="display:flex;flex-wrap:wrap;gap:12px;margin:6px 0">${cats.map((c) => `<label class="row" style="margin:0"><input type="checkbox" data-cat="${i}" value="${esc(c)}" ${b.categories.map((x) => x.toLowerCase()).includes(c.toLowerCase()) ? "checked" : ""}>${esc(c)}</label>`).join("") || '<span class="hint">Chưa có nhóm nào — hãy thêm liên kết ở trang Kho liên kết.</span>'}</div>`}
         <div style="text-align:right">${ctl("lbs", i, lbs.length)}</div></div>`).join("") || '<p class="hint">Chưa có nút liên kết (người dùng tải ngay).</p>';
       $("#dll").innerHTML = dls.map((x, i) => `<div class="card" style="background:#0a1626"><div class="cols">
         <label>Chữ trên nút<input data-f="dls:${i}:label" value="${esc(x.label)}"></label>
