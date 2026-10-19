@@ -1,0 +1,34 @@
+name: Prerender
+
+on:
+  push:
+    branches: [main]        # chạy ngay sau mỗi lần admin/bạn commit
+  schedule:
+    - cron: "*/5 * * * *"   # dự phòng: 5 phút một lần
+  workflow_dispatch:         # có nút chạy tay trong tab Actions
+
+concurrency:
+  group: prerender
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node tools/prerender.js
+      - name: Commit nếu có thay đổi
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "Prerender: cập nhật nội dung dựng sẵn"
+          git pull --rebase origin main
+          git push
