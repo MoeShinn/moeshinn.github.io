@@ -1,32 +1,9 @@
 {
   "albums": [
     {
-      "id": "avatar-short-link",
-      "name": "Avatar Short Link"
-    },
-    {
       "id": "model-png-tuber-vtuber",
       "name": "Model PNG Tuber/Vtuber"
     }
   ],
-  "images": [
-    {
-      "file": "8gr3db9j.webp",
-      "album": "model-png-tuber-vtuber",
-      "w": 1024,
-      "h": 1536,
-      "size": 222490,
-      "name": "Only Model.png",
-      "added": "2026-10-15T10:27:50.416Z"
-    },
-    {
-      "file": "6vkutwb9.webp",
-      "album": "model-png-tuber-vtuber",
-      "w": 1024,
-      "h": 1536,
-      "size": 219730,
-      "name": "Model Gui.png",
-      "added": "2026-10-15T10:27:50.103Z"
-    }
-  ]
+  "images": []
 }
