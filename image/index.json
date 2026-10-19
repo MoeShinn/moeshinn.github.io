@@ -2,8 +2,27 @@
   "albums": [
     {
       "id": "model-png-tuber-vtuber",
-      "name": "Model PNG Tuber/Vtuber"
+      "name": "Model Shinn"
     }
   ],
-  "images": []
+  "images": [
+    {
+      "file": "1obh8l68.webp",
+      "album": "model-png-tuber-vtuber",
+      "w": 800,
+      "h": 800,
+      "size": 53978,
+      "name": "easy-peasy_dEgMXcqa4m.png",
+      "added": "2026-10-19T00:30:44.134Z"
+    },
+    {
+      "file": "up0i8xkm.webp",
+      "album": "model-png-tuber-vtuber",
+      "w": 1024,
+      "h": 1536,
+      "size": 273690,
+      "name": "Cô gái anime tóc xanh phong cách đường phố.png",
+      "added": "2026-10-19T00:30:44.035Z"
+    }
+  ]
 }
