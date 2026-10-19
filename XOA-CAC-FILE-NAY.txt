@@ -1,7 +1,0 @@
-Xóa các file sau khỏi repo (sau khi ghi đè):
-assets/avatar/avatar-mvdqth1t.webp
-assets/avatar/avatar.png   (chỉ nếu bạn đã ghi đè bản zip trước)
-image/mj8fb5z8.webp
-image/pek5of68.webp
-image/s52syz31.webp
-post/data/ExampleFormat.json
