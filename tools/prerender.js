@@ -42,6 +42,8 @@ function safeHref(url) {
   if (/^[a-z][a-z0-9+.-]*:/i.test(probe) && !/^(https?|mailto|tel):/i.test(probe)) return "#";
   return u;
 }
+// avatar-336.webp có bản nhỏ avatar-168.webp (nếu tồn tại) → srcset: màn 1x tải bản 168px, màn 2x tải bản 336px
+const srcsetFor = (u) => { const s = String(u || ""), sm = s.replace(/-336(\.webp)$/, "-168$1"); return sm !== s && exists(sm.replace(/^\//, "")) ? ` srcset="${a(sm)} 1x, ${a(s)} 2x"` : ""; };
 const label = (l) => (l && typeof l === "object" ? l.vi || l.en || Object.values(l)[0] || "" : l || "");
 const parseDMY = (s) => { const m = String(s || "").match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/); return m ? new Date(+m[3], +m[2] - 1, +m[1]).getTime() : 0; };
 const isoDate = (s) => { const m = String(s || "").match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/); return m ? `${m[3]}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}` : ""; };
@@ -149,18 +151,18 @@ function transform(rel, html) {
 
   // 2) header dùng chung: logo → "/", menu dựng sẵn
   html = html.replace(/<a href="[^"]*" class="site-header-logo"/, '<a href="/" class="site-header-logo"');
-  html = html.replace(/<img src="[^"]*" alt="[^"]*"(?: width="\d+" height="\d+")? data-nav-logo \/>/, `<img src="${a((data.nav && data.nav.logo) || avatar)}" alt="${a(SITE_NAME)}" width="36" height="36" data-nav-logo />`);
+  html = html.replace(/<img src="[^"]*" alt="[^"]*"(?: width="\d+" height="\d+"(?: srcset="[^"]*")?)? data-nav-logo \/>/, `<img src="${a((data.nav && data.nav.logo) || avatar)}" alt="${a(SITE_NAME)}" width="36" height="36"${srcsetFor((data.nav && data.nav.logo) || avatar)} data-nav-logo />`);
   html = slotAfter(html, '<nav class="site-header-menu" data-nav-menu role="menu">', "nav", navHtml);
 
   if (rel === "index.html") {
-    html = html.replace(/<img data-avatar src="[^"]*" alt="[^"]*"(?: width="\d+" height="\d+" fetchpriority="high")? \/>/, `<img data-avatar src="${a(avatar)}" alt="${a(profile.name || SITE_NAME)}" width="168" height="168" fetchpriority="high" />`);
+    html = html.replace(/<img data-avatar src="[^"]*" alt="[^"]*"(?: width="\d+" height="\d+" fetchpriority="high"(?: srcset="[^"]*")?)? \/>/, `<img data-avatar src="${a(avatar)}" alt="${a(profile.name || SITE_NAME)}" width="168" height="168" fetchpriority="high"${srcsetFor(avatar)} />`);
     html = html.replace(/(<h1 class="display-name" data-name>)[^<]*(<\/h1>)/, (_m, h, c) => h + t(profile.name || SITE_NAME) + c);
     html = slotAfter(html, /<h1 class="display-name" data-name>[^<]*<\/h1>/, "tagline", homeDesc ? `<p class="site-tagline">${t(homeDesc)}</p>` : "");
     html = slotAfter(html, '<div class="link-list" data-link-list>', "links", homeButtons);
     html = slotAfter(html, "<!-- seo:end -->", "jsonld", jsonLd);
     html = slotAfter(html, "<!--/pre:jsonld-->", "css", inlineCss());
   } else if (rel === "channel/index.html") {
-    html = html.replace(/<img data-avatar src="[^"]*" alt="[^"]*"(?: width="\d+" height="\d+" fetchpriority="high")? \/>/, `<img data-avatar src="${a(avatar)}" alt="${a(profile.name || SITE_NAME)}" width="168" height="168" fetchpriority="high" />`);
+    html = html.replace(/<img data-avatar src="[^"]*" alt="[^"]*"(?: width="\d+" height="\d+" fetchpriority="high"(?: srcset="[^"]*")?)? \/>/, `<img data-avatar src="${a(avatar)}" alt="${a(profile.name || SITE_NAME)}" width="168" height="168" fetchpriority="high"${srcsetFor(avatar)} />`);
     html = html.replace(/(<h1 class="display-name" data-name>)[^<]*(<\/h1>)/, (_m, h, c) => h + t(profile.name || SITE_NAME) + c);
     html = slotAfter(html, '<div class="link-list" data-link-list>', "links", channelHtml);
   } else if (rel === "donate/index.html") {

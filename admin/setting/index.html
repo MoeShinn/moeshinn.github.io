@@ -200,13 +200,13 @@ Admin.boot({ id: "setting", title: "Cài đặt", async render(main) {
       }
       const deletes = [], avFile = $("#av_file").files[0];
       if (avFile) { // luôn ghi đè lên MỘT file cố định /assets/avatar/avatar.webp → mọi trang (kể cả HTML tĩnh) tự dùng ảnh mới, không phải sửa trang nào
-        const { b64 } = await toSquare(avFile, 512), { b64: b64s } = await toSquare(avFile, 336), path = "assets/avatar/avatar.webp", pathS = "assets/avatar/avatar-336.webp", url = "/" + pathS;
+        const { b64 } = await toSquare(avFile, 512), { b64: b64s } = await toSquare(avFile, 336), { b64: b64t } = await toSquare(avFile, 168), path = "assets/avatar/avatar.webp", pathS = "assets/avatar/avatar-336.webp", pathT = "assets/avatar/avatar-168.webp", url = "/" + pathS;
         const old = [D.profile?.avatar, D.nav?.logo].filter((x) => x && x.startsWith("/assets/avatar/")).map((x) => x.split("?")[0].slice(1));
-        files.push({ path, content: b64, encoding: "base64" }, { path: pathS, content: b64s, encoding: "base64" }); // 512px (og:image) + 336px (hiển thị)
+        files.push({ path, content: b64, encoding: "base64" }, { path: pathS, content: b64s, encoding: "base64" }, { path: pathT, content: b64t, encoding: "base64" }); // 512px (og:image) + 336px (hiển thị)
         D.profile = { ...D.profile, avatar: url }; D.nav = D.nav || {};
         if ($("#av_logo").checked || (D.nav.logo || "").startsWith("/assets/avatar/")) D.nav.logo = url;
         const have = new Set((await Admin.api("/tree")).files.map((f) => f.path));
-        [...new Set(old)].filter((x) => have.has(x) && x !== path && x !== pathS).forEach((x) => deletes.push(x)); // dọn ảnh avatar kiểu cũ (có mã phiên bản trong tên)
+        [...new Set(old)].filter((x) => have.has(x) && x !== path && x !== pathS && x !== pathT).forEach((x) => deletes.push(x)); // dọn ảnh avatar kiểu cũ (có mã phiên bản trong tên)
       } else if ($("#av_logo").checked && D.profile?.avatar) { D.nav = D.nav || {}; D.nav.logo = D.profile.avatar; } // chỉ đồng bộ logo với avatar hiện tại
       files.push({ path: "manifest.webmanifest", content: AdminSeo.manifest(S.seo) }); // PWA: tên + biểu tượng theo cài đặt
       files.unshift({ path: "site-settings.json", content: JSON.stringify(S, null, 2) + "\n" }, { path: "data.json", content: JSON.stringify(D, null, 2) + "\n" });
