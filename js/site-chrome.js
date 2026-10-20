@@ -80,8 +80,7 @@
   async function init() {
     let data = null;
     try {
-      const res = await fetch("/data.json", { cache: "no-store" });
-      if (res.ok) data = await res.json();
+      data = window.siteJSON ? await window.siteJSON("/data.json") : await (await fetch("/data.json", { cache: "no-cache" })).json();
     } catch (e) {
       console.error("site-chrome: could not load /data.json", e);
     }
@@ -285,8 +284,8 @@
     // Lần trước đang bảo trì → dựng ngay từ bộ nhớ, rồi xác nhận lại với server.
     try { const c = JSON.parse(store.get(K_MAINT) || "null"); if (c) showMaintenance(c.message); } catch (e) {}
     try {
-      const res = await fetch("/site-settings.json", { cache: "no-cache" });
-      if (res.ok) apply(await res.json());
+      const st = window.siteJSON ? await window.siteJSON("/site-settings.json") : await (await fetch("/site-settings.json", { cache: "no-cache" })).json();
+      if (st) apply(st);
     } catch (e) {
       console.error("site-chrome: could not load /site-settings.json", e);
     }

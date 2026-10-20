@@ -68,7 +68,7 @@ Admin.boot({ id: "setting", title: "Cài đặt", async render(main) {
   <div class="card"><h3>Trang chủ</h3>
     <label>Tên hiển thị<input id="name" value="${esc(D.profile?.name)}"></label>
     <label>Chân trang (footer)<input id="footer" value="${esc(D.footer)}"></label>
-    <label>Ảnh đại diện (avatar) mới — ảnh vuông càng tốt, tự cắt giữa, thu về 512 px và ghi đè lên /assets/avatar/avatar.webp<input id="av_file" type="file" accept="image/*"></label>
+    <label>Ảnh đại diện (avatar) mới — ảnh vuông càng tốt, tự cắt giữa, thu về 512 px (avatar.webp, dùng cho og:image) và 336 px (avatar-336.webp, dùng để hiển thị), ghi đè lên /assets/avatar/<input id="av_file" type="file" accept="image/*"></label>
     <img id="av_prev" src="${esc(D.profile?.avatar || "")}" width="72" height="72" alt="" style="border-radius:50%;object-fit:cover;background:#0a1626">
     <label class="row" style="margin-top:8px"><input type="checkbox" id="pf_online" ${D.profile?.showOnline === false ? "" : "checked"}>Hiện chấm tròn "đang online" ở góc avatar</label>
     <label>Màu chấm online<input id="pf_color" type="color" value="${esc(D.profile?.statusColor || "#3ddc3d")}" style="height:38px;padding:2px"></label>
@@ -200,13 +200,13 @@ Admin.boot({ id: "setting", title: "Cài đặt", async render(main) {
       }
       const deletes = [], avFile = $("#av_file").files[0];
       if (avFile) { // luôn ghi đè lên MỘT file cố định /assets/avatar/avatar.webp → mọi trang (kể cả HTML tĩnh) tự dùng ảnh mới, không phải sửa trang nào
-        const { b64 } = await toSquare(avFile, 512), path = "assets/avatar/avatar.webp", url = "/" + path;
+        const { b64 } = await toSquare(avFile, 512), { b64: b64s } = await toSquare(avFile, 336), path = "assets/avatar/avatar.webp", pathS = "assets/avatar/avatar-336.webp", url = "/" + pathS;
         const old = [D.profile?.avatar, D.nav?.logo].filter((x) => x && x.startsWith("/assets/avatar/")).map((x) => x.split("?")[0].slice(1));
-        files.push({ path, content: b64, encoding: "base64" });
+        files.push({ path, content: b64, encoding: "base64" }, { path: pathS, content: b64s, encoding: "base64" }); // 512px (og:image) + 336px (hiển thị)
         D.profile = { ...D.profile, avatar: url }; D.nav = D.nav || {};
         if ($("#av_logo").checked || (D.nav.logo || "").startsWith("/assets/avatar/")) D.nav.logo = url;
         const have = new Set((await Admin.api("/tree")).files.map((f) => f.path));
-        [...new Set(old)].filter((x) => have.has(x) && x !== path).forEach((x) => deletes.push(x)); // dọn ảnh avatar kiểu cũ (có mã phiên bản trong tên)
+        [...new Set(old)].filter((x) => have.has(x) && x !== path && x !== pathS).forEach((x) => deletes.push(x)); // dọn ảnh avatar kiểu cũ (có mã phiên bản trong tên)
       } else if ($("#av_logo").checked && D.profile?.avatar) { D.nav = D.nav || {}; D.nav.logo = D.profile.avatar; } // chỉ đồng bộ logo với avatar hiện tại
       files.push({ path: "manifest.webmanifest", content: AdminSeo.manifest(S.seo) }); // PWA: tên + biểu tượng theo cài đặt
       files.unshift({ path: "site-settings.json", content: JSON.stringify(S, null, 2) + "\n" }, { path: "data.json", content: JSON.stringify(D, null, 2) + "\n" });

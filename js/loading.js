@@ -8,12 +8,19 @@
    • Ở trang chủ (có .avatar-wrap) hiện bong bóng trạng thái phía trên avatar; các trang khác không hiện.
    • Xem thử một theme: thêm ?loadpreview=<tên theme> vào địa chỉ trang chủ (màn hình chờ sẽ không tắt). */
 (function () {
+    /* Bộ nạp JSON dùng chung: mỗi URL chỉ tải MỘT lần cho cả trang (trước đây data.json / site-settings.json bị tải 2–3 lần).
+       Dùng "no-cache" (hỏi lại server bằng ETag, thường nhận 304) thay vì "no-store" để không tải lại toàn bộ file. */
+    if (!window.siteJSON) {
+        const memo = {};
+        window.siteJSON = (url) => memo[url] || (memo[url] = fetch(url, { cache: "no-cache" }).then((r) => (r.ok ? r.json() : null)).catch(() => null));
+    }
     /* Màn hình chờ KHÔNG còn nằm trong HTML tĩnh. Lý do: bot/AI không chạy JS (Gemini, ChatGPT, Perplexity, …)
        chỉ đọc HTML gốc, nếu overlay nằm sẵn trong HTML thì chúng chỉ thấy chữ "Trang của bạn đang được tải".
        Giờ HTML gốc chứa sẵn nội dung thật; overlay chỉ được JS dựng cho người dùng bằng trình duyệt thật. */
     const IS_BOT = /bot|crawl|spider|slurp|lighthouse|headless|facebookexternalhit|perplexity|claude|gemini|chatgpt|bytespider/i.test(navigator.userAgent || "") || navigator.webdriver === true;
     if (IS_BOT) {
         // Bot chạy JS: không dựng overlay, nội dung hiện ngay. Giữ API rỗng để main.js của từng trang không lỗi.
+        document.documentElement.classList.remove("sl-wait");
         window.SiteLoading = { waitFor() {}, ready() {} };
         window.SiteStatus = Promise.resolve({ status: {}, moods: { moods: [] } });
         return;
@@ -33,6 +40,8 @@
             "</div>";
         document.body.insertBefore(overlay, document.body.firstChild);
     }
+
+    document.documentElement.classList.remove("sl-wait"); // overlay thật đã có → gỡ tấm màn tạm trong <head>
 
     const THEMES = ["sunset", "sunny", "rain", "night", "storm", "calm", "fog", "focus"];
     const DEFAULT_THEME = "sunset";
@@ -111,7 +120,7 @@
         }
         return DEFAULT_THEME;
     }
-    const getJson = (url) => fetch(url, { cache: "no-cache" }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+    const getJson = (url) => window.siteJSON(url);
     const statusReady = Promise.all([getJson("/status.json"), getJson("/moods.json")]).then(([status, moods]) => ({ status: status || {}, moods: moods || { moods: [] } }));
     window.SiteStatus = statusReady;
 
@@ -136,7 +145,7 @@
         if (!text && mood && mood.custom) text = (mood.text || "").trim();
         else if (!text && mood) { // cảm xúc có sẵn mà không có lời → "Tên đang cảm thấy …"
             let name = "Shinju Ch.";
-            try { const d = await (await fetch("/data.json")).json(); name = (d.profile && d.profile.name) || name; } catch (e) { /* dùng tên mặc định */ }
+            try { const d = await window.siteJSON("/data.json"); name = (d.profile && d.profile.name) || name; } catch (e) { /* dùng tên mặc định */ }
             text = `${name} ${mood.phrase}`;
         }
         if (!text && !(mood && mood.custom)) return;

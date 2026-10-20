@@ -18,7 +18,8 @@ async function networkFirst(req, name) {
 async function staleWhileRevalidate(req, name) {
   const cache = await caches.open(name), hit = await cache.match(req);
   const net = fetch(req).then((res) => { if (res.ok) { cache.put(req, res.clone()); trim(name); } return res; });
-  return hit || net;
+  if (hit) { net.catch(() => {}); return hit; }
+  return net;
 }
 
 self.addEventListener("fetch", (e) => {

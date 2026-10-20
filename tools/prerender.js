@@ -135,6 +135,12 @@ const jsonLd = `<script type="application/ld+json" id="home-jsonld">${ld({
   ],
 })}</script>`;
 
+/* ---------------- CSS dùng chung, nhúng thẳng vào <head> trang chủ (bỏ 3 yêu cầu chặn hiển thị) ---------------- */
+const cssMin = (c) => c.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\s+/g, " ").replace(/\s*([{};,>])\s*/g, "$1").replace(/:\s+/g, ":").replace(/;}/g, "}").trim();
+// Tấm màn tối che trang trong lúc js/loading.js (defer) chưa dựng xong màn hình chờ; js/loading.js gỡ class sl-wait.
+const CURTAIN = "html.sl-wait::after{content:\"\";position:fixed;inset:0;z-index:9998;background:#050b16}";
+const inlineCss = () => `<style>${["css/loading.css", "css/header.css", "css/style.css"].filter(exists).map((f) => cssMin(rd(f))).join("")}${CURTAIN}</style>`;
+
 /* ---------------- Áp dụng cho từng trang ---------------- */
 const OVERLAY = /[ \t]*<!--\s*Shared loading screen[^>]*-->\s*|[ \t]*<div id="site-loading" class="site-loading">[\s\S]*?<div class="site-loading-fill"><\/div><\/div>\s*<\/div>\s*<\/div>\s*/g;
 
@@ -143,17 +149,18 @@ function transform(rel, html) {
 
   // 2) header dùng chung: logo → "/", menu dựng sẵn
   html = html.replace(/<a href="[^"]*" class="site-header-logo"/, '<a href="/" class="site-header-logo"');
-  html = html.replace(/<img src="[^"]*" alt="[^"]*" data-nav-logo \/>/, `<img src="${a((data.nav && data.nav.logo) || avatar)}" alt="${a(SITE_NAME)}" data-nav-logo />`);
+  html = html.replace(/<img src="[^"]*" alt="[^"]*"(?: width="\d+" height="\d+")? data-nav-logo \/>/, `<img src="${a((data.nav && data.nav.logo) || avatar)}" alt="${a(SITE_NAME)}" width="36" height="36" data-nav-logo />`);
   html = slotAfter(html, '<nav class="site-header-menu" data-nav-menu role="menu">', "nav", navHtml);
 
   if (rel === "index.html") {
-    html = html.replace(/<img data-avatar src="[^"]*" alt="[^"]*" \/>/, `<img data-avatar src="${a(avatar)}" alt="${a(profile.name || SITE_NAME)}" />`);
+    html = html.replace(/<img data-avatar src="[^"]*" alt="[^"]*"(?: width="\d+" height="\d+" fetchpriority="high")? \/>/, `<img data-avatar src="${a(avatar)}" alt="${a(profile.name || SITE_NAME)}" width="168" height="168" fetchpriority="high" />`);
     html = html.replace(/(<h1 class="display-name" data-name>)[^<]*(<\/h1>)/, (_m, h, c) => h + t(profile.name || SITE_NAME) + c);
     html = slotAfter(html, /<h1 class="display-name" data-name>[^<]*<\/h1>/, "tagline", homeDesc ? `<p class="site-tagline">${t(homeDesc)}</p>` : "");
     html = slotAfter(html, '<div class="link-list" data-link-list>', "links", homeButtons);
     html = slotAfter(html, "<!-- seo:end -->", "jsonld", jsonLd);
+    html = slotAfter(html, "<!--/pre:jsonld-->", "css", inlineCss());
   } else if (rel === "channel/index.html") {
-    html = html.replace(/<img data-avatar src="[^"]*" alt="[^"]*" \/>/, `<img data-avatar src="${a(avatar)}" alt="${a(profile.name || SITE_NAME)}" />`);
+    html = html.replace(/<img data-avatar src="[^"]*" alt="[^"]*"(?: width="\d+" height="\d+" fetchpriority="high")? \/>/, `<img data-avatar src="${a(avatar)}" alt="${a(profile.name || SITE_NAME)}" width="168" height="168" fetchpriority="high" />`);
     html = html.replace(/(<h1 class="display-name" data-name>)[^<]*(<\/h1>)/, (_m, h, c) => h + t(profile.name || SITE_NAME) + c);
     html = slotAfter(html, '<div class="link-list" data-link-list>', "links", channelHtml);
   } else if (rel === "donate/index.html") {

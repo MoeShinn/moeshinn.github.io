@@ -118,7 +118,8 @@ background:radial-gradient(60% 50% at 20% 30%,rgba(60,200,170,.45),transparent 6
   window.ShinjuTheme = { list: LIST, mount, pageKey };
 
   if (!manual) {
-    fetch("/site-settings.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).then((s) => {
+    (window.siteJSON ? window.siteJSON("/site-settings.json") : fetch("/site-settings.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : null)).catch(() => null)).then((s) => {
+      s = s || {};
       const t = s.theme || {}, test = new URLSearchParams(location.search).get("fx"); // ?fx=night: thử nhanh một theme trên trang này (không cần lưu)
       mount(null, test || (t.pages && t.pages[pageKey()]) || t.default || "none", { intensity: t.intensity, force: !!t.forceMotion, wash: t.wash, dim: t.dim });
     }).catch(() => {});

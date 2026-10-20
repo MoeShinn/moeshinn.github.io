@@ -10,9 +10,10 @@ const ICONS = Object.fromEntries(
 );
 
 async function loadData() {
-  const res = await fetch("/data.json", { cache: "no-store" });
-  if (!res.ok) throw new Error("Could not load data.json");
-  return res.json();
+  // Dùng chung bản đã tải bởi site-chrome.js (window.siteJSON) → không gọi /data.json lần thứ hai.
+  const data = window.siteJSON ? await window.siteJSON("/data.json") : await (await fetch("/data.json", { cache: "no-cache" })).json();
+  if (!data) throw new Error("Could not load data.json");
+  return data;
 }
 
 function labelText(label) {
