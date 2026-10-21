@@ -3,7 +3,8 @@
   if (!("serviceWorker" in navigator) || !(location.protocol === "https:" || location.hostname === "localhost")) return;
   let had = !!navigator.serviceWorker.controller; // lần đầu cài đặt thì không báo "bản mới"
   navigator.serviceWorker.addEventListener("controllerchange", () => { if (!had) { had = true; return; } bar(); });
-  addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => {}));
+  const go = () => navigator.serviceWorker.register("/sw.js").catch(() => {});
+  if (document.readyState === "complete") go(); else addEventListener("load", go);
   function bar() {
     if (document.getElementById("pwa-update")) return;
     const d = document.createElement("div"); d.id = "pwa-update";

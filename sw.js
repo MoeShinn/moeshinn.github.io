@@ -7,7 +7,7 @@ const VERSION = "v1", STATIC = `shinju-static-${VERSION}`, PAGES = `shinju-pages
 // <img>, og:image, iframe, fetch… vẫn nhận file ảnh gốc. Thêm ?raw=1 vào link để luôn lấy ảnh gốc.
 const IMG_LINK = /\.(?:webp|png|jpe?g|gif|avif|svg)$/i, VIEWER = "/assets/viewer/index.html";
 
-self.addEventListener("install", (e) => e.waitUntil(caches.open(PAGES).then((c) => c.addAll([OFFLINE])).then(() => self.skipWaiting())));
+self.addEventListener("install", (e) => e.waitUntil(caches.open(PAGES).then((c) => c.addAll([OFFLINE]).then(() => c.add(VIEWER).catch(() => {}))).then(() => self.skipWaiting())));
 self.addEventListener("activate", (e) => e.waitUntil(
   caches.keys().then((ks) => Promise.all(ks.filter((k) => k.startsWith("shinju-") && k !== STATIC && k !== PAGES).map((k) => caches.delete(k)))).then(() => self.clients.claim())));
 
