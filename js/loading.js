@@ -135,10 +135,17 @@
         else start();
     });
 
+    // Nhớ "lần trước có bong bóng hay không" để lần sau <head> chừa sẵn chỗ (xem script đầu index.html) → không bị layout shift.
+    function setStatusHint(on) {
+        try { localStorage.setItem("shinju_has_status", on ? "1" : "0"); } catch (e) { /* bỏ qua */ }
+        if (!on) document.documentElement.classList.remove("has-status-hint");
+    }
+
     async function showBubble(status, moods) {
         if (!/^\/(index\.html)?$/.test(location.pathname)) return; // bong bóng trạng thái chỉ hiện ở trang chủ
         const wrap = document.querySelector(".avatar-wrap");
-        if (!wrap || !isActive(status) || wrap.querySelector(".status-bubble")) return;
+        if (wrap && wrap.querySelector(".status-bubble")) return;
+        if (!wrap || !isActive(status)) { setStatusHint(false); return; }
         const mood = allMoods(moods, status).find((x) => x.id === status.mood);
         let text = (status.text || "").trim();
         // Trạng thái tự tạo: lời trống thì KHÔNG tự thêm câu nào, chỉ hiện icon trong khung trắng.
@@ -148,7 +155,7 @@
             try { const d = await window.siteJSON("/data.json"); name = (d.profile && d.profile.name) || name; } catch (e) { /* dùng tên mặc định */ }
             text = `${name} ${mood.phrase}`;
         }
-        if (!text && !(mood && mood.custom)) return;
+        if (!text && !(mood && mood.custom)) { setStatusHint(false); return; }
         const b = document.createElement("div");
         b.className = "status-bubble" + (text ? "" : " icon-only");
         b.setAttribute("role", "status");
@@ -160,6 +167,7 @@
         }
         wrap.classList.add("has-status");
         wrap.insertBefore(b, wrap.firstChild);
+        setStatusHint(true);
     }
 
     /* ---------------- Tiến trình và ẩn màn hình chờ ---------------- */

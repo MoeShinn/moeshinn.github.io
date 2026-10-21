@@ -7,6 +7,29 @@
     src: url("/assets/fonts/baloo2-vi.woff") format("woff");
 }
 
+/* Font dự phòng có số đo chỉnh khớp Baloo 2 → lúc font thật tải xong và hoán đổi, chữ gần như không đổi kích thước
+   (tránh Cumulative Layout Shift). Số đo lấy từ chính file baloo2-vi.woff. */
+@font-face {
+    font-family: "Baloo 2 Fallback";
+    font-style: normal;
+    font-weight: 400 600;
+    src: local("Arial"), local("Liberation Sans"), local("Helvetica Neue"), local("Helvetica"), local("Roboto");
+    size-adjust: 91.6%;
+    ascent-override: 117.7%;
+    descent-override: 57.2%;
+    line-gap-override: 0%;
+}
+@font-face {
+    font-family: "Baloo 2 Fallback";
+    font-style: normal;
+    font-weight: 700 800;
+    src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("Helvetica Neue Bold"), local("Helvetica-Bold"), local("Roboto Bold"), local("Roboto-Bold");
+    size-adjust: 91.6%;
+    ascent-override: 117.7%;
+    descent-override: 57.2%;
+    line-gap-override: 0%;
+}
+
 /* loading.css — màn hình chờ dùng chung cho mọi trang, có 8 theme (đổi theo cảm xúc trong /admin → Trạng thái).
    Thuần code, không ảnh. Mặc định: hoàng hôn. Lớp trang trí do js/loading.js tạo (.fx-a, .fx-b, .fx-p). */
 
@@ -122,7 +145,7 @@
 .site-loading-msg {
     margin: 0;
     text-align: center;
-    font-family: "Baloo 2", "Comic Sans MS", "Segoe UI", sans-serif;
+    font-family: "Baloo 2", "Baloo 2 Fallback", "Comic Sans MS", "Segoe UI", sans-serif;
     font-size: 22px;
     font-weight: 800;
     line-height: 1.4;
@@ -158,6 +181,8 @@
 /* ---------- Bong bóng trạng thái phía trên avatar (kiểu ghi chú Messenger) ----------
    Nội dung do js/loading.js dựng từ status.json; để ở đây vì mọi trang đều nạp file này.
    Icon cảm xúc là huy hiệu tròn đè lên góc trái dưới của khung chữ. */
+/* html.has-status-hint do script nhỏ trong <head> trang chủ đặt sớm (dựa vào lần ghé trước) → chừa chỗ ngay từ lúc vẽ đầu tiên, bong bóng hiện ra không làm trang nhảy. */
+html.has-status-hint .avatar-wrap,
 .avatar-wrap.has-status {
     margin-top: 66px;
 }
@@ -174,7 +199,7 @@
     color: #1d2433;
     border-radius: 20px;
     padding: 10px 16px 10px 20px;
-    font: 700 14px/1.35 "Baloo 2", "Segoe UI", sans-serif;
+    font: 700 14px/1.35 "Baloo 2", "Baloo 2 Fallback", "Segoe UI", sans-serif;
     text-align: center;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
     animation: sb-float 3.6s ease-in-out infinite;

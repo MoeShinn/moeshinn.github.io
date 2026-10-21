@@ -126,6 +126,7 @@
   const K_ADMIN = "shinju_admin_session"; // cùng khóa với /admin
   const K_BYPASS = "shinju_bypass";
   const K_ADMIN_UNTIL = "shinju_bypass_until"; // do /admin ghi khi đăng nhập (xem admin/js/core.js)
+  const K_ANN_H = "shinju_announce_h"; // chiều cao thanh thông báo lần trước → chừa sẵn chỗ để trang không bị nhảy (CLS)
 
   const store = {
     get: (k, area) => { try { return (area || localStorage).getItem(k); } catch (e) { return null; } },
@@ -161,7 +162,8 @@
     const st = document.createElement("style");
     st.id = "sc-notice-css";
     st.textContent =
-      ".sc-announce{position:relative;z-index:12;display:flex;align-items:center;justify-content:center;gap:8px;" +
+      "html.has-ann body{padding-top:var(--ann-h,0px)}" +
+      ".sc-announce{position:absolute;top:0;left:0;right:0;z-index:12;display:flex;align-items:center;justify-content:center;gap:8px;" +
       "padding:8px 42px 8px 14px;text-align:center;font-family:inherit;font-weight:600;font-size:14px;line-height:1.4;color:#fff;" +
       "background:linear-gradient(90deg,rgba(31,111,214,.95),rgba(20,80,163,.95));border-bottom:1px solid rgba(255,255,255,.18)}" +
       ".sc-announce a,.sc-announce span.sc-a-text{color:#fff;overflow-wrap:anywhere}" +
@@ -187,9 +189,25 @@
     document.head.appendChild(st);
   }
 
+  /* ---------- Chừa chỗ cho thanh thông báo ---------- */
+  // Thanh được chèn bằng JS sau khi tải xong site-settings.json; nếu để nó đẩy nội dung xuống thì cả trang bị nhảy.
+  // Thay vào đó: thanh nằm đè (absolute) lên một khoảng đã chừa sẵn ở đầu <body>. Khoảng này được đặt NGAY khi script chạy,
+  // dựa vào chiều cao đã lưu ở lần ghé trước (khách mới: chưa có số đo → vẫn như cũ, chỉ nhảy một lần).
+  function reserve(h) {
+    const root = document.documentElement;
+    if (h > 0) { root.style.setProperty("--ann-h", h + "px"); root.classList.add("has-ann"); store.set(K_ANN_H, String(h)); }
+    else { root.classList.remove("has-ann"); root.style.removeProperty("--ann-h"); store.del(K_ANN_H); }
+  }
+  const cachedH = Number(store.get(K_ANN_H)) || 0;
+  if (cachedH > 0) { injectCss(); reserve(cachedH); } // nếu thông báo đã hết hạn / đã bị đóng thì showAnnouncement sẽ gỡ khoảng chừa
+
   /* ---------- Thanh thông báo ---------- */
-  let bar = null;
-  function hideBar() { if (bar) { bar.remove(); bar = null; } }
+  let bar = null, barRO = null;
+  function hideBar() {
+    if (barRO) { barRO.disconnect(); barRO = null; }
+    if (bar) { bar.remove(); bar = null; }
+    reserve(0);
+  }
   function showAnnouncement(a) {
     const text = a && a.enabled ? String(a.text || "").trim() : "";
     const url = a ? safeUrl(a.url) : "";
@@ -219,6 +237,11 @@
     x.textContent = "×";
     x.addEventListener("click", () => { store.set(K_ANN, id); hideBar(); });
     bar.append(label, x);
+    reserve(Math.ceil(bar.getBoundingClientRect().height));
+    if (window.ResizeObserver && !barRO) { // xoay màn hình / đổi cỡ chữ → thanh có thể xuống dòng, cập nhật khoảng chừa
+      barRO = new ResizeObserver(() => { if (bar) reserve(Math.ceil(bar.getBoundingClientRect().height)); });
+      barRO.observe(bar);
+    }
   }
 
   /* ---------- Chế độ bảo trì ---------- */
