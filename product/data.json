@@ -1,13 +1,3 @@
 {
-  "nodes": [
-    {
-      "id": "phan-mem",
-      "type": "category",
-      "parent": "",
-      "title": "Phần mềm",
-      "thumb": "/post/photo/thumbnail-post-picture-lite-mv2hh33b.webp",
-      "order": 0,
-      "updated": "2026-10-21"
-    }
-  ]
+  "nodes": []
 }
