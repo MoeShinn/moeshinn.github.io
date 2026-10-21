@@ -1,0 +1,25 @@
+{
+  "description": "Ezy Tuber là phần mềm chạy model Vtuber và PNGTuber theo thời gian thực: theo dõi khuôn mặt qua webcam, phản hồi giọng nói và biểu cảm để bạn lên hình, livestream dễ dàng.",
+  "keywords": "Ezy Tuber, phần mềm Vtuber, chạy model Vtuber, PNGTuber, app PNGTuber, face tracking Vtuber, theo dõi khuôn mặt webcam, livestream Vtuber, phần mềm vtubing, avatar ảo, Vtuber Việt Nam, Vtuber software",
+  "licenses": [
+    {
+      "title": "GIẤY PHÉP SỬ DỤNG",
+      "text": "1. Quyền sử dụng\nBạn được sử dụng Ezy Tuber miễn phí [kiểm tra lại] cho mục đích cá nhân, bao gồm livestream, quay video và đăng tải nội dung. Bạn được kiếm tiền từ nội dung do mình tạo ra [kiểm tra lại].\n\n2. Quyền sở hữu\nBạn giữ toàn quyền sở hữu đối với model, hình ảnh và nội dung do bạn tạo ra hoặc nhập vào phần mềm. Tác giả không có quyền sở hữu đối với các nội dung này.\n\n3. Các hành vi không được phép\n- Bán lại, cho thuê hoặc phát tán lại phần mềm khi chưa được tác giả đồng ý.\n- Gỡ bỏ hoặc chỉnh sửa thông tin bản quyền của phần mềm.\n- Dùng phần mềm vào mục đích vi phạm pháp luật hoặc xâm phạm quyền của người khác.\n\n4. Miễn trừ trách nhiệm\nPhần mềm được cung cấp \"nguyên trạng\", không kèm bất kỳ bảo đảm nào. Tác giả không chịu trách nhiệm cho các thiệt hại phát sinh từ việc sử dụng phần mềm.\n\n5. Không liên kết\nEzy Tuber là sản phẩm độc lập, không liên kết với PNGTuber Plus hay bất kỳ phần mềm nào khác. Mọi tên sản phẩm được nhắc đến thuộc về chủ sở hữu tương ứng."
+    }
+  ],
+  "price": "Miễn phí",
+  "body": "<h2>Giới thiệu Ezy Tuber</h2>\n&l&bEzy Tuber&r là phần mềm &lchạy model Vtuber và PNGTuber&r theo thời gian thực, được làm &l&dhoàn toàn bằng tiếng Việt&r. Chỉ cần model của bạn, mở app lên là nhân vật có thể phản hồi giọng nói và biểu cảm của bạn để livestream, quay video hay trò chuyện cùng bạn bè.\n\n<h2>Điểm nổi bật</h2>\n<ul><li>&l&aTiếng Việt&r: giao diện và hướng dẫn đều bằng tiếng Việt, dễ dùng ngay từ lần đầu.</li><li>&l&bGiao diện trực quan&r: bố cục rõ ràng, bấm là hiểu, không cần học cách dùng phức tạp.</li><li>&l&dRig dễ hơn PNGTuber Plus&r: thiết lập layer và chuyển động nhanh gọn, ít bước, ít rối hơn.</li><li>&l&eChạy thời gian thực&r: nhân vật phản hồi theo giọng nói và biểu cảm của bạn.</li></ul>\n\n<hr>\n\n&7Liên hệ & hỗ trợ: [Liên hệ](https://shinjuvn.github.io/channel/)&r",
+  "gallery": [
+    "/image/nm548qoa.webp",
+    "/image/km6lw3ph.webp",
+    "/image/g60eq3gp.webp",
+    "/image/n0ea043i.webp"
+  ],
+  "buttons": [
+    {
+      "label": "Tải xuống",
+      "url": "https://github.com/ShinjuVN/Ezy-Software-and-Model/releases/download/Software/EzyTuber.zip",
+      "style": "blue"
+    }
+  ]
+}
