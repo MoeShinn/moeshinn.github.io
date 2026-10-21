@@ -47,11 +47,12 @@ a{color:inherit}
 <footer class="info" id="info" hidden></footer>
 <script>
 (function () {
-  var EXT = /^\/image\/[^\/?#]+\.(?:webp|png|jpe?g|gif|avif|svg)$/i;
+  var EXT0 = /^\/(?:[^\/?#]+\/)*[^\/?#]+\.(?:webp|png|jpe?g|gif|avif|svg)$/i;
+  var EXT = { test: function (s) { return EXT0.test(s) && !/(^|\/)\.\.?(\/|$)/.test(s); } }; // chỉ đường dẫn ảnh trong site, không cho ../
   var $ = function (id) { return document.getElementById(id); };
   var stage = $("stage"), msg = $("msg"), info = $("info");
 
-  // Đường dẫn ảnh: chính địa chỉ đang mở (/image/xxx.webp, do service worker trả trang này), hoặc ?i=/image/xxx.webp khi mở trực tiếp trang viewer
+  // Đường dẫn ảnh: chính địa chỉ đang mở (ví dụ /image/xxx.webp hay /post/photo/xxx.webp, do service worker trả trang này), hoặc ?i=/đường/dẫn/ảnh.webp khi mở trực tiếp trang viewer
   var file = "";
   if (EXT.test(location.pathname)) file = location.pathname;
   else { var q = new URLSearchParams(location.search).get("i") || ""; if (EXT.test(q)) file = q; }
@@ -70,7 +71,7 @@ a{color:inherit}
     var lg = d && d.nav && d.nav.logo; if (lg) $("logo").src = lg;
   }).catch(function () {});
 
-  if (!file) { fail("Không tìm thấy ảnh", "Link này không trỏ tới ảnh nào trong thư mục /image/."); return; }
+  if (!file) { fail("Không tìm thấy ảnh", "Link này không trỏ tới file ảnh nào của trang."); return; }
 
   var name = file.split("/").pop(); try { name = decodeURIComponent(name); } catch (e) {}
   var abs = location.origin + file;

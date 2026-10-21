@@ -3,9 +3,9 @@
    - Ảnh, font: dùng bản đã lưu ngay, rồi cập nhật ngầm cho lần sau.
    - KHÔNG đụng vào /admin, /s/ (link rút gọn), /sw.js và mọi yêu cầu sang domain khác (bộ đếm, Giscus…). */
 const VERSION = "v1", STATIC = `shinju-static-${VERSION}`, PAGES = `shinju-pages-${VERSION}`, OFFLINE = "/offline.html", MAX = 80;
-// Mở thẳng link ảnh /image/xxx.webp trên thanh địa chỉ → hiện trang xem ảnh (giao diện kiểu Reddit). Chỉ áp dụng khi mở link ở tab/cửa sổ (gõ địa chỉ, bấm link, chuột phải → mở ảnh trong tab mới):
+// Mở thẳng link ảnh (bất kỳ ảnh nào của site: /image, /post/photo, /assets…) trên thanh địa chỉ → hiện trang xem ảnh (giao diện kiểu Reddit). Chỉ áp dụng khi mở link ở tab/cửa sổ (gõ địa chỉ, bấm link, chuột phải → mở ảnh trong tab mới):
 // <img>, og:image, iframe, fetch… vẫn nhận file ảnh gốc. Thêm ?raw=1 vào link để luôn lấy ảnh gốc.
-const IMG_LINK = /^\/image\/[^/]+\.(?:webp|png|jpe?g|gif|avif|svg)$/i, VIEWER = "/assets/viewer/index.html";
+const IMG_LINK = /\.(?:webp|png|jpe?g|gif|avif|svg)$/i, VIEWER = "/assets/viewer/index.html";
 
 self.addEventListener("install", (e) => e.waitUntil(caches.open(PAGES).then((c) => c.addAll([OFFLINE])).then(() => self.skipWaiting())));
 self.addEventListener("activate", (e) => e.waitUntil(
