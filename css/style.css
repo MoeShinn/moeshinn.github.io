@@ -23,7 +23,7 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    font-family: "Baloo 2", "Baloo 2 Fallback", "Comic Sans MS", "Segoe UI", sans-serif;
+    font-family: "Baloo 2", "Comic Sans MS", "Segoe UI", sans-serif;
     color: var(--text-cream);
     background: radial-gradient(ellipse at 30% 10%, var(--bg-mid) 0%, var(--bg-deep) 65%);
     overflow-x: hidden;
