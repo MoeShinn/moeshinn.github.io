@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<meta name="theme-color" content="#050b16" />
+<meta name="color-scheme" content="dark" />
+<title>Xem ảnh</title>
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32.png" />
+<style>
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;min-height:100%}
+body{min-height:100vh;min-height:100dvh;display:grid;grid-template-rows:auto 1fr auto;background:radial-gradient(ellipse at 30% 10%,#0c1a2e 0%,#050b16 65%) fixed;color:#f4ecd8;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:inherit}
+.bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(5,11,22,.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.08)}
+.brand{display:flex;align-items:center;gap:9px;text-decoration:none;font-weight:700;min-width:0}
+.brand img{width:30px;height:30px;border-radius:50%;object-fit:cover;flex:none;background:#0c1a2e}
+.brand span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sp{flex:1}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:inherit;border-radius:999px;padding:7px 13px;font:inherit;font-size:13.5px;cursor:pointer;text-decoration:none;white-space:nowrap;transition:background .15s}
+.btn:hover,.btn:focus-visible{background:rgba(255,255,255,.14);outline:none}
+.btn.ok{background:#1f6fd6;border-color:#1f6fd6;color:#fff}
+.stage{display:flex;overflow:auto;padding:16px;min-height:0}
+.stage img{margin:auto;display:block;max-width:100%;max-height:calc(100vh - 150px);max-height:calc(100dvh - 150px);width:auto;height:auto;border-radius:10px;background:#0c1a2e;box-shadow:0 12px 36px rgba(0,0,0,.55);cursor:zoom-in}
+.stage.zoom img{max-width:none;max-height:none;cursor:zoom-out;border-radius:0}
+.stage.load img{opacity:0}
+.msg{margin:auto;text-align:center;color:rgba(244,236,216,.75);line-height:1.6}
+.msg.err b{display:block;font-size:18px;color:#f4ecd8;margin-bottom:6px}
+.info{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;align-items:center;padding:12px 16px 16px;font-size:13px;color:rgba(244,236,216,.7);border-top:1px solid rgba(255,255,255,.06)}
+.info b{color:#f4ecd8;font-weight:600;word-break:break-all}
+.info i{font-style:normal;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,.08)}
+.hint{opacity:.6}
+@media (max-width:560px){.btn .lbl{display:none}.btn{padding:8px 11px}.brand span{display:none}.stage{padding:10px}}
+</style>
+</head>
+<body>
+<header class="bar">
+  <a class="brand" href="/" title="Về trang chủ"><img id="logo" src="/assets/favicon/favicon-192.png" alt="" /><span id="site">Trang chủ</span></a>
+  <div class="sp"></div>
+  <button class="btn" id="copy" type="button" title="Sao chép link ảnh">🔗<span class="lbl"> Sao chép link</span></button>
+  <a class="btn" id="dl" href="#" download title="Tải ảnh xuống">⬇️<span class="lbl"> Tải xuống</span></a>
+  <a class="btn" id="raw" href="#" title="Mở ảnh gốc (không qua trang này)">🖼️<span class="lbl"> Ảnh gốc</span></a>
+</header>
+<main class="stage load" id="stage"><div class="msg" id="msg">Đang tải ảnh…</div></main>
+<footer class="info" id="info" hidden></footer>
+<script>
+(function () {
+  var EXT = /^\/image\/[^\/?#]+\.(?:webp|png|jpe?g|gif|avif|svg)$/i;
+  var $ = function (id) { return document.getElementById(id); };
+  var stage = $("stage"), msg = $("msg"), info = $("info");
+
+  // Đường dẫn ảnh: chính địa chỉ đang mở (/image/xxx.webp, do service worker trả trang này), hoặc ?i=/image/xxx.webp khi mở trực tiếp trang viewer
+  var file = "";
+  if (EXT.test(location.pathname)) file = location.pathname;
+  else { var q = new URLSearchParams(location.search).get("i") || ""; if (EXT.test(q)) file = q; }
+
+  function fail(t, d) {
+    stage.className = "stage"; stage.innerHTML = "";
+    var m = document.createElement("div"); m.className = "msg err";
+    var b = document.createElement("b"); b.textContent = t; m.appendChild(b); m.appendChild(document.createTextNode(d));
+    stage.appendChild(m);
+    $("copy").hidden = $("dl").hidden = $("raw").hidden = true;
+  }
+
+  // Tên + logo trang (không bắt buộc, lỗi thì bỏ qua)
+  fetch("/data.json").then(function (r) { return r.json(); }).then(function (d) {
+    var nm = d && d.profile && d.profile.name; if (nm) $("site").textContent = nm;
+    var lg = d && d.nav && d.nav.logo; if (lg) $("logo").src = lg;
+  }).catch(function () {});
+
+  if (!file) { fail("Không tìm thấy ảnh", "Link này không trỏ tới ảnh nào trong thư mục /image/."); return; }
+
+  var name = file.split("/").pop(); try { name = decodeURIComponent(name); } catch (e) {}
+  var abs = location.origin + file;
+  document.title = name + " – Xem ảnh";
+  $("dl").href = file; $("dl").setAttribute("download", name);
+  $("raw").href = file + "?raw=1";
+
+  var img = new Image();
+  img.alt = name; img.decoding = "async";
+  img.onload = function () {
+    msg.remove(); stage.className = "stage"; stage.appendChild(img);
+    var w = img.naturalWidth, h = img.naturalHeight;
+    info.innerHTML = ""; info.hidden = false;
+    function add(html) { var s = document.createElement("span"); s.innerHTML = html; info.appendChild(s); return s; }
+    var n = add("<b></b>"); n.firstChild.textContent = name;
+    var dim = w && h ? add("<i></i>") : null; if (dim) dim.firstChild.textContent = w + " × " + h + " px";
+    var ext = (name.split(".").pop() || "").toUpperCase(); add("<i></i>").firstChild.textContent = ext;
+    var sz = add("<i hidden></i>").firstChild;
+    var hint = add('<span class="hint">Bấm vào ảnh để phóng to / thu nhỏ</span>');
+    fetch(file, { method: "HEAD" }).then(function (r) {
+      var L = +r.headers.get("content-length"); if (L > 0) { sz.textContent = L >= 1048576 ? (L / 1048576).toFixed(2) + " MB" : Math.max(1, Math.round(L / 1024)) + " KB"; sz.hidden = false; }
+    }).catch(function () {});
+  };
+  img.onerror = function () { fail("Không tải được ảnh", "Ảnh có thể đã bị xóa hoặc đường dẫn sai. Bạn thử mở ảnh gốc ở nút phía trên."); $("raw").hidden = false; };
+  img.addEventListener("click", function () { stage.classList.toggle("zoom"); });
+  img.src = file;
+
+  $("copy").addEventListener("click", function () {
+    var b = this, done = function () { b.classList.add("ok"); b.lastChild.textContent = " Đã sao chép"; setTimeout(function () { b.classList.remove("ok"); b.lastChild.textContent = " Sao chép link"; }, 1600); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(abs).then(done, legacy); else legacy();
+    function legacy() { var t = document.createElement("textarea"); t.value = abs; t.style.cssText = "position:fixed;opacity:0"; document.body.appendChild(t); t.select(); try { document.execCommand("copy"); done(); } catch (e) {} t.remove(); }
+  });
+})();
+</script>
+</body>
+</html>

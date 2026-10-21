@@ -3,6 +3,9 @@
    - Ảnh, font: dùng bản đã lưu ngay, rồi cập nhật ngầm cho lần sau.
    - KHÔNG đụng vào /admin, /s/ (link rút gọn), /sw.js và mọi yêu cầu sang domain khác (bộ đếm, Giscus…). */
 const VERSION = "v1", STATIC = `shinju-static-${VERSION}`, PAGES = `shinju-pages-${VERSION}`, OFFLINE = "/offline.html", MAX = 80;
+// Mở thẳng link ảnh /image/xxx.webp trên thanh địa chỉ → hiện trang xem ảnh (giao diện kiểu Reddit). Chỉ áp dụng cho điều hướng trang chính:
+// <img>, og:image, iframe, fetch… vẫn nhận file ảnh gốc. Thêm ?raw=1 vào link để luôn lấy ảnh gốc.
+const IMG_LINK = /^\/image\/[^/]+\.(?:webp|png|jpe?g|gif|avif|svg)$/i, VIEWER = "/assets/viewer/index.html";
 
 self.addEventListener("install", (e) => e.waitUntil(caches.open(PAGES).then((c) => c.addAll([OFFLINE])).then(() => self.skipWaiting())));
 self.addEventListener("activate", (e) => e.waitUntil(
@@ -29,6 +32,10 @@ self.addEventListener("fetch", (e) => {
   if (u.origin !== location.origin) return;
   const p = u.pathname;
   if (p.startsWith("/admin") || p.startsWith("/s/") || p === "/sw.js") return;
+  if (req.mode === "navigate" && req.destination === "document" && IMG_LINK.test(p) && !u.searchParams.has("raw")) {
+    e.respondWith(networkFirst(new Request(VIEWER), PAGES).catch(() => fetch(req)).catch(() => caches.match(OFFLINE)));
+    return;
+  }
   if (req.mode === "navigate") { e.respondWith(networkFirst(req, PAGES).catch(() => caches.match(OFFLINE))); return; }
   if (p.startsWith("/assets/avatar/")) { e.respondWith(networkFirst(req, STATIC)); return; } // avatar ghi đè cùng tên file → lấy bản mới trước
   if (/\.(png|jpe?g|webp|gif|svg|ico|woff2?)$/i.test(p)) { e.respondWith(staleWhileRevalidate(req, STATIC)); return; }
