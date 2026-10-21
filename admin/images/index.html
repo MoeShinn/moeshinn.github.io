@@ -26,11 +26,11 @@ Admin.boot({ id: "images", title: "Kho ảnh", async render(main) {
   // Ảnh đã nằm trong /image nhưng chưa có trong index (bỏ vào tay) vẫn hiện, ở mục "Chưa phân loại"
   const known = new Set(idx.images.map((i) => i.file));
   tree.filter((f) => /^image\/[^/]+\.(png|jpe?g|webp|gif|svg|avif)$/i.test(f.path)).forEach((f) => { const file = f.path.slice(6); if (!known.has(file)) idx.images.push({ file, album: "", size: f.size, name: file, added: "" }); });
-  const orig = JSON.stringify(idx), dirty = () => JSON.stringify(idx) !== orig;
+  const orig = JSON.stringify(idx), dirty = () => JSON.stringify(idx) !== orig, savedAlbums = new Set(idx.albums.map((a) => a.id));
   window.onbeforeunload = () => (dirty() ? "Có thay đổi chưa lưu" : undefined);
   let cur = "all", sel = new Set(), busy = false; const local = new Map(); // file → blob URL (ảnh vừa tải lên, web chưa kịp xuất bản)
   const O = (() => { try { return { q: 85, raw: false, ...JSON.parse(localStorage.getItem("shinju_img_opts") || "{}") }; } catch (e) { return { q: 85, raw: false }; } })();
-  const urlOf = (f) => `${site}/image/${f}`, nameUsed = () => new Set(idx.images.map((i) => i.file.replace(/\.[^.]+$/, "")));
+  const urlOf = (f) => `${site}/image/${f}`, albumUrl = (id) => `${site}/album/${encodeURIComponent(id)}/`, hubUrl = `${site}/album/`, nameUsed = () => new Set(idx.images.map((i) => i.file.replace(/\.[^.]+$/, "")));
   const albumName = (id) => (idx.albums.find((a) => a.id === id) || {}).name || "Chưa phân loại";
   const inView = () => idx.images.filter((i) => cur === "all" || (cur === "none" ? !i.album : i.album === cur));
 
@@ -99,7 +99,9 @@ Admin.boot({ id: "images", title: "Kho ảnh", async render(main) {
     <div class="chips"><span class="chip ${cur === "all" ? "on" : ""}" data-c="all">Tất cả (${idx.images.length})</span><span class="chip ${cur === "none" ? "on" : ""}" data-c="none">Chưa phân loại (${cnt((i) => !i.album)})</span>
       ${idx.albums.map((a) => `<span class="chip ${cur === a.id ? "on" : ""}" data-c="${esc(a.id)}">${esc(a.name)} (${cnt((i) => i.album === a.id)})</span>`).join("")}
       <span class="chip" id="al_add">＋ Album</span></div>
-    ${idx.albums.some((a) => a.id === cur) ? `<p><button type="button" class="ghost" id="al_ren">Đổi tên album</button> <button type="button" class="ghost" id="al_del" style="color:#ff8b8f">Xóa album</button></p>` : ""}
+    ${idx.albums.some((a) => a.id === cur)
+      ? `<p><button type="button" id="al_cp">🔗 Chép link album</button> <button type="button" class="ghost" id="al_open">↗ Mở trang album</button> <button type="button" class="ghost" id="al_ren">Đổi tên album</button> <button type="button" class="ghost" id="al_del" style="color:#ff8b8f">Xóa album</button><br><span class="hint">${esc(albumUrl(cur))} · link không đổi khi đổi tên album${savedAlbums.has(cur) ? "" : " · <b>album mới: bấm “Lưu album” rồi chờ ~1 phút link mới chạy</b>"}</span></p>`
+      : `<p><button type="button" class="ghost" id="al_hub">🔗 Chép link trang Album (tất cả album)</button> <span class="hint">${esc(hubUrl)}</span></p>`}
     <div class="drop" id="drop"><input id="up" type="file" accept="image/*" multiple hidden><button type="button" id="upb" ${busy ? "disabled" : ""}>＋ Chọn ảnh tải lên${cur !== "all" && cur !== "none" ? ` (vào “${esc(albumName(cur))}”)` : ""}</button>
       <div class="hint" style="margin-top:6px">hoặc kéo thả ảnh vào đây · tên file thành 8 ký tự ngẫu nhiên · ảnh chỉ được nén sang WebP, <b>giữ nguyên kích thước</b> (không cắt, không thu nhỏ) · <span id="st">${busy ? "Đang xử lý…" : ""}</span></div>
       <div style="margin-top:8px;text-align:left"><label>Chất lượng nén: <b id="qv">${O.q}</b>% (thấp hơn = file nhẹ hơn, ảnh kém nét hơn một chút)<input id="oq" type="range" min="50" max="95" step="5" value="${O.q}"></label></div>
@@ -112,6 +114,10 @@ Admin.boot({ id: "images", title: "Kho ảnh", async render(main) {
     <div class="bar" style="position:sticky;bottom:8px;margin-top:12px;${dirty() ? "" : "opacity:.6"}">${dirty() ? "Có thay đổi album chưa lưu." : "Không có thay đổi album."} <button id="sv" ${dirty() && !busy ? "" : "disabled"}>Lưu album</button> <button class="ghost" id="ud" ${dirty() ? "" : "disabled"}>Hoàn tác</button></div>`;
     main.querySelectorAll("[data-c]").forEach((el) => (el.onclick = () => { cur = el.dataset.c; draw(); }));
     $("#al_add").onclick = () => { const n = (prompt("Tên album mới:") || "").trim(); if (!n) return; let id = PostGen.slugify(n), k = 2; while (idx.albums.some((a) => a.id === id)) id = PostGen.slugify(n) + "-" + k++; idx.albums.push({ id, name: n }); cur = id; draw(); };
+    const copyLink = async (u, extra) => { try { await navigator.clipboard.writeText(u); } catch (e) { prompt("Sao chép link:", u); } Admin.toast("Đã chép: " + u + (extra || "")); };
+    if ($("#al_cp")) $("#al_cp").onclick = () => copyLink(albumUrl(cur), savedAlbums.has(cur) ? "" : " — album chưa lưu, hãy bấm “Lưu album”");
+    if ($("#al_open")) $("#al_open").onclick = () => window.open(albumUrl(cur), "_blank", "noopener");
+    if ($("#al_hub")) $("#al_hub").onclick = () => copyLink(hubUrl);
     if ($("#al_ren")) $("#al_ren").onclick = () => { const a = idx.albums.find((x) => x.id === cur), n = (prompt("Tên mới của album:", a.name) || "").trim(); if (n) { a.name = n; draw(); } };
     if ($("#al_del")) $("#al_del").onclick = () => { const n = cnt((i) => i.album === cur); if (!confirm(`Xóa album “${albumName(cur)}”?${n ? ` ${n} ảnh trong đó sẽ chuyển sang “Chưa phân loại” (không bị xóa).` : ""}`)) return; idx.images.forEach((i) => { if (i.album === cur) i.album = ""; }); idx.albums = idx.albums.filter((a) => a.id !== cur); cur = "all"; draw(); };
     const inp = $("#up"); $("#upb").onclick = () => inp.click(); inp.onchange = () => { if (inp.files.length) upload(inp.files); };
