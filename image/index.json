@@ -7,9 +7,22 @@
     {
       "id": "art-shinn",
       "name": "art-shinn"
+    },
+    {
+      "id": "san-pham",
+      "name": "Sản phẩm"
     }
   ],
   "images": [
+    {
+      "file": "ewloog8v.webp",
+      "album": "san-pham",
+      "w": 512,
+      "h": 512,
+      "size": 34772,
+      "name": "572000.png",
+      "added": "2026-10-21T08:45:33.382Z"
+    },
     {
       "file": "xkmwsvep.webp",
       "album": "art-shinn",
