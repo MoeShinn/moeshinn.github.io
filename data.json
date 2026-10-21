@@ -36,29 +36,29 @@
       "id": "social",
       "icon": "youtube",
       "url": "channel",
-      "style": "blue",
+      "style": "#63B3ED ",
       "label": "Mạng Xã Hội"
     },
     {
       "id": "donate",
-      "icon": "ticket",
+      "icon": "",
       "url": "donate",
-      "style": "green",
-      "label": "Donate Tại Đây"
+      "style": "#F687B3 ",
+      "label": "💰 Donate Tại Đây"
     },
     {
       "id": "posts",
       "icon": "",
       "url": "post",
-      "style": "red",
-      "label": "Bài Đăng"
+      "style": "#F6E05E ",
+      "label": "💬 Bài Đăng"
     },
     {
       "id": "product",
       "icon": "",
       "url": "product",
-      "style": "green",
-      "label": "Sản Phẩm"
+      "style": "#4FD1C5 ",
+      "label": "🎁 Cửa hàng"
     }
   ],
   "footer": "© 2026 Shinju Ch. (@ShinjuVNer). All rights reserved."
