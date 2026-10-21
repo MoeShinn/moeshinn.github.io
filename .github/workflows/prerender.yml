@@ -2,9 +2,34 @@ name: Prerender
 
 on:
   push:
-    branches: [main]        # chạy ngay sau mỗi lần admin/bạn commit
+    branches: [main]
+    # Chỉ chạy khi commit/push có đụng tới các định dạng dưới đây (các dòng bắt đầu bằng ! là loại trừ).
+    # Commit chỉ có .png/.jpg, .xml, .txt, .zip… thì KHÔNG chạy.
+    paths:
+      - "*.json"            # JSON ở gốc repo (data.json, site-settings.json, site-links.json…)
+      - "**/*.json"         # JSON ở mọi thư mục (posts.json, product/data/*.json, download/data/*.json, image/index.json…)
+      - "*.md"
+      - "**/*.md"           # nội dung bài (post/data/*.md)
+      - "*.html"
+      - "**/*.html"         # khung trang (index.html, post/index.html, product/index.html…)
+      - "*.webp"
+      - "**/*.webp"         # ảnh WebP (ảnh bài, album, avatar…) — site dùng 100% webp
+      - "css/*.css"         # CSS được nhúng vào trang chủ
+      - "js/icons.js"       # 4 file JS mà prerender đọc/gọi trực tiếp
+      - "post/js/render.js"
+      - "product/js/productgen.js"
+      - "assets/album/albumgen.js"
+      - "tools/prerender.js"
+      # --- loại trừ: file đổi liên tục hoặc không ảnh hưởng tới kết quả dựng sẵn ---
+      - "!admin/**"                   # trang quản trị (prerender bỏ qua thư mục này)
+      - "!s/**"                       # trang chuyển hướng link rút gọn
+      - "!site-notify-state.json"     # trạng thái Telegram, Worker ghi mỗi giờ
+      - "!status.json"
+      - "!moods.json"
+      - "!manifest.webmanifest"
+      - "!download/link-data.json"
   schedule:
-    - cron: "*/5 * * * *"   # dự phòng: 5 phút một lần
+    - cron: "*/5 * * * *"   # dự phòng: 5 phút một lần (xóa mục này nếu không cần dự phòng)
   workflow_dispatch:         # có nút chạy tay trong tab Actions
 
 concurrency:
