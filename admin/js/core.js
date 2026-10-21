@@ -6,6 +6,7 @@
   const NAV = [
     ["dashboard", "Dashboard", "/admin/"],
     ["post", "Bài đăng", "/admin/post/"],
+    ["product", "Sản phẩm", "/admin/product/"],
     ["download", "Download", "/admin/download/"],
     ["channel", "Kênh", "/admin/channel/"],
     ["donate", "Donate", "/admin/donate/"],

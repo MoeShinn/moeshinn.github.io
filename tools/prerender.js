@@ -10,6 +10,8 @@
      2. Điền sẵn vào HTML: menu, avatar + tên + các nút trang chủ, trang Kênh, trang Donate,
         danh sách bài ở /post/, JSON-LD (WebSite + Person) ở trang chủ.
      3. Tạo llms.txt (mục lục dạng văn bản cho các công cụ AI).
+     4. Trang Sản phẩm: dựng sẵn HTML thật (+ SEO, JSON-LD) cho /product/ và từng /product/<id>/ từ product/data.json,
+        dọn thư mục mục đã xóa, và giữ các địa chỉ /product/… trong sitemap.xml (dùng chung product/js/productgen.js với admin).
 
    Chạy:   node tools/prerender.js           (ghi file)
            node tools/prerender.js --check   (không ghi; thoát mã 1 nếu có file cần cập nhật)
@@ -20,6 +22,7 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
+const PG = require("../product/js/productgen.js");
 
 const ROOT = path.resolve(__dirname, "..");
 const CHECK = process.argv.includes("--check");
@@ -69,6 +72,31 @@ const SITE_NAME = seo.siteName || (data.profile && data.profile.name) || "Shinju
 const profile = data.profile || {};
 const avatar = profile.avatar || "/assets/avatar/avatar.webp";
 const homeDesc = (seo.pages && seo.pages.home && seo.pages.home.description) || "";
+
+// post/js/render.js (không đụng DOM) → renderPostBody dùng chung để dựng phần mô tả sản phẩm giống hệt trang công khai
+const renderPostBody = (() => {
+  try { const ctx = {}; vm.createContext(ctx); vm.runInContext(rd("post/js/render.js"), ctx); return ctx.renderPostBody; } catch (e) { return (x) => String(x || ""); }
+})();
+
+/* ---- Sản phẩm: cây mục ở product/data.json, chi tiết ở product/data/<id>.json ---- */
+const productIdx = json("product/data.json", { nodes: [] });
+const pnodes = Array.isArray(productIdx.nodes) ? productIdx.nodes : [];
+const pdetails = Object.fromEntries(pnodes.map((n) => [n.id, json(`product/data/${n.id}.json`, {})]));
+const phub = { title: productIdx.title, intro: productIdx.intro };
+const pseo = { ...seo, siteUrl: SITE, siteName: SITE_NAME, favicon: seo.favicon || {}, ogImage: seo.ogImage || "" };
+const VFS = {}; // trang tĩnh được tạo ra trong lần chạy này (chưa nằm trên đĩa)
+if (pnodes.length && exists("product/index.html")) {
+  const shell = rd("product/index.html");
+  pnodes.forEach((n) => {
+    const d = pdetails[n.id] || {};
+    const bodyHtml = !PG.isCat(n) && d.body ? renderPostBody(d.body) : "";
+    VFS[`product/${n.id}/index.html`] = PG.buildNodePage(shell, { seo: pseo, node: n, nodes: pnodes, details: pdetails, bodyHtml, hub: phub });
+  });
+}
+// Thư mục /product/<id>/ không còn trong dữ liệu (mục đã xóa) → dọn, nhưng chỉ khi trong đó chỉ có index.html
+const orphans = !exists("product") ? [] : fs.readdirSync(path.join(ROOT, "product"), { withFileTypes: true })
+  .filter((e) => e.isDirectory() && !PG.RESERVED.includes(e.name) && !pnodes.some((n) => n.id === e.name))
+  .filter((e) => fs.readdirSync(path.join(ROOT, "product", e.name)).every((f) => f === "index.html")).map((e) => `product/${e.name}`);
 
 // js/icons.js gán window.MEDIA_ICONS → chạy trong sandbox để lấy màu nền từng nền tảng
 const ICONS = (() => {
@@ -123,6 +151,9 @@ const postCard = (p) =>
 const postListHtml = `<div class="page" data-prerender><header class="blog-title-bar"><h1>${t(SITE_NAME)}</h1></header>` +
   `<section class="post-section"><h2>📝 Bài đăng</h2><div class="post-grid">${publicPosts.map(postCard).join("")}</div></section></div>`;
 
+const productListHtml = `<div class="page" data-prerender>${PG.bodyHub({ nodes: pnodes, hub: phub })}</div>`;
+const productLd = `<script type="application/ld+json" id="product-jsonld">${ld(PG.ldFor({ seo: pseo, node: null, nodes: pnodes, details: {}, hub: phub }))}</script>`;
+
 const sameAs = [...new Set([
   ...(channel.links || []).filter((l) => l.visible !== false).map((l) => l.url),
   ...siteLinks.map((l) => l.url),
@@ -170,6 +201,9 @@ function transform(rel, html) {
     html = slotAfter(html, '<div class="method-list" data-method-list>', "methods", donateHtml);
   } else if (rel === "post/index.html") {
     html = slotAfter(html, '<script src="/js/site-chrome.js"></script>', "postlist", postListHtml);
+  } else if (rel === "product/index.html") {
+    html = slotAfter(html, '<script src="/js/site-chrome.js"></script>', "productlist", productListHtml);
+    html = slotAfter(html, "<!-- seo:end -->", "jsonld", productLd);
   }
   return html;
 }
@@ -199,6 +233,15 @@ function buildLlms() {
       L.push(`- [${p.title}](${SITE}/post/${encodeURIComponent(p.id)}/)${isoDate(p.date) ? ` (${isoDate(p.date)})` : ""}${desc}`);
     });
   }
+  if (pnodes.length) {
+    L.push("", "## Sản phẩm", "");
+    const line = (pid, depth) => PG.children(pnodes, pid).forEach((n) => {
+      const d = pdetails[n.id] || {};
+      L.push(`${"  ".repeat(depth)}- [${n.title}](${SITE}${PG.url(n.id)})${PG.isCat(n) ? " (danh mục)" : ""}${d.description ? `: ${d.description}` : ""}${d.price ? ` Giá: ${d.price}.` : ""}`);
+      if (PG.isCat(n)) line(n.id, depth + 1);
+    });
+    line("", 0);
+  }
   const dls = exists("download/data") ? fs.readdirSync(path.join(ROOT, "download/data")).filter((f) => f.endsWith(".json")) : [];
   if (dls.length) {
     L.push("", "## Tải xuống", "");
@@ -216,10 +259,22 @@ function put(rel, next) {
   const cur = exists(rel) ? rd(rel) : null;
   if (cur === next) return;
   changed.push(rel);
-  if (!CHECK) fs.writeFileSync(path.join(ROOT, rel), next);
+  if (!CHECK) { fs.mkdirSync(path.dirname(path.join(ROOT, rel)), { recursive: true }); fs.writeFileSync(path.join(ROOT, rel), next); }
 }
-walk("").filter((r) => !/^(404|offline|google[^/]*)\.html$/.test(r)).forEach((rel) => put(rel, transform(rel, rd(rel))));
+// sitemap.xml do Worker admin-api viết lại mỗi lần admin commit (không biết trang Sản phẩm) → ở đây bổ sung lại các địa chỉ /product/…
+function patchSitemap(xml) {
+  const prefix = `${SITE}/product/`;
+  let out = xml.replace(/[ \t]*<url><loc>([^<]*)<\/loc>(?:<lastmod>[^<]*<\/lastmod>)?<\/url>\r?\n?/g, (m, loc) => (loc.startsWith(prefix) && /\/$/.test(loc) ? "" : m));
+  if (!pnodes.length) return out;
+  const lines = PG.allUrls(pseo, pnodes).map((u) => `  <url><loc>${t(u.loc)}</loc>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ""}</url>\n`).join("");
+  return out.replace(/<\/urlset>/, () => lines + "</urlset>");
+}
+const pages = new Set(walk("").filter((r) => !orphans.some((o) => r.startsWith(o + "/"))));
+Object.keys(VFS).forEach((k) => pages.add(k));
+[...pages].filter((r) => !/^(404|offline|google[^/]*)\.html$/.test(r)).forEach((rel) => put(rel, transform(rel, rel in VFS ? VFS[rel] : rd(rel))));
+orphans.forEach((o) => { changed.push(o + "/ (xóa)"); if (!CHECK) fs.rmSync(path.join(ROOT, o), { recursive: true, force: true }); });
 put("llms.txt", buildLlms());
+if (exists("sitemap.xml")) put("sitemap.xml", patchSitemap(rd("sitemap.xml")));
 
 console.log(changed.length ? `${CHECK ? "Cần cập nhật" : "Đã cập nhật"} ${changed.length} file:\n  ` + changed.join("\n  ") : "Không có gì thay đổi — nội dung dựng sẵn đã khớp dữ liệu.");
 if (CHECK && changed.length) process.exit(1);

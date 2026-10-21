@@ -114,7 +114,7 @@ background:radial-gradient(60% 50% at 20% 30%,rgba(60,200,170,.45),transparent 6
     return () => { off = true; cancelAnimationFrame(raf); removeEventListener("resize", size); document.removeEventListener("visibilitychange", vis); if (ro) ro.disconnect(); cv.remove(); };
   }
 
-  const pageKey = () => { const p = location.pathname; return p.startsWith("/post") ? "post" : p.startsWith("/download") ? "download" : p.startsWith("/channel") ? "channel" : p.startsWith("/donate") ? "donate" : "home"; };
+  const pageKey = () => { const p = location.pathname; return p.startsWith("/post") ? "post" : p.startsWith("/product") ? "product" : p.startsWith("/download") ? "download" : p.startsWith("/channel") ? "channel" : p.startsWith("/donate") ? "donate" : "home"; };
   window.ShinjuTheme = { list: LIST, mount, pageKey };
 
   if (!manual) {

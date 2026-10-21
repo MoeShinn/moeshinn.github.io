@@ -26,6 +26,7 @@
     "pages": {
       "home": "stars",
       "post": "fireflies",
+      "product": "aurora",
       "download": "aurora",
       "channel": "stars",
       "donate": "snow"
@@ -71,6 +72,11 @@
         "title": "Ủng Hộ — Shinju Ch.",
         "description": "Ủng hộ Shinju Ch. để duy trì và phát triển nội dung.",
         "keywords": "ủng hộ, đóng góp, Shinju Ch."
+      },
+      "product": {
+        "title": "Sản phẩm — Shinju Ch.",
+        "description": "Sản phẩm số của Shinju Ch.: phần mềm và model PNGTuber/Vtuber (Ezy Tuber), kèm chính sách sử dụng rõ ràng.",
+        "keywords": "sản phẩm số, phần mềm, model Ezy Tuber, PNGTuber, Vtuber, Shinju Ch."
       }
     }
   },

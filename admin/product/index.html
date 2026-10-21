@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Sản phẩm</title>
+<link rel="stylesheet" href="/admin/css/admin.css">
+<style>
+.tr{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.tr:first-child{border-top:0}
+.tr .th{width:44px;height:44px;border-radius:8px;background:#050b16 center/cover no-repeat;flex:none;border:1px solid var(--line);overflow:hidden;display:grid;place-items:center;font-size:11px;color:var(--mute)}
+.tr .th img{width:100%;height:100%;object-fit:cover;display:block}
+.tr .nm{flex:1;min-width:0}.tr .nm b{word-break:break-word}
+.tr .ac{display:flex;flex-wrap:wrap;gap:4px 10px;justify-content:flex-end;font-size:13px}
+.badge{display:inline-block;font-size:11px;padding:1px 8px;border-radius:999px;margin-left:6px;vertical-align:middle;background:#16304f;border:1px solid #2a4a74}
+.badge.p{background:#12391f;border-color:#23703a}
+.sub{background:#0a1626;border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:10px}
+.thumbbox{display:flex;gap:12px;align-items:flex-start}
+.thumbbox .pv{width:120px;aspect-ratio:16/10;border-radius:10px;background:#050b16;border:1px solid var(--line);overflow:hidden;display:grid;place-items:center;color:var(--mute);font-size:12px;flex:none}
+.thumbbox .pv img{width:100%;height:100%;object-fit:cover}
+.mini{display:flex;gap:8px;align-items:center}.mini img{width:54px;height:54px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+a.act{cursor:pointer}a.dng{color:#ff8b8f}
+</style></head>
+<body><div id="app"></div><div id="toast"></div>
+<script src="/admin/js/core.js"></script>
+<script src="/admin/js/seo.js"></script>
+<script src="/admin/js/postgen.js"></script>
+<script src="/admin/js/imgutil.js"></script>
+<script src="/admin/js/imgpick.js"></script>
+<script src="/post/js/render.js"></script>
+<script src="/product/js/productgen.js"></script>
+<script>
+Admin.boot({ id: "product", title: "Sản phẩm", async render(main) {
+  const { esc, $ } = Admin, PG = ProductGen, DATA = "product/data.json";
+  main.innerHTML = `<h2>Sản phẩm</h2><p class="hint">Đang tải…</p>`;
+  let idx, S, tree;
+  try {
+    [idx, S, tree] = await Promise.all([Admin.readJson(DATA, { title: "", intro: "", nodes: [] }), Admin.readJson("site-settings.json", {}), Admin.api("/tree").then((r) => r.files.map((f) => f.path))]);
+  } catch (e) { main.innerHTML = `<h2>Sản phẩm</h2><p class="err">${esc(e.message)}</p>`; return; }
+  idx.nodes = idx.nodes || [];
+  const seo = AdminSeo.merge(S.seo), site = seo.siteUrl.replace(/\/$/, "");
+  const today = () => new Date().toISOString().slice(0, 10);
+  const LIMIT = 38; // Worker nhận tối đa 40 file mỗi commit
+  const hubOf = (i = idx) => ({ title: i.title, intro: i.intro });
+  const idxFile = (nodes) => ({ path: DATA, content: JSON.stringify({ ...(idx.title ? { title: idx.title } : {}), ...(idx.intro ? { intro: idx.intro } : {}), nodes }, null, 2) + "\n" });
+  const label = (n) => PG.path(idx.nodes, n.id).map((x) => x.title).join(" › ");
+  const readDetail = (id) => Admin.readJson(`product/data/${id}.json`, {});
+
+  // Dựng trang tĩnh cho một mục (cần chi tiết của mục và các danh mục cha để kế thừa chính sách)
+  async function pageFor(shell, id, nodes, over = {}) {
+    const node = PG.find(nodes, id); if (!node) return null;
+    const details = {};
+    for (const n of PG.path(nodes, id)) details[n.id] = over[n.id] || (await readDetail(n.id));
+    const d = details[id], bodyHtml = !PG.isCat(node) && d.body ? renderPostBody(d.body) : "";
+    return { path: `product/${id}/index.html`, content: PG.buildNodePage(shell, { seo, node, nodes, details, bodyHtml, hub: hubOf() }) };
+  }
+  async function commit(message, files, deletes = []) {
+    if (files.length + deletes.length > LIMIT) throw new Error(`Thay đổi này chạm ${files.length + deletes.length} file (tối đa ${LIMIT} mỗi lần). Hãy làm từng nhánh nhỏ hơn.`);
+    await Admin.commitFiles(message, files, deletes);
+  }
+  const done = (msg) => { Admin.toast(msg); setTimeout(() => { location.hash = ""; location.reload(); }, 1600); };
+
+  /* ---------------- Danh sách / cây ---------------- */
+  function showList() {
+    const rows = (pid, depth) => PG.children(idx.nodes, pid).map((n) => {
+      const sib = PG.children(idx.nodes, n.parent || ""), i = sib.findIndex((x) => x.id === n.id), cat = PG.isCat(n), kids = cat ? PG.children(idx.nodes, n.id).length : 0;
+      return `<div class="tr" style="margin-left:${depth * 24}px"><div class="th">${n.thumb ? `<img src="${esc(n.thumb)}" alt="" loading="lazy" onerror="this.replaceWith(document.createTextNode('—'))">` : "—"}</div>
+        <div class="nm"><b>${esc(n.title)}</b><span class="badge ${cat ? "" : "p"}">${cat ? "Danh mục · " + kids : "Sản phẩm"}</span><br><small class="hint">/product/${esc(n.id)}/</small></div>
+        <div class="ac"><a href="/product/${encodeURIComponent(n.id)}/" target="_blank">Mở</a>
+          <a class="act" data-mv="${esc(n.id)}:-1" ${i === 0 ? 'style="opacity:.3;pointer-events:none"' : ""}>↑</a><a class="act" data-mv="${esc(n.id)}:1" ${i === sib.length - 1 ? 'style="opacity:.3;pointer-events:none"' : ""}>↓</a>
+          <a href="#edit/${encodeURIComponent(n.id)}">Sửa</a>
+          ${cat ? `<a href="#new/category/${encodeURIComponent(n.id)}">＋ Danh mục</a><a href="#new/product/${encodeURIComponent(n.id)}">＋ Sản phẩm</a>` : ""}
+          <a class="act dng" data-del="${esc(n.id)}">Xóa</a></div></div>${cat ? rows(n.id, depth + 1) : ""}`;
+    }).join("");
+    main.innerHTML = `<h2>Sản phẩm</h2>
+      <div class="card"><h3>Trang chính /product/</h3>
+        <label>Tiêu đề trang<input id="h_title" value="${esc(idx.title || "")}" placeholder="Sản phẩm"></label>
+        <label>Giới thiệu ngắn (hiện dưới tiêu đề, Google và AI đọc được)<textarea id="h_intro" rows="2">${esc(idx.intro || "")}</textarea></label>
+        <button type="button" class="ghost" id="h_save">Lưu trang chính</button> <span class="hint">Tiêu đề / mô tả / từ khóa Google của trang này chỉnh ở Cài đặt → SEO.</span></div>
+      <p><a class="btn" href="#new/category/">＋ Danh mục gốc</a> <a class="btn" href="#new/product/" style="background:#12391f">＋ Sản phẩm gốc</a></p>
+      <div class="card">${rows("", 0) || '<p class="hint">Chưa có mục nào. Bấm “＋ Danh mục gốc” để bắt đầu (ví dụ: Phần mềm, Model Ezy Tuber).</p>'}</div>
+      <p class="hint">Thêm danh mục ở đâu cũng được, lồng nhau không giới hạn tầng. Thứ tự: danh mục luôn xếp trước sản phẩm; dùng ↑ ↓ để đổi thứ tự trong cùng cấp.</p>`;
+    $("#h_save").onclick = async () => {
+      const b = $("#h_save"); b.disabled = true;
+      try { idx.title = $("#h_title").value.trim(); idx.intro = $("#h_intro").value.trim(); await commit("Admin: sửa trang chính Sản phẩm", [idxFile(idx.nodes)]); done("Đã lưu. Web cập nhật sau ~1 phút."); }
+      catch (e) { Admin.toast(e.message, true); b.disabled = false; }
+    };
+    main.querySelectorAll("[data-mv]").forEach((el) => (el.onclick = async () => {
+      const [id, dir] = el.dataset.mv.split(":"), n = PG.find(idx.nodes, id), sib = PG.children(idx.nodes, n.parent || ""), i = sib.findIndex((x) => x.id === id), j = i + Number(dir);
+      if (j < 0 || j >= sib.length) return;
+      const nodes = idx.nodes.map((x) => ({ ...x })), A = PG.find(nodes, sib[i].id), B = PG.find(nodes, sib[j].id);
+      sib.forEach((s, k) => (PG.find(nodes, s.id).order = k)); [A.order, B.order] = [B.order, A.order];
+      try { await commit("Admin: đổi thứ tự trong Sản phẩm", [idxFile(nodes)]); done("Đã đổi thứ tự."); } catch (e) { Admin.toast(e.message, true); }
+    }));
+    main.querySelectorAll("[data-del]").forEach((el) => (el.onclick = () => removeNode(el.dataset.del)));
+  }
+
+  async function removeNode(id) {
+    const n = PG.find(idx.nodes, id), kids = PG.descendants(idx.nodes, id), all = [n].concat(kids);
+    if (!confirm(`Xóa “${n.title}”${kids.length ? ` và ${kids.length} mục bên trong nó` : ""}? Trang của các mục này sẽ bị xóa.`)) return;
+    const gone = new Set(all.map((x) => x.id)), nodes = idx.nodes.filter((x) => !gone.has(x.id));
+    const deletes = all.flatMap((x) => [`product/data/${x.id}.json`, `product/${x.id}/index.html`]).filter((p) => tree.includes(p));
+    try {
+      const shell = await Admin.readText("product/index.html"), files = [idxFile(nodes)];
+      if (n.parent && PG.find(nodes, n.parent)) files.push(await pageFor(shell, n.parent, nodes));
+      await commit(`Admin: xóa ${all.length} mục sản phẩm`, files, deletes);
+      done("Đã xóa. Web cập nhật sau ~1 phút.");
+    } catch (e) { Admin.toast(e.message, true); }
+  }
+
+  /* ---------------- Trình soạn ---------------- */
+  async function showEditor(editId, newType, newParent) {
+    const old = editId ? PG.find(idx.nodes, editId) : null;
+    if (editId && !old) { location.hash = ""; return; }
+    main.innerHTML = `<h2>Đang tải…</h2>`;
+    const type = old ? old.type : newType, cat = type === "category";
+    let d = old ? await readDetail(editId) : {};
+    const n0 = old || { type, parent: newParent || "", title: "", thumb: "" };
+    let gallery = (d.gallery || []).map((u) => ({ url: u })), btns = (d.buttons || []).map((b) => ({ ...b })), lics = (d.licenses || []).map((l) => ({ ...l }));
+    let thumb = n0.thumb || "", thumbPv = thumb;
+    const banned = old ? new Set([old.id].concat(PG.descendants(idx.nodes, old.id).map((x) => x.id))) : new Set();
+    const parents = idx.nodes.filter((n) => PG.isCat(n) && !banned.has(n.id));
+    main.innerHTML = `<h2>${old ? "Sửa" : "Thêm"} ${cat ? "danh mục" : "sản phẩm"} <a href="#" style="font-size:14px;margin-left:8px">← Danh sách</a></h2>
+    <div class="card">
+      <label>Tên ${cat ? "danh mục" : "sản phẩm"}<input id="e_title" value="${esc(n0.title)}"></label>
+      <label>ID / đường dẫn (${esc(site)}/product/…)<input id="e_id" ${old ? "readonly" : ""} value="${esc(editId || "")}" placeholder="để trống: tự tạo từ tên, ví dụ picture-lite"></label>
+      <label>Nằm trong<select id="e_parent"><option value="">(Gốc — ngay trang Sản phẩm)</option>${parents.map((p) => `<option value="${esc(p.id)}" ${p.id === n0.parent ? "selected" : ""}>${esc(label(p))}</option>`).join("")}</select></label>
+      <label>Ảnh thumbnail (hiện trên thẻ và khi chia sẻ link)</label>
+      <div class="thumbbox"><div class="pv" id="e_pv">chưa có ảnh</div><div style="flex:1"><input id="e_thumb" placeholder="/image/xxxxxxxx.webp hoặc https://…" value="${esc(thumb)}"><div style="margin-top:6px"><button type="button" class="ghost" id="e_pick">Chọn / tải ảnh lên</button> <button type="button" class="ghost" id="e_nothumb">Bỏ ảnh</button></div></div></div>
+    </div>
+    <div class="card"><h3>Để Google và AI hiểu trang này</h3>
+      <label>Mô tả ngắn (1–2 câu nói rõ trang chứa gì — hiện trên Google và là thứ AI đọc đầu tiên)<textarea id="e_desc" rows="3">${esc(d.description || "")}</textarea></label>
+      <label>Từ khóa (cách nhau bằng dấu phẩy)<input id="e_kw" value="${esc(d.keywords || "")}"></label>
+      <button type="button" class="ghost" id="e_ai">✨ AI gợi ý mô tả và từ khóa</button> <span class="hint">AI chỉ điền gợi ý, ông xem lại rồi mới lưu.</span></div>
+    ${cat ? "" : `<div class="card"><h3>Thông tin sản phẩm</h3>
+      <label>Giá (tuỳ chọn, ví dụ: Miễn phí, 50.000đ)<input id="e_price" value="${esc(d.price || "")}" placeholder="Miễn phí"></label>
+      <label>Nội dung giới thiệu (Markdown-lite giống bài đăng: ảnh, link, nút, mã màu &amp;a…)</label>
+      <div class="tb"><button type="button" data-ins="img">🖼 Ảnh</button><button type="button" data-ins="link">🔗 Link</button><button type="button" data-ins="btn">🔘 Nút</button><button type="button" data-ins="b">B Đậm</button><button type="button" class="ghost" id="e_prev">👁 Xem trước</button></div>
+      <textarea id="e_body" rows="12" style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px">${esc(d.body || "")}</textarea>
+      <div id="e_pvw" style="display:none;margin-top:8px"><iframe id="e_pvf" style="width:100%;height:340px;border:1px solid var(--line);border-radius:8px;background:#050b16"></iframe></div></div>
+    <div class="card"><h3>Hình ảnh thêm (thư viện)</h3><div id="e_gal"></div><button type="button" class="ghost" id="g_add">＋ Thêm ảnh</button></div>
+    <div class="card"><h3>Nút trên trang sản phẩm</h3><p class="hint" style="margin-top:0">Ví dụ “Tải xuống” (dán link /download/… hoặc link ngoài), “Mua ngay”, “Xem trên YouTube”…</p><div id="e_btns"></div><button type="button" class="ghost" id="b_add">＋ Thêm nút</button></div>`}
+    <div class="card"><h3>Chính sách / Giấy phép</h3>
+      <p class="hint" style="margin-top:0">Tự viết nội dung. Có thể thêm <b>nhiều khối</b> (giấy phép kép — ví dụ phần mình chịu trách nhiệm và phần điều khoản của nguồn gốc). ${cat ? "Các mục con không tự viết chính sách sẽ tự áp dụng chính sách của danh mục này." : "Nếu để trống, sản phẩm tự áp dụng chính sách của danh mục cha gần nhất có viết."}</p>
+      <div id="e_lic"></div><button type="button" class="ghost" id="l_add">＋ Thêm khối chính sách</button></div>
+    ${cat ? "" : `<div class="card"><label class="row"><input type="checkbox" id="e_cm" ${d.comments === false ? "" : "checked"}>Cho phép bình luận (Giscus) ở trang này</label></div>`}
+    <button id="e_save">${old ? "Lưu thay đổi" : cat ? "Tạo danh mục" : "Đăng sản phẩm"}</button> <span class="hint" id="e_st"></span>`;
+
+    const move = (arr, i, k) => { const j = i + k; if (j < 0 || j >= arr.length) return; [arr[i], arr[j]] = [arr[j], arr[i]]; };
+    const ctl = (kind, i, n) => `<span style="white-space:nowrap"><button type="button" class="ghost" data-mv="${kind}:${i}:-1" ${i === 0 ? "disabled" : ""}>↑</button> <button type="button" class="ghost" data-mv="${kind}:${i}:1" ${i === n - 1 ? "disabled" : ""}>↓</button> <button type="button" class="ghost" data-rm="${kind}:${i}">✕</button></span>`;
+    const arrOf = (k) => (k === "gal" ? gallery : k === "btn" ? btns : lics);
+    function drawThumb() { $("#e_pv").innerHTML = thumbPv ? `<img src="${esc(thumbPv)}" alt="" onerror="this.replaceWith(document.createTextNode('Đang xuất bản…'))">` : "chưa có ảnh"; }
+    function draw() {
+      drawThumb();
+      if ($("#e_gal")) $("#e_gal").innerHTML = gallery.map((g, i) => `<div class="sub mini"><img src="${esc(g.pv || g.url)}" alt="" onerror="this.style.opacity=.3"><input style="flex:1" data-f="gal:${i}" value="${esc(g.url)}">${ctl("gal", i, gallery.length)}</div>`).join("") || '<p class="hint">Chưa có ảnh thêm.</p>';
+      if ($("#e_btns")) $("#e_btns").innerHTML = btns.map((b, i) => `<div class="sub"><div class="cols"><label>Chữ trên nút<input data-f="btn:${i}:label" value="${esc(b.label || "")}"></label><label>Link<input data-f="btn:${i}:url" placeholder="https://… hoặc /download/…/" value="${esc(b.url || "")}"></label></div>
+        <label>Màu nút<select data-f="btn:${i}:style">${[["blue", "Xanh dương"], ["green", "Xanh lá"], ["red", "Đỏ"], ["gray", "Xám"]].map(([v, l]) => `<option value="${v}" ${(b.style || "blue") === v ? "selected" : ""}>${l}</option>`).join("")}</select></label><div style="text-align:right">${ctl("btn", i, btns.length)}</div></div>`).join("") || '<p class="hint">Chưa có nút.</p>';
+      $("#e_lic").innerHTML = lics.map((l, i) => `<div class="sub"><label>Tiêu đề khối (ví dụ: Giấy phép sử dụng)<input data-f="lic:${i}:title" value="${esc(l.title || "")}"></label><label>Nội dung<textarea rows="6" data-f="lic:${i}:text">${esc(l.text || "")}</textarea></label><div style="text-align:right">${ctl("lic", i, lics.length)}</div></div>`).join("") || '<p class="hint">Chưa có chính sách riêng.</p>';
+    }
+    main.oninput = (e) => {
+      const f = e.target.dataset.f; if (f) { const [k, i, p] = f.split(":"); if (k === "gal") { gallery[+i].url = e.target.value; gallery[+i].pv = ""; } else arrOf(k)[+i][p] = e.target.value; }
+      if (e.target.id === "e_thumb") { thumb = e.target.value.trim(); thumbPv = thumb; drawThumb(); }
+    };
+    main.onchange = (e) => { const f = e.target.dataset.f; if (f && f.startsWith("btn:") && f.endsWith(":style")) btns[+f.split(":")[1]].style = e.target.value; };
+    main.onclick = (e) => {
+      const t = e.target;
+      if (t.dataset.mv) { const [k, i, s] = t.dataset.mv.split(":"); move(arrOf(k), +i, +s); draw(); }
+      if (t.dataset.rm) { const [k, i] = t.dataset.rm.split(":"); arrOf(k).splice(+i, 1); draw(); }
+      if (t.dataset.ins) insert(t.dataset.ins);
+    };
+    let insert = () => {};
+    const pick = (cb) => ImgPick.open({ Admin, onPick: cb });
+    $("#e_pick").onclick = () => pick((u, pv) => { thumb = u; thumbPv = pv; $("#e_thumb").value = u; drawThumb(); });
+    $("#e_nothumb").onclick = () => { thumb = ""; thumbPv = ""; $("#e_thumb").value = ""; drawThumb(); };
+    if (!cat) {
+      $("#g_add").onclick = () => pick((u, pv) => { gallery.push({ url: u, pv }); draw(); });
+      $("#b_add").onclick = () => { btns.push({ label: "Tải xuống", url: "", style: "blue" }); draw(); };
+      const ta = $("#e_body");
+      const put = (before, mid, after = "") => { const s = ta.selectionStart, e = ta.selectionEnd, sel = ta.value.slice(s, e) || mid; ta.setRangeText(before + sel + after, s, e, "end"); ta.focus(); };
+      insert = (kind) => {
+        if (kind === "img") return pick((u) => put(`\n\n![${$("#e_title").value.trim()}](`, u, ")\n\n"));
+        if (kind === "link") { const u = prompt("Link (https://… hoặc /đường-dẫn):"); if (u) put("[", "chữ hiển thị", `](${u})`); }
+        if (kind === "btn") { const u = prompt("Link của nút:"); if (u) put(`\n\n<a class="btn" href="${u.replace(/"/g, "%22")}" target="_blank" rel="noopener noreferrer">`, "Chữ trên nút", "</a>\n\n"); }
+        if (kind === "b") put("&l", "chữ đậm", "&r");
+      };
+      $("#e_prev").onclick = () => {
+        const w = $("#e_pvw"); w.style.display = w.style.display === "none" ? "" : "none";
+        $("#e_pvf").srcdoc = `<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="/product/css/style.css"></head><body><div class="page" style="min-height:0;padding:16px"><div class="post-body product-body">${renderPostBody(ta.value)}</div></div></body></html>`;
+      };
+    }
+    $("#l_add").onclick = () => { lics.push({ title: "", text: "" }); draw(); };
+    $("#e_ai").onclick = async () => {
+      const b = $("#e_ai"); b.disabled = true;
+      try {
+        const r = await Admin.api("/ai/seo", { title: $("#e_title").value, body: `${cat ? "Danh mục" : "Sản phẩm số"} trên website Shinju Ch. ${$("#e_desc").value} ${$("#e_body") ? $("#e_body").value : ""} ${$("#e_kw").value}`.slice(0, 6000) });
+        if (r.description) $("#e_desc").value = r.description; if (r.keywords) $("#e_kw").value = [].concat(r.keywords).join(", ");
+        Admin.toast("AI đã điền gợi ý, xem lại rồi lưu.");
+      } catch (err) { Admin.toast(err.message, true); } b.disabled = false;
+    };
+
+    $("#e_save").onclick = async () => {
+      const v = (i) => ($("#" + i) ? $("#" + i).value.trim() : ""), title = v("e_title").replace(/\s+/g, " ");
+      if (!title) return Admin.toast("Cần nhập tên", true);
+      const parent = v("e_parent");
+      if (parent && banned.has(parent)) return Admin.toast("Không thể đặt một mục vào chính nó hoặc mục con của nó", true);
+      const th = $("#e_thumb").value.trim();
+      if (th && !/^(https?:\/\/|\/(?!\/))/.test(th)) return Admin.toast("Ảnh thumbnail phải là link https://… hoặc đường dẫn bắt đầu bằng /", true);
+      const isUrl = (u) => /^(https?:\/\/|mailto:|tel:|\/(?!\/))/i.test(String(u || "").trim());
+      const gal = gallery.map((g) => String(g.url || "").trim()).filter(Boolean), bt = btns.filter((b) => (b.label || "").trim() || (b.url || "").trim());
+      if (gal.some((u) => !/^(https?:\/\/|\/(?!\/))/.test(u))) return Admin.toast("Ảnh trong thư viện phải là link https://… hoặc đường dẫn bắt đầu bằng /", true);
+      for (const [i, b] of bt.entries()) if (!isUrl(b.url)) return Admin.toast(`Nút ${i + 1}: link phải bắt đầu bằng https://, / , mailto: hoặc tel:`, true);
+      const used = new Set(idx.nodes.map((n) => n.id));
+      let id = editId;
+      if (!id) {
+        const typed = v("e_id") && PostGen.slugify(v("e_id"));
+        if (typed) { if (!PG.slugOk(typed)) return Admin.toast(`ID “${typed}” không dùng được (chữ thường, số, dấu -, không trùng css/js/data/index)`, true); if (used.has(typed)) return Admin.toast("ID này đã có mục khác dùng", true); id = typed; }
+        else { let base = PostGen.slugify(title).slice(0, 56).replace(/-+$/, "") || "muc"; if (PG.RESERVED.includes(base)) base += "-sp"; id = base; for (let k = 2; used.has(id); k++) id = `${base}-${k}`; }
+      }
+      const nodes = idx.nodes.map((n) => ({ ...n }));
+      const sibs = nodes.filter((n) => (n.parent || "") === parent && n.id !== id);
+      const prev = old && (old.parent || "") === parent ? old.order : (sibs.reduce((m, n) => Math.max(m, n.order ?? 0), -1) + 1);
+      const node = { id, type, parent, title, thumb: th, order: prev ?? 0, updated: today() };
+      if (old) nodes[nodes.findIndex((n) => n.id === id)] = node; else nodes.push(node);
+      const det = { ...d }; for (const k of ["price", "body", "gallery", "buttons", "licenses", "description", "keywords", "comments"]) delete det[k];
+      const put = (k, val) => { if (val) det[k] = val; };
+      put("description", v("e_desc")); put("keywords", v("e_kw"));
+      const lc = lics.map((l) => ({ title: (l.title || "").trim(), text: (l.text || "").trim() })).filter((l) => l.title || l.text); if (lc.length) det.licenses = lc;
+      if (!cat) {
+        put("price", v("e_price")); put("body", $("#e_body").value.replace(/\r\n/g, "\n").trim());
+        if (gal.length) det.gallery = gal;
+        if (bt.length) det.buttons = bt.map((b) => ({ label: (b.label || "").trim() || "Mở liên kết", url: b.url.trim(), style: b.style || "blue" }));
+        if (!$("#e_cm").checked) det.comments = false;
+      }
+      const b = $("#e_save"); b.disabled = true; $("#e_st").textContent = "Đang lưu…";
+      try {
+        const shell = await Admin.readText("product/index.html"), files = [idxFile(nodes), { path: `product/data/${id}.json`, content: JSON.stringify(det, null, 2) + "\n" }];
+        files.push(await pageFor(shell, id, nodes, { [id]: det }));
+        for (const p of new Set([parent, old && old.parent || ""].filter((x) => x && PG.find(nodes, x)))) files.push(await pageFor(shell, p, nodes)); // trang danh mục cha (cũ và mới) liệt kê mục này
+        await commit(`Admin: ${old ? "sửa" : "thêm"} ${cat ? "danh mục" : "sản phẩm"} ${id}`, files);
+        done(`Đã ${old ? "lưu" : "đăng"}: ${site}/product/${id}/ (hoạt động sau ~1 phút)`);
+      } catch (err) { $("#e_st").textContent = ""; Admin.toast(err.message, true); b.disabled = false; }
+    };
+    draw();
+  }
+
+  const show = () => {
+    const h = location.hash;
+    if (h.startsWith("#new/")) { const [, t, p] = h.split("/"); showEditor(null, t === "product" ? "product" : "category", p ? decodeURIComponent(p) : ""); }
+    else if (h.startsWith("#edit/")) showEditor(decodeURIComponent(h.slice(6)));
+    else showList();
+  };
+  addEventListener("hashchange", () => location.reload()); show();
+}});
+</script></body></html>

@@ -22,6 +22,10 @@
         "url": "/donate/index.html"
       },
       {
+        "label": "Sản phẩm",
+        "url": "/product/index.html"
+      },
+      {
         "label": "Bài Đăng",
         "url": "/post/index.html"
       }

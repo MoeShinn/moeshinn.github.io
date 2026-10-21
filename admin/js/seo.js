@@ -1,14 +1,15 @@
 /* Dựng khối SEO <head> cho các trang công khai (dùng chung cho admin và script di chuyển). */
 (function (root, factory) { if (typeof module === "object" && module.exports) module.exports = factory(); else root.AdminSeo = factory(); })(typeof window !== "undefined" ? window : this, function () {
-  const PAGES = { home: "Trang chủ", post: "Bài đăng", download: "Download", channel: "Mạng xã hội", donate: "Donate" };
-  const URLS = { home: "/", post: "/post/", download: "/download/", channel: "/channel/", donate: "/donate/" };
-  const FILE = { home: "index.html", post: "post/index.html", download: "download/index.html", channel: "channel/index.html", donate: "donate/index.html" };
+  const PAGES = { home: "Trang chủ", post: "Bài đăng", product: "Sản phẩm", download: "Download", channel: "Mạng xã hội", donate: "Donate" };
+  const URLS = { home: "/", post: "/post/", product: "/product/", download: "/download/", channel: "/channel/", donate: "/donate/" };
+  const FILE = { home: "index.html", post: "post/index.html", product: "product/index.html", download: "download/index.html", channel: "channel/index.html", donate: "donate/index.html" };
   const DEFAULT = {
     siteUrl: "https://shinjuvn.github.io", siteName: "Shinju Ch.", ogImage: "", shortLength: 10, // shortLength: số ký tự mã rút gọn /s/ tự sinh
     favicon: { icon: "/assets/favicon.png", apple: "", v: "" },
     pages: {
       home: { title: "Shinju Ch.", description: "Trang cá nhân của Shinju Ch. (@ShinjuVNer): mạng xã hội, ủng hộ và các bài đăng mới.", keywords: "Shinju Ch., ShinjuVNer, Shinju, mạng xã hội, blog" },
       post: { title: "Shinju Ch. — Blog", description: "Blog của Shinju Ch.: thông báo, hướng dẫn và các bài viết mới.", keywords: "blog, bài viết, hướng dẫn, Shinju Ch." },
+      product: { title: "Sản phẩm — Shinju Ch.", description: "Sản phẩm số của Shinju Ch.: phần mềm và model PNGTuber/Vtuber (Ezy Tuber), kèm chính sách sử dụng rõ ràng.", keywords: "sản phẩm số, phần mềm, model Ezy Tuber, PNGTuber, Vtuber, Shinju Ch." },
       download: { title: "Tải xuống — Shinju Ch.", description: "Tải xuống các tệp và tài nguyên do Shinju Ch. chia sẻ.", keywords: "tải xuống, download, Shinju Ch." },
       channel: { title: "Shinju Ch. — Channel", description: "Các kênh mạng xã hội của Shinju Ch.: YouTube và các nền tảng khác.", keywords: "Shinju Ch., ShinjuVNer, YouTube, mạng xã hội" },
       donate: { title: "Ủng Hộ — Shinju Ch.", description: "Ủng hộ Shinju Ch. để duy trì và phát triển nội dung.", keywords: "ủng hộ, donate, Shinju Ch." },
