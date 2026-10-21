@@ -9,9 +9,9 @@
   },
   "announcement": {
     "enabled": true,
-    "text": "Shinju Ch. đã ra mắt trên Youtube",
+    "text": "Shinju Ch. đã ra mắt trên Youtube ✨",
     "url": "https://www.youtube.com/channel/UCoZR9unQFHLfqoOQ22lPcGA",
-    "expires": "2026-11-19"
+    "expires": "2026-10-23"
   },
   "maintenance": {
     "enabled": false,
@@ -22,7 +22,7 @@
     "intensity": 0.85,
     "wash": 0.2,
     "dim": 0.25,
-    "forceMotion": true,
+    "forceMotion": false,
     "pages": {
       "home": "stars",
       "post": "fireflies",
@@ -58,6 +58,11 @@
         "description": "Blog của Shinju Ch.: thông báo, hướng dẫn và các bài viết mới",
         "keywords": "blog, bài viết, hướng dẫn, Shinju Ch."
       },
+      "product": {
+        "title": "Sản phẩm — Shinju Ch.",
+        "description": "Sản phẩm số của Shinju Ch. [VNer]: phần mềm và model PNGTuber/Vtuber (Ezy Tuber), kèm chính sách sử dụng rõ ràng.",
+        "keywords": "sản phẩm số, phần mềm, model Ezy Tuber, PNGTuber, Vtuber, Shinju Ch."
+      },
       "download": {
         "title": "Tải xuống — Shinju Ch.",
         "description": "Tải xuống các tệp và tài nguyên do Shinju Ch. chia sẻ",
@@ -72,11 +77,6 @@
         "title": "Ủng Hộ — Shinju Ch.",
         "description": "Ủng hộ Shinju Ch. để duy trì và phát triển nội dung.",
         "keywords": "ủng hộ, đóng góp, Shinju Ch."
-      },
-      "product": {
-        "title": "Sản phẩm — Shinju Ch.",
-        "description": "Sản phẩm số của Shinju Ch.: phần mềm và model PNGTuber/Vtuber (Ezy Tuber), kèm chính sách sử dụng rõ ràng.",
-        "keywords": "sản phẩm số, phần mềm, model Ezy Tuber, PNGTuber, Vtuber, Shinju Ch."
       }
     }
   },
