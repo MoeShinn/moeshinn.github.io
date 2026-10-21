@@ -1,3 +1,12 @@
+/* Font Baloo 2 tự host (OFL) — bản con tiếng Việt + Latin, biến thiên 400–800, ~44 KB. Gắn ở đây vì file này nạp trên mọi trang công khai (và được nhúng thẳng vào trang chủ). */
+@font-face {
+    font-family: "Baloo 2";
+    font-style: normal;
+    font-weight: 400 800;
+    font-display: swap;
+    src: url("/assets/fonts/baloo2-vi.woff") format("woff");
+}
+
 /* loading.css — màn hình chờ dùng chung cho mọi trang, có 8 theme (đổi theo cảm xúc trong /admin → Trạng thái).
    Thuần code, không ảnh. Mặc định: hoàng hôn. Lớp trang trí do js/loading.js tạo (.fx-a, .fx-b, .fx-p). */
 

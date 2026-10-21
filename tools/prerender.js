@@ -220,6 +220,8 @@ function transform(rel, html) {
   } else if (rel === "product/index.html") {
     html = slotAfter(html, '<script src="/js/site-chrome.js"></script>', "productlist", productListHtml);
     html = slotAfter(html, "<!-- seo:end -->", "jsonld", productLd);
+    // Chưa có sản phẩm nào → trang hub rỗng (nội dung mỏng): báo noindex. Có sản phẩm → tự gỡ. (Đặt SAU khối jsonld để slot jsonld không bị chen ngang.)
+    html = slotAfter(html, "<!--/pre:jsonld-->", "robots", pnodes.length ? "" : '<meta name="robots" content="noindex, follow" />');
   } else if (rel === "album/index.html") {
     html = slotAfter(html, '<div id="app" class="page">', "albumlist", albumListHtml);
     html = slotAfter(html, "<!-- seo:end -->", "jsonld", albumLd);
