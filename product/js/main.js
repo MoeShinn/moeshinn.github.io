@@ -6,6 +6,7 @@
                          đúng cùng HTML bằng product/js/productgen.js.
    Dữ liệu: /product/data.json (cây mục) và /product/data/<id>.json (chi tiết từng mục).
    Id không tồn tại -> /404.html.
+   Mục có "tool" trong product/data/<id>.json là công cụ chạy trên trình duyệt: giao diện ở product/tools/<tool>.js (+ common.js, tools.css).
 
    Lượt xem sản phẩm: chỉ +1 khi người xem Ở LẠI trang (tab đang hiện) ít nhất 30 giây, và tối đa 1 lần / 10 phút / trình duyệt.
    Cần thêm loại "product" vào biến COUNTER_TYPES của Worker bộ đếm (xem hướng dẫn); chưa thêm thì trang vẫn chạy, chỉ không đếm. */
@@ -121,6 +122,32 @@
   // Gắn thông tin vào <head> khi dữ liệu mới hơn bản tĩnh (tiêu đề tab); phần SEO đầy đủ đã nằm sẵn trong HTML tĩnh.
   const setTitle = (s) => { if (s) document.title = s; };
 
+  /* ---------- Trang công cụ (chi tiết có "tool"): nạp CSS + JS riêng rồi dựng giao diện vào [data-tool-root] ---------- */
+  const TOOLS_BASE = "/product/tools/";
+  const loadCss = (href) => new Promise((resolve) => {
+    if (document.querySelector(`link[href="${href}"]`)) return resolve();
+    const l = document.createElement("link"); l.rel = "stylesheet"; l.href = href; l.onload = l.onerror = () => resolve(); document.head.appendChild(l);
+    setTimeout(resolve, 4000); // mạng chậm vẫn không giữ màn hình tải
+  });
+  const loadJs = (src) => new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) return resolve();
+    const s = document.createElement("script"); s.src = src; s.onload = () => resolve(); s.onerror = () => reject(new Error("Không tải được " + src)); document.head.appendChild(s);
+  });
+  async function mountTool(name) {
+    const root = document.querySelector("[data-tool-root]"); if (!root) return;
+    try {
+      if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(name)) throw new Error("Tên công cụ không hợp lệ");
+      await Promise.all([loadCss(TOOLS_BASE + "tools.css"), loadJs(TOOLS_BASE + "common.js")]);
+      await loadJs(`${TOOLS_BASE}${name}.js`);
+      const tool = window.ShinjuTools && window.ShinjuTools.tools[name];
+      if (!tool) throw new Error("Chưa có công cụ " + name);
+      root.textContent = ""; tool.mount(root);
+    } catch (e) {
+      root.innerHTML = '<p class="empty-msg" style="text-align:center">Không tải được công cụ. Vui lòng tải lại trang.</p>';
+      console.error(e);
+    }
+  }
+
   /* ---------- Hiển thị ---------- */
   async function main() {
     // Danh sách dựng sẵn trong HTML (cho bot không chạy JS, xem tools/prerender.js): JS tự dựng lại bản động nên bỏ bản tĩnh.
@@ -147,6 +174,7 @@
     const bodyHtml = !PG.isCat(node) && d.body && typeof renderPostBody === "function" ? renderPostBody(d.body) : "";
     app.innerHTML = PG.bodyNode({ node, nodes, details, bodyHtml, hub });
     setTitle(`${node.title} — ${(document.title.split(" — ")[1]) || "Shinju Ch."}`);
+    if (PG.isTool(node, d)) await mountTool(d.tool);
     if (window.SiteLoading) window.SiteLoading.ready();
     if (!PG.isCat(node)) { trackViews(id); mountShare(node); mountComments(d); }
   }

@@ -13,7 +13,7 @@
   const t = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const a = (s) => t(s).replace(/"/g, "&quot;");
   const jsonSafe = (o) => JSON.stringify(o).replace(/</g, "\\u003c");
-  const RESERVED = ["css", "js", "data", "index"]; // trùng tên thư mục con của /product/
+  const RESERVED = ["css", "js", "data", "index", "tools"]; // trùng tên thư mục con của /product/
   const HUB = "Sản phẩm";
   const site = (seo) => String(seo.siteUrl || "").replace(/\/$/, "");
   const url = (id) => `/product/${encodeURIComponent(id)}/`;
@@ -56,6 +56,29 @@
   const crumbs = (nodes, id, hubTitle) => { const p = path(nodes, id); return `<nav class="breadcrumb" aria-label="Breadcrumb"><a href="/product/">${t(hubTitle || HUB)}</a>${p.map((n, i) => i === p.length - 1 ? `<span aria-current="page">${t(n.title)}</span>` : `<a href="${a(url(n.id))}">${t(n.title)}</a>`).join("")}</nav>`; };
   const BTN = { blue: "blue", green: "green", red: "red", gray: "gray" };
 
+
+  /* ---------------- Trang công cụ (chi tiết có trường "tool") ----------------
+     Mục loại "product" mà product/data/<id>.json có "tool": "<tên>" là một CÔNG CỤ chạy ngay trên trình duyệt.
+     HTML tĩnh vẫn chứa nội dung THẬT (mô tả, tính năng, cách dùng, hỏi đáp) cho Google / AI đọc;
+     giao diện công cụ do product/tools/<tên>.js dựng vào [data-tool-root] (xem product/js/main.js).
+     Trường riêng: tool, features[], steps[{name,text}], faq[{q,a}]. */
+  const isTool = (n, d) => !isCat(n) && !!(d && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(String(d.tool || "")));
+  const toolFeatures = (d) => (d.features || []).map((x) => String(x || "").trim()).filter(Boolean);
+  const toolSteps = (d) => (d.steps || []).filter((x) => x && (x.text || x.name)).map((x) => ({ name: String(x.name || "").trim(), text: String(x.text || "").trim() }));
+  const toolFaq = (d) => (d.faq || []).filter((x) => x && x.q && x.a).map((x) => ({ q: String(x.q).trim(), a: String(x.a).trim() }));
+  function toolInfoHtml(d) {
+    const feats = toolFeatures(d), steps = toolSteps(d), faq = toolFaq(d);
+    return (feats.length ? `<section class="post-section tool-features"><h2>✨ Tính năng</h2><ul>${feats.map((f) => `<li>${t(f)}</li>`).join("")}</ul></section>` : "") +
+      (steps.length ? `<section class="post-section tool-steps"><h2>📝 Cách sử dụng</h2><ol>${steps.map((s) => `<li>${s.name ? `<strong>${t(s.name)}</strong> ` : ""}${t(s.text)}</li>`).join("")}</ol></section>` : "") +
+      (faq.length ? `<section class="post-section tool-faq"><h2>❓ Câu hỏi thường gặp</h2>${faq.map((f) => `<details class="faq-item"><summary>${t(f.q)}</summary><div>${textHtml(f.a)}</div></details>`).join("")}</section>` : "");
+  }
+  function bodyTool({ node, d, bc, head, desc, bodyHtml, lic }) {
+    return `<article class="product-article tool-article" data-tool="${a(d.tool)}">${bc}${head}${d.price ? `<div class="product-price">${t(d.price)}</div>` : ""}${desc}` +
+      `<section class="tool-app" data-tool-root aria-label="${a(node.title)}"><p class="t-boot">Công cụ chạy ngay trên trình duyệt của bạn, ảnh không bị tải lên máy chủ.</p><noscript><p class="empty-msg">Hãy bật JavaScript để dùng công cụ này.</p></noscript></section>` +
+      `<div class="tool-info">${toolInfoHtml(d)}</div>` + (bodyHtml ? `<div class="post-body product-body">${bodyHtml}</div>` : "") +
+      `<div class="product-meta" data-views-wrap hidden></div><div class="post-share" data-share></div>${lic}</article>`;
+  }
+
   // Nội dung trang /product/ (hub)
   function bodyHub({ nodes, hub = {} }) {
     return `<header class="blog-title-bar"><h1>${t(hub.title || HUB)}</h1></header>${hub.intro ? `<div class="product-desc">${textHtml(hub.intro)}</div>` : ""}<section class="post-section">${grid(children(nodes, ""))}</section>`;
@@ -66,6 +89,7 @@
     const head = `<header class="blog-title-bar"><h1>${t(node.title)}</h1></header>`;
     const desc = d.description ? `<p class="product-desc">${t(d.description)}</p>` : "";
     if (isCat(node)) return `${bc}${head}${desc}<section class="post-section">${grid(children(nodes, node.id))}</section>${lic}`;
+    if (isTool(node, d)) return bodyTool({ node, d, bc, head, desc, bodyHtml, lic });
     const gallery = (d.gallery || []).filter(imgOk), btns = (d.buttons || []).filter((b) => b && String(b.url || "").trim());
     return `<article class="product-article">${bc}${head}${d.price ? `<div class="product-price">${t(d.price)}</div>` : ""}` +
       (imgSrc(node.thumb) ? `<div class="product-hero"><img src="${a(imgSrc(node.thumb))}" alt="${a(node.title)}" /></div>` : "") + desc +
@@ -89,6 +113,17 @@
     if (!id || isCat(node)) {
       const name = id ? node.title : hubName, desc = id ? d.description : (hub.intro ? excerpt(hub.intro) : "");
       return { "@context": "https://schema.org", "@graph": [{ "@type": "CollectionPage", "@id": u + "#page", url: u, name, inLanguage: "vi", ...(desc ? { description: desc } : {}), isPartOf: { "@id": base + "/#website" }, mainEntity: list(name) }, bc] };
+    }
+    if (isTool(node, d)) {
+      const feats = toolFeatures(d), steps = toolSteps(d), faq = toolFaq(d), imgs = [node.thumb].filter(imgOk).map((x) => absUrl(seo, x));
+      const app = { "@type": "WebApplication", "@id": u + "#app", url: u, name: node.title, inLanguage: "vi", ...(d.description ? { description: d.description } : {}), ...(imgs.length ? { image: imgs } : {}),
+        applicationCategory: "MultimediaApplication", operatingSystem: "Any (trình duyệt web)", browserRequirements: "Cần JavaScript, dùng được trên trình duyệt hiện đại", isAccessibleForFree: true,
+        offers: { "@type": "Offer", url: u, price: "0", priceCurrency: "VND", availability: "https://schema.org/InStock" }, author: { "@type": "Person", name: seo.siteName }, ...(d.keywords ? { keywords: d.keywords } : {}), ...(feats.length ? { featureList: feats } : {}) };
+      const graph = [app];
+      if (steps.length) graph.push({ "@type": "HowTo", "@id": u + "#howto", name: `Cách dùng ${node.title}`, step: steps.map((s, i) => ({ "@type": "HowToStep", position: i + 1, name: s.name || `Bước ${i + 1}`, text: s.text || s.name })) });
+      if (faq.length) graph.push({ "@type": "FAQPage", "@id": u + "#faq", mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) });
+      graph.push(bc);
+      return { "@context": "https://schema.org", "@graph": graph };
     }
     const imgs = [node.thumb].concat(d.gallery || []).filter(imgOk).map((x) => absUrl(seo, x));
     const price = priceNumber(d.price);
@@ -133,5 +168,5 @@
   const allUrls = (seo, nodes) => [{ loc: site(seo) + "/product/", lastmod: nodes.map((n) => n.updated).filter(Boolean).sort().pop() || "" }].concat(nodes.map((n) => ({ loc: site(seo) + url(n.id), lastmod: n.updated || "" })));
 
   return { HUB, RESERVED, t, a, url, absUrl, isCat, byOrder, find, children, path, descendants, slugOk, excerpt, textHtml, resolveLicenses, licenseHtml, card, grid, crumbs,
-    bodyHub, bodyNode, ldFor, headFor, buildNodePage, stripPrerender, allUrls, priceNumber, isHttp };
+    bodyHub, bodyNode, isTool, ldFor, headFor, buildNodePage, stripPrerender, allUrls, priceNumber, isHttp };
 });

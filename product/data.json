@@ -34,7 +34,7 @@
       "type": "category",
       "parent": "ezy",
       "title": "Ezy Model Trả phí",
-      "thumb": "/image/of80a6i7.webp",
+      "thumb": "/image/up0i8xkm.webp",
       "order": 2,
       "updated": "2026-10-21"
     },
@@ -45,34 +45,34 @@
       "title": "Công cụ ảnh",
       "thumb": "/image/1pl9ya60.webp",
       "order": 1,
-      "updated": "2026-10-21"
+      "updated": "2026-10-22"
     },
     {
-      "id": "ezy-tuber",
+      "id": "convert-image",
       "type": "product",
-      "parent": "ezy-software",
-      "title": "Ezy Tuber",
-      "thumb": "/image/vje1d3j6.webp",
+      "parent": "photo-tools",
+      "title": "Chuyển đổi định dạng ảnh",
+      "thumb": "/product/tools/img/convert-image.webp",
       "order": 0,
-      "updated": "2026-10-21"
+      "updated": "2026-10-22"
     },
     {
-      "id": "ezy-maker",
+      "id": "crop-image",
       "type": "product",
-      "parent": "ezy-software",
-      "title": "Ezy Maker - Rig model cho Ezy Tuber",
-      "thumb": "/image/8tom4y3p.webp",
+      "parent": "photo-tools",
+      "title": "Cắt ảnh theo tỉ lệ",
+      "thumb": "/product/tools/img/crop-image.webp",
       "order": 1,
-      "updated": "2026-10-21"
+      "updated": "2026-10-22"
     },
     {
-      "id": "chibi",
+      "id": "compress-image",
       "type": "product",
-      "parent": "ezy-model-free",
-      "title": "Chibi",
-      "thumb": "/image/qakyzfxz.webp",
-      "order": 0,
-      "updated": "2026-10-21"
+      "parent": "photo-tools",
+      "title": "Nén ảnh giảm dung lượng",
+      "thumb": "/product/tools/img/compress-image.webp",
+      "order": 2,
+      "updated": "2026-10-22"
     }
   ]
 }
