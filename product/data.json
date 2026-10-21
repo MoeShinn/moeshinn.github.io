@@ -37,6 +37,15 @@
       "thumb": "/image/up0i8xkm.webp",
       "order": 2,
       "updated": "2026-10-21"
+    },
+    {
+      "id": "photo-tools",
+      "type": "category",
+      "parent": "",
+      "title": "Công cụ ảnh",
+      "thumb": "/image/1pl9ya60.webp",
+      "order": 1,
+      "updated": "2026-10-21"
     }
   ]
 }
