@@ -52,6 +52,13 @@
       "url": "post",
       "style": "red",
       "label": "Bài Đăng"
+    },
+    {
+      "id": "product",
+      "icon": "",
+      "url": "product",
+      "style": "green",
+      "label": "Sản Phẩm"
     }
   ],
   "footer": "© 2026 Shinju Ch. (@ShinjuVNer). All rights reserved."
