@@ -23,6 +23,7 @@ const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 const PG = require("../product/js/productgen.js");
+const AG = require("../assets/album/albumgen.js");
 
 const ROOT = path.resolve(__dirname, "..");
 const CHECK = process.argv.includes("--check");
@@ -98,6 +99,19 @@ const orphans = !exists("product") ? [] : fs.readdirSync(path.join(ROOT, "produc
   .filter((e) => e.isDirectory() && !PG.RESERVED.includes(e.name) && !pnodes.some((n) => n.id === e.name))
   .filter((e) => fs.readdirSync(path.join(ROOT, "product", e.name)).every((f) => f === "index.html")).map((e) => `product/${e.name}`);
 
+/* ---- Album: ảnh ở image/index.json (admin "Kho ảnh"), album = trường "album" của từng ảnh → /album/ và /album/<id>/ ---- */
+const albumIdx = AG.normalize(json("image/index.json", { albums: [], images: [] }));
+if (exists("album/index.html")) {
+  const ashell = rd("album/index.html");
+  albumIdx.albums.forEach((al) => { VFS[`album/${al.id}/index.html`] = AG.buildAlbumPage(ashell, { seo: pseo, idx: albumIdx, album: al }); });
+}
+// Thư mục /album/<id>/ không còn trong dữ liệu (album đã xóa) → dọn, nhưng chỉ khi trong đó chỉ có index.html
+if (exists("album")) {
+  fs.readdirSync(path.join(ROOT, "album"), { withFileTypes: true })
+    .filter((e) => e.isDirectory() && !albumIdx.albums.some((al) => al.id === e.name))
+    .filter((e) => fs.readdirSync(path.join(ROOT, "album", e.name)).every((f) => f === "index.html")).forEach((e) => orphans.push(`album/${e.name}`));
+}
+
 // js/icons.js gán window.MEDIA_ICONS → chạy trong sandbox để lấy màu nền từng nền tảng
 const ICONS = (() => {
   try { const w = {}; vm.runInNewContext(rd("js/icons.js"), { window: w }); return w.MEDIA_ICONS || {}; } catch (e) { return {}; }
@@ -153,6 +167,8 @@ const postListHtml = `<div class="page" data-prerender><header class="blog-title
 
 const productListHtml = `<div class="page" data-prerender>${PG.bodyHub({ nodes: pnodes, hub: phub })}</div>`;
 const productLd = `<script type="application/ld+json" id="product-jsonld">${ld(PG.ldFor({ seo: pseo, node: null, nodes: pnodes, details: {}, hub: phub }))}</script>`;
+const albumListHtml = AG.bodyHub({ idx: albumIdx });
+const albumLd = `<script type="application/ld+json" id="album-jsonld">${ld(AG.ldFor({ seo: pseo, idx: albumIdx, album: null }))}</script>`;
 
 const sameAs = [...new Set([
   ...(channel.links || []).filter((l) => l.visible !== false).map((l) => l.url),
@@ -204,6 +220,9 @@ function transform(rel, html) {
   } else if (rel === "product/index.html") {
     html = slotAfter(html, '<script src="/js/site-chrome.js"></script>', "productlist", productListHtml);
     html = slotAfter(html, "<!-- seo:end -->", "jsonld", productLd);
+  } else if (rel === "album/index.html") {
+    html = slotAfter(html, '<div id="app" class="page">', "albumlist", albumListHtml);
+    html = slotAfter(html, "<!-- seo:end -->", "jsonld", albumLd);
   }
   return html;
 }
@@ -242,6 +261,11 @@ function buildLlms() {
     });
     line("", 0);
   }
+  const alist = AG.listed(albumIdx);
+  if (alist.length) {
+    L.push("", "## Album ảnh", "");
+    alist.forEach((al) => L.push(`- [${al.name}](${SITE}${AG.url(al.id)}): ${al.count} ảnh`));
+  }
   const dls = exists("download/data") ? fs.readdirSync(path.join(ROOT, "download/data")).filter((f) => f.endsWith(".json")) : [];
   if (dls.length) {
     L.push("", "## Tải xuống", "");
@@ -263,10 +287,11 @@ function put(rel, next) {
 }
 // sitemap.xml do Worker admin-api viết lại mỗi lần admin commit (không biết trang Sản phẩm) → ở đây bổ sung lại các địa chỉ /product/…
 function patchSitemap(xml) {
-  const prefix = `${SITE}/product/`;
-  let out = xml.replace(/[ \t]*<url><loc>([^<]*)<\/loc>(?:<lastmod>[^<]*<\/lastmod>)?<\/url>\r?\n?/g, (m, loc) => (loc.startsWith(prefix) && /\/$/.test(loc) ? "" : m));
-  if (!pnodes.length) return out;
-  const lines = PG.allUrls(pseo, pnodes).map((u) => `  <url><loc>${t(u.loc)}</loc>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ""}</url>\n`).join("");
+  const prefixes = [`${SITE}/product/`, `${SITE}/album/`];
+  let out = xml.replace(/[ \t]*<url><loc>([^<]*)<\/loc>(?:<lastmod>[^<]*<\/lastmod>)?<\/url>\r?\n?/g, (m, loc) => (prefixes.some((p) => loc.startsWith(p)) && /\/$/.test(loc) ? "" : m));
+  const urls = (pnodes.length ? PG.allUrls(pseo, pnodes) : []).concat(AG.allUrls(pseo, albumIdx));
+  if (!urls.length) return out;
+  const lines = urls.map((u) => `  <url><loc>${t(u.loc)}</loc>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ""}</url>\n`).join("");
   return out.replace(/<\/urlset>/, () => lines + "</urlset>");
 }
 const pages = new Set(walk("").filter((r) => !orphans.some((o) => r.startsWith(o + "/"))));
