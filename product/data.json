@@ -10,6 +10,15 @@
       "thumb": "/image/ewloog8v.webp",
       "order": 0,
       "updated": "2026-10-21"
+    },
+    {
+      "id": "ezy-software",
+      "type": "category",
+      "parent": "ezy",
+      "title": "Ezy Software",
+      "thumb": "/image/ewloog8v.webp",
+      "order": 0,
+      "updated": "2026-10-21"
     }
   ]
 }
