@@ -23,7 +23,7 @@ description: "Kênh YouTube Vtuber/PNGtuber Việt Nam gaming, reaction & stream
 </ul>
 
 <h3>Lịch stream</h3>
-<blockquote>&l&e20h mỗi tối&r (giờ Việt Nam), trừ những ngày nghỉ stream. Lịch nghỉ sẽ được báo trước trên kênh và mạng xã hội.</blockquote>
+<blockquote>&l&e19h mỗi tối&r, trừ những ngày nghỉ stream. Lịch nghỉ sẽ được báo trước trên kênh và mạng xã hội.</blockquote>
 
 <hr>
 
