@@ -18,6 +18,10 @@
 - [HƯỚNG DẪN TẢI, CÀI ĐẶT VÀ SỬ DỤNG OBS TỐI ƯU CHO MÁY YẾU (2026)](https://shinjuvn.github.io/post/huong-dan-tai-cai-dat-va-su-dung-obs-toi-uu-cho-may-yeu-2026-948192262/) (2026-10-15): Hướng dẫn tải, cài đặt và sử dụng OBS tối ưu cho máy yếu để quay và stream mượt mà, ổn định dù máy chỉ có cấu hình thấp. Thông số chuẩn để quay video và stream mượt, không giật, không rớt frame.
 - [Picture Lite - tool cho HSSV Ngành CNTT](https://shinjuvn.github.io/post/picture-lite-tool-cho-hssv-nganh-cntt-392687181/) (2026-10-10): Tải Picture Lite - công cụ nén ảnh miễn phí cho HSSV ngành CNTT
 
+## Sản phẩm
+
+- [Ezy Software và Model build sẵn](https://shinjuvn.github.io/product/ezy/) (danh mục): Xem kho sản phẩm Ezy Software và Model EzyTuber build và rig sẵn free trên website Shinju Ch
+
 ## Album ảnh
 
 - [Model Shinn](https://shinjuvn.github.io/album/model-png-tuber-vtuber/): 2 ảnh
