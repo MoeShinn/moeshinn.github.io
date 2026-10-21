@@ -18,11 +18,6 @@
 - [HƯỚNG DẪN TẢI, CÀI ĐẶT VÀ SỬ DỤNG OBS TỐI ƯU CHO MÁY YẾU (2026)](https://shinjuvn.github.io/post/huong-dan-tai-cai-dat-va-su-dung-obs-toi-uu-cho-may-yeu-2026-948192262/) (2026-10-15): Hướng dẫn tải, cài đặt và sử dụng OBS tối ưu cho máy yếu để quay và stream mượt mà, ổn định dù máy chỉ có cấu hình thấp. Thông số chuẩn để quay video và stream mượt, không giật, không rớt frame.
 - [Picture Lite - tool cho HSSV Ngành CNTT](https://shinjuvn.github.io/post/picture-lite-tool-cho-hssv-nganh-cntt-392687181/) (2026-10-10): Tải Picture Lite - công cụ nén ảnh miễn phí cho HSSV ngành CNTT
 
-## Sản phẩm
-
-- [Phần mềm](https://shinjuvn.github.io/product/phan-mem/) (danh mục): Danh mục phần mềm và công cụ do Shinju Ch. chia sẻ.
-- [Model Ezy Tuber](https://shinjuvn.github.io/product/model-ezy-tuber/) (danh mục): Danh mục các model Ezy Tuber do Shinju Ch. chia sẻ.
-
 ## Tải xuống
 
 - [TOOL HỖ TRỢ TỐI ƯU CHO PAGE CỦA BẠN](https://shinjuvn.github.io/download/1271266172/): Tải Source Tree Extractor và Picture Lite để nén ảnh, thay ảnh đã nén và xuất mã nguồn website ra TXT dễ đọc.
