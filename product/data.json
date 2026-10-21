@@ -19,6 +19,15 @@
       "thumb": "/image/ewloog8v.webp",
       "order": 0,
       "updated": "2026-10-21"
+    },
+    {
+      "id": "ezy-model-free",
+      "type": "category",
+      "parent": "ezy",
+      "title": "Ezy Model Free",
+      "thumb": "/image/l77sakzh.webp",
+      "order": 1,
+      "updated": "2026-10-21"
     }
   ]
 }
