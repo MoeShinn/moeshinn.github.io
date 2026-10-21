@@ -1,5 +1,15 @@
 {
   "title": "Cửa hàng",
   "intro": "Các sản phẩm số 0đ-trả phí của Shinn ✨",
-  "nodes": []
+  "nodes": [
+    {
+      "id": "ezy",
+      "type": "category",
+      "parent": "",
+      "title": "Ezy Software và Model build sẵn",
+      "thumb": "/image/ewloog8v.webp",
+      "order": 0,
+      "updated": "2026-10-21"
+    }
+  ]
 }
