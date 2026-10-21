@@ -9,6 +9,16 @@ const ICONS = Object.fromEntries(
   Object.entries(window.MEDIA_ICONS || {}).map(([id, def]) => [id, def.svg])
 );
 
+/* Màu nút: tên có sẵn trong css/style.css, hoặc mã "#rgb"/"#rrggbb". Tên lạ → xanh dương (tránh nút trong suốt). Giữ bản sao ở tools/prerender.js. */
+const BTN_COLORS = ["blue", "green", "red", "orange", "yellow", "purple", "pink", "teal", "gray", "black", "white"];
+function btnColor(style) {
+  const s = String(style || "").trim().toLowerCase(), m = s.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/);
+  if (!m) return { cls: BTN_COLORS.includes(s) ? s : "blue", vars: null };
+  const h = m[1].length === 3 ? m[1].replace(/./g, "$&$&") : m[1], n = parseInt(h, 16), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  const dk = (x) => Math.round(x * 0.7).toString(16).padStart(2, "0");
+  return { cls: "custom" + (0.299 * r + 0.587 * g + 0.114 * b > 170 ? " light" : ""), vars: { "--c1": "#" + h, "--c2": "#" + dk(r) + dk(g) + dk(b) } };
+}
+
 async function loadData() {
   // Dùng chung bản đã tải bởi site-chrome.js (window.siteJSON) → không gọi /data.json lần thứ hai.
   const data = window.siteJSON ? await window.siteJSON("/data.json") : await (await fetch("/data.json", { cache: "no-cache" })).json();
@@ -53,7 +63,9 @@ function render(data) {
     list.replaceChildren();
     data.buttons.forEach((btn) => {
       const a = document.createElement("a");
-      a.className = `link-btn ${btn.style}`;
+      const bc = btnColor(btn.style);
+      a.className = `link-btn ${bc.cls}`;
+      if (bc.vars) for (const k in bc.vars) a.style.setProperty(k, bc.vars[k]);
       a.href = safeHref(btn.url);
       const iconEl = document.createElement("span");
       iconEl.className = "link-icon";

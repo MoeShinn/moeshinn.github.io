@@ -134,8 +134,19 @@ function frontmatter(id) {
 const navPages = (data.nav && data.nav.pages) || [{ label: "Trang chủ", url: "/" }];
 const navHtml = navPages.map((p) => `<a href="${a(clean(p.url))}" role="menuitem">${t(p.label)}</a>`).join("");
 
-const homeButtons = (data.buttons || []).map((b) =>
-  `<a class="link-btn ${a(b.style || "")}" href="${a(safeHref(b.url))}"><span class="link-icon"></span><span>${t(label(b.label))}</span></a>`).join("");
+// Màu nút: giữ đồng bộ với btnColor() trong js/main.js (tên có sẵn trong css/style.css hoặc mã "#rgb"/"#rrggbb"; tên lạ → blue).
+const BTN_COLORS = ["blue", "green", "red", "orange", "yellow", "purple", "pink", "teal", "gray", "black", "white"];
+function btnColor(style) {
+  const s = String(style || "").trim().toLowerCase(), m = s.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/);
+  if (!m) return { cls: BTN_COLORS.includes(s) ? s : "blue", css: "" };
+  const h = m[1].length === 3 ? m[1].replace(/./g, "$&$&") : m[1], n = parseInt(h, 16), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  const dk = (x) => Math.round(x * 0.7).toString(16).padStart(2, "0");
+  return { cls: "custom" + (0.299 * r + 0.587 * g + 0.114 * b > 170 ? " light" : ""), css: `--c1:#${h};--c2:#${dk(r)}${dk(g)}${dk(b)}` };
+}
+const homeButtons = (data.buttons || []).map((b) => {
+  const c = btnColor(b.style);
+  return `<a class="link-btn ${c.cls}"${c.css ? ` style="${c.css}"` : ""} href="${a(safeHref(b.url))}"><span class="link-icon"></span><span>${t(label(b.label))}</span></a>`;
+}).join("");
 
 function channelButton(l) {
   const def = ICONS[l.icon || l.id] || {};
