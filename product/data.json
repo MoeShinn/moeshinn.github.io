@@ -64,6 +64,15 @@
       "thumb": "/image/8tom4y3p.webp",
       "order": 1,
       "updated": "2026-10-21"
+    },
+    {
+      "id": "chibi",
+      "type": "product",
+      "parent": "ezy-model-free",
+      "title": "Chibi",
+      "thumb": "/image/qakyzfxz.webp",
+      "order": 0,
+      "updated": "2026-10-21"
     }
   ]
 }
