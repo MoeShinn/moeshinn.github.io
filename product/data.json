@@ -82,6 +82,15 @@
       "thumb": "",
       "order": 0,
       "updated": "2026-10-22"
+    },
+    {
+      "id": "ezy-maker",
+      "type": "product",
+      "parent": "ezy-software",
+      "title": "Ezy Maker",
+      "thumb": "",
+      "order": 1,
+      "updated": "2026-10-22"
     }
   ]
 }
