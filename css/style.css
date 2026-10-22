@@ -133,11 +133,13 @@ body::before {
 }
 
 .link-btn {
-    display: flex;
+    /* Lưới 3 cột: [icon] [chữ] [chừa trống đối xứng] → chữ luôn nằm đúng GIỮA nút dù có icon/emoji hay không */
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) 30px;
     align-items: center;
-    justify-content: center;
-    gap: 9px;
-    padding: 11px 16px;
+    column-gap: 8px;
+    text-align: center;
+    padding: 11px 20px;
     border-radius: 999px;
     text-decoration: none;
     font-size: 16px;
@@ -182,12 +184,22 @@ body::before {
     .link-btn.custom.light { color: #1a2433; }
 
 .link-icon {
-    width: 21px;
-    height: 21px;
-    flex-shrink: 0;
+    grid-column: 1;
+    width: 24px;
+    height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 19px;      /* emoji được tách từ đầu nhãn nằm ở đây */
+    line-height: 1;
+}
+
+/* Chữ của nút: cột giữa, tự xuống dòng gọn khi nhãn dài */
+.link-btn > span:last-child {
+    grid-column: 2;
+    min-width: 0;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
 }
 
     .link-icon svg {
@@ -212,7 +224,7 @@ body::before {
 
     .link-btn {
         font-size: 15px;
-        padding: 10px 14px;
+        padding: 10px 18px;
     }
 
     .avatar-wrap {

@@ -16,7 +16,15 @@ function btnColor(style) {
   if (!m) return { cls: BTN_COLORS.includes(s) ? s : "blue", vars: null };
   const h = m[1].length === 3 ? m[1].replace(/./g, "$&$&") : m[1], n = parseInt(h, 16), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
   const dk = (x) => Math.round(x * 0.7).toString(16).padStart(2, "0");
-  return { cls: "custom" + (0.299 * r + 0.587 * g + 0.114 * b > 170 ? " light" : ""), vars: { "--c1": "#" + h, "--c2": "#" + dk(r) + dk(g) + dk(b) } };
+  // Chọn màu chữ theo độ tương phản WCAG, tính tại giữa nút (màu giữa c1 và c2 ≈ 85% c1): chữ tối (#1a2433) hay trắng, bên nào rõ hơn.
+  const lin = (x) => { x = (x * 0.85) / 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); };
+  const L = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b), dark = (L + 0.05) / 0.068 > 1.05 / (L + 0.05);
+  return { cls: "custom" + (dark ? " light" : ""), vars: { "--c1": "#" + h, "--c2": "#" + dk(r) + dk(g) + dk(b) } };
+}
+/* Emoji đứng đầu nhãn (vd "💰 Donate") → tách ra cột icon để chữ luôn căn giữa. Không tách nếu nhãn chỉ có emoji. */
+function splitLeadEmoji(label) {
+  const m = /^\s*(\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic}|\p{Emoji_Modifier})*)\s*([\s\S]*)$/u.exec(String(label || ""));
+  return m && m[2].trim() ? { icon: m[1], text: m[2].trim() } : { icon: "", text: String(label || "") };
 }
 
 async function loadData() {
@@ -69,9 +77,12 @@ function render(data) {
       a.href = safeHref(btn.url);
       const iconEl = document.createElement("span");
       iconEl.className = "link-icon";
-      iconEl.innerHTML = ICONS[btn.icon] || ""; // SVG tĩnh từ /js/icons.js (code của site), không phải dữ liệu người dùng
+      iconEl.setAttribute("aria-hidden", "true");
+      const lead = ICONS[btn.icon] ? { icon: "", text: labelText(btn.label) } : splitLeadEmoji(labelText(btn.label));
+      if (ICONS[btn.icon]) iconEl.innerHTML = ICONS[btn.icon]; // SVG tĩnh từ /js/icons.js (code của site), không phải dữ liệu người dùng
+      else iconEl.textContent = lead.icon; // emoji tách từ đầu nhãn (văn bản thuần)
       const labelEl = document.createElement("span");
-      labelEl.textContent = labelText(btn.label); // văn bản thuần, không hiểu là HTML
+      labelEl.textContent = lead.text; // văn bản thuần, không hiểu là HTML
       a.append(iconEl, labelEl);
       list.appendChild(a);
     });

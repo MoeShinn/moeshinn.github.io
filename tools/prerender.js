@@ -134,18 +134,27 @@ function frontmatter(id) {
 const navPages = (data.nav && data.nav.pages) || [{ label: "Trang chủ", url: "/" }];
 const navHtml = navPages.map((p) => `<a href="${a(clean(p.url))}" role="menuitem">${t(p.label)}</a>`).join("");
 
-// Màu nút: giữ đồng bộ với btnColor() trong js/main.js (tên có sẵn trong css/style.css hoặc mã "#rgb"/"#rrggbb"; tên lạ → blue).
+// Màu nút + tách emoji đầu nhãn: giữ đồng bộ với js/main.js.
 const BTN_COLORS = ["blue", "green", "red", "orange", "yellow", "purple", "pink", "teal", "gray", "black", "white"];
 function btnColor(style) {
   const s = String(style || "").trim().toLowerCase(), m = s.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/);
   if (!m) return { cls: BTN_COLORS.includes(s) ? s : "blue", css: "" };
   const h = m[1].length === 3 ? m[1].replace(/./g, "$&$&") : m[1], n = parseInt(h, 16), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
   const dk = (x) => Math.round(x * 0.7).toString(16).padStart(2, "0");
-  return { cls: "custom" + (0.299 * r + 0.587 * g + 0.114 * b > 170 ? " light" : ""), css: `--c1:#${h};--c2:#${dk(r)}${dk(g)}${dk(b)}` };
+  // Chọn màu chữ theo độ tương phản WCAG, tính tại giữa nút (màu giữa c1 và c2 ≈ 85% c1): chữ tối (#1a2433) hay trắng, bên nào rõ hơn.
+  const lin = (x) => { x = (x * 0.85) / 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); };
+  const L = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b), dark = (L + 0.05) / 0.068 > 1.05 / (L + 0.05);
+  return { cls: "custom" + (dark ? " light" : ""), css: `--c1:#${h};--c2:#${dk(r)}${dk(g)}${dk(b)}` };
+}
+/* Emoji đứng đầu nhãn (vd "💰 Donate") → tách ra cột icon để chữ luôn căn giữa. Không tách nếu nhãn chỉ có emoji. */
+function splitLeadEmoji(label) {
+  const m = /^\s*(\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic}|\p{Emoji_Modifier})*)\s*([\s\S]*)$/u.exec(String(label || ""));
+  return m && m[2].trim() ? { icon: m[1], text: m[2].trim() } : { icon: "", text: String(label || "") };
 }
 const homeButtons = (data.buttons || []).map((b) => {
   const c = btnColor(b.style);
-  return `<a class="link-btn ${c.cls}"${c.css ? ` style="${c.css}"` : ""} href="${a(safeHref(b.url))}"><span class="link-icon"></span><span>${t(label(b.label))}</span></a>`;
+  const lead = b.icon ? { icon: "", text: label(b.label) } : splitLeadEmoji(label(b.label)); // có icon SVG thì giữ nguyên nhãn
+  return `<a class="link-btn ${c.cls}"${c.css ? ` style="${c.css}"` : ""} href="${a(safeHref(b.url))}"><span class="link-icon" aria-hidden="true">${t(lead.icon)}</span><span>${t(lead.text)}</span></a>`;
 }).join("");
 
 function channelButton(l) {
