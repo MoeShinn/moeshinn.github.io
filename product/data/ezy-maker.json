@@ -1,1 +1,26 @@
-{}
+{
+  "description": "Ezy Maker là công cụ rig layer để biến tranh nhân vật nhiều lớp (PSD, PNG) thành model PNGTuber hoàn chỉnh, thao tác trực quan, không cần kỹ năng kỹ thuật phức tạp.",
+  "keywords": "Ezy Maker, rig Vtuber, rig layer, tạo model Vtuber, làm model Vtuber, rigging PSD, rig PNGTuber, công cụ rig model 2D, biến tranh thành Vtuber, Vtuber model maker, Vtuber rigging tool",
+  "licenses": [
+    {
+      "title": "GIẤY PHÉP SỬ DỤNG",
+      "text": "1. Quyền sử dụng\nBạn được sử dụng Ezy Maker miễn phí [kiểm tra lại] để tạo model cho bản thân. Bạn được dùng model tạo ra cho mục đích cá nhân hoặc thương mại, kể cả nhận làm model cho người khác [kiểm tra lại].\n\n2. Quyền sở hữu\nBạn giữ toàn quyền sở hữu đối với tranh, layer và model do bạn tạo ra hoặc nhập vào phần mềm. Tác giả không có quyền sở hữu đối với các nội dung này.\n\n3. Các hành vi không được phép\n- Bán lại, cho thuê hoặc phát tán lại phần mềm khi chưa được tác giả đồng ý.\n- Gỡ bỏ hoặc chỉnh sửa thông tin bản quyền của phần mềm.\n- Rig và sử dụng tranh của người khác khi chưa có sự cho phép của họa sĩ.\n\n4. Miễn trừ trách nhiệm\nPhần mềm được cung cấp \"nguyên trạng\", không kèm bất kỳ bảo đảm nào. Tác giả không chịu trách nhiệm cho các thiệt hại hoặc tranh chấp bản quyền phát sinh từ tranh và model do người dùng tạo ra hoặc sử dụng.\n\n5. Không liên kết\nEzy Maker là sản phẩm độc lập, không liên kết với PNGTuber Plus hay bất kỳ phần mềm nào khác. Mọi tên sản phẩm được nhắc đến thuộc về chủ sở hữu tương ứng."
+    },
+    {
+      "title": "CHÍNH SÁCH QUYỀN RIÊNG TƯ",
+      "text": "1. Dữ liệu tranh và layer\nTranh và các tệp layer bạn mở trong Ezy Maker được xử lý trực tiếp trên máy của bạn, không được tải lên máy chủ nào [kiểm tra lại].\n\n2. Thông tin cá nhân\nEzy Maker không thu thập, lưu trữ hay chia sẻ thông tin cá nhân của người dùng [kiểm tra lại].\n\n3. Model và dữ liệu\nModel bạn tạo ra chỉ được lưu trên thiết bị của bạn, trừ khi bạn tự chia sẻ.\n\n4. Thay đổi chính sách\nChính sách này có thể được cập nhật khi phần mềm có thay đổi. Phiên bản mới nhất luôn được đăng tại trang này."
+    }
+  ],
+  "price": "Miễn phí",
+  "body": "<h2>Giới thiệu Ezy Maker</h2>\n&l&dEzy Maker&r là công cụ &lrig layer&r giúp bạn biến tranh nhân vật nhiều lớp thành model PNGTuber hoàn chỉnh. Giao diện &l&btiếng Việt&r, thao tác trực quan, kéo thả là xong, phù hợp cả với người mới bắt đầu.\n\n<h2>Điểm nổi bật</h2>\n<ul><li>&l&aRig dễ hơn PNGTuber Plus&r: ít bước thiết lập hơn, tiết kiệm thời gian khi làm model.</li><li>&l&bGiao diện trực quan&r: nhìn layer, chọn, chỉnh và xem kết quả ngay.</li><li>&l&dTiếng Việt&r: mọi nút bấm và hướng dẫn đều dễ hiểu với người Việt.</li><li>&l&eLàm model nhanh&r: từ tranh nhiều layer đến model dùng được chỉ trong vài bước.</li></ul>\n\nLiên hệ & hỗ trợ: [Liên hệ](https://shinjuvn.github.io/channel/)",
+  "gallery": [
+    "/image/54yjexng.webp"
+  ],
+  "buttons": [
+    {
+      "label": "Tải xuống",
+      "url": "https://github.com/ShinjuVN/Ezy-Software-and-Model/releases/download/Software/EzyMaker.exe",
+      "style": "blue"
+    }
+  ]
+}

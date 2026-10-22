@@ -222,7 +222,9 @@ Admin.boot({ id: "product", title: "Sản phẩm", async render(main) {
       <textarea id="e_body" rows="12" style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px">${esc(d.body || "")}</textarea>
       <div id="e_pvw" style="display:none;margin-top:8px"><iframe id="e_pvf" style="width:100%;height:340px;border:1px solid var(--line);border-radius:8px;background:#050b16"></iframe></div></div>
     <div class="card"><h3>Hình ảnh thêm (thư viện)</h3><div id="e_gal"></div><button type="button" class="ghost" id="g_add">＋ Thêm ảnh</button></div>
-    <div class="card"><h3>Nút trên trang sản phẩm</h3><p class="hint" style="margin-top:0">Ví dụ “Tải xuống” (dán link /download/… hoặc link ngoài), “Mua ngay”, “Xem trên YouTube”…</p><div id="e_btns"></div><button type="button" class="ghost" id="b_add">＋ Thêm nút</button></div>`}
+    <div class="card"><h3>Nút trên trang sản phẩm</h3><p class="hint" style="margin-top:0">Ví dụ “Tải xuống” (dán link /download/… hoặc link ngoài), “Mua ngay”, “Xem trên YouTube”…</p><div id="e_btns"></div><button type="button" class="ghost" id="b_add">＋ Thêm nút</button>
+      <label class="row" style="margin-top:12px"><input type="checkbox" id="e_cs" ${d.consent === false ? "" : "checked"}>Bắt khách <b>tích “đồng ý chính sách &amp; giấy phép”</b> (có nút xem chính sách ngay trong popup) trước khi mở link của các nút này</label>
+      <p class="hint" style="margin:4px 0 0">Chỉ có tác dụng khi trang này có hoặc kế thừa chính sách (khung “Chính sách / Giấy phép” bên dưới, hoặc của danh mục cha). Không có chính sách thì nút mở link bình thường.</p></div>`}
     <div class="card"><h3>Chính sách / Giấy phép</h3>
       <p class="hint" style="margin-top:0">Tự viết nội dung. Có thể thêm <b>nhiều khối</b> (giấy phép kép — ví dụ phần mình chịu trách nhiệm và phần điều khoản của nguồn gốc). ${cat ? "Các mục con không tự viết chính sách sẽ tự áp dụng chính sách của danh mục này." : "Nếu để trống, sản phẩm tự áp dụng chính sách của danh mục cha gần nhất có viết."}</p>
       <div id="e_lic"></div><button type="button" class="ghost" id="l_add">＋ Thêm khối chính sách</button></div>
@@ -304,7 +306,7 @@ Admin.boot({ id: "product", title: "Sản phẩm", async render(main) {
       const prev = old && (old.parent || "") === parent ? old.order : (sibs.reduce((m, n) => Math.max(m, n.order ?? 0), -1) + 1);
       const node = { id, type, parent, title, thumb: th, order: prev ?? 0, updated: today() };
       if (old) nodes[nodes.findIndex((n) => n.id === id)] = node; else nodes.push(node);
-      const det = { ...d }; for (const k of ["price", "body", "gallery", "buttons", "licenses", "description", "keywords", "comments"]) delete det[k];
+      const det = { ...d }; for (const k of ["price", "body", "gallery", "buttons", "licenses", "description", "keywords", "comments", "consent"]) delete det[k];
       const put = (k, val) => { if (val) det[k] = val; };
       put("description", v("e_desc")); put("keywords", v("e_kw"));
       const lc = lics.map((l) => ({ title: (l.title || "").trim(), text: (l.text || "").trim() })).filter((l) => l.title || l.text); if (lc.length) det.licenses = lc;
@@ -313,6 +315,7 @@ Admin.boot({ id: "product", title: "Sản phẩm", async render(main) {
         if (gal.length) det.gallery = gal;
         if (bt.length) det.buttons = bt.map((b) => ({ label: (b.label || "").trim() || "Mở liên kết", url: b.url.trim(), style: b.style || "blue" }));
         if (!$("#e_cm").checked) det.comments = false;
+        if (!$("#e_cs").checked) det.consent = false;
       }
       const b = $("#e_save"); b.disabled = true; $("#e_st").textContent = "Đang lưu…";
       try {

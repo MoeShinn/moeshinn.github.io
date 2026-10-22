@@ -6,7 +6,7 @@
 
    Dữ liệu (cây danh mục không giới hạn tầng):
    • product/data.json        { title?, intro?, nodes: [ { id, type: "category"|"product", parent: ""|<id>, title, thumb, order, updated } ] }
-   • product/data/<id>.json   chi tiết từng mục: description, keywords, licenses[{title,text}]; sản phẩm thêm: price, body (Markdown-lite),
+   • product/data/<id>.json   chi tiết từng mục: description, keywords, licenses[{title,text}], consent (false = không bắt tích đồng ý chính sách trước khi bấm nút); sản phẩm thêm: price, body (Markdown-lite),
                                gallery[], buttons[{label,url,style}], comments:false
    Địa chỉ mọi mục đều phẳng: /product/<id>/ (id là slug duy nhất trên toàn cây). */
 (function (root, factory) { if (typeof module === "object" && module.exports) module.exports = factory(); else root.ProductGen = factory(); })(typeof window !== "undefined" ? window : this, function () {
@@ -85,7 +85,9 @@
   }
   // Nội dung trang một mục (danh mục hoặc sản phẩm). details: { id → chi tiết } đủ cho mục này và các danh mục cha (để kế thừa chính sách)
   function bodyNode({ node, nodes, details, bodyHtml = "", hub = {} }) {
-    const d = details[node.id] || {}, lic = licenseHtml(resolveLicenses(nodes, details, node.id)), bc = crumbs(nodes, node.id, hub.title);
+    const d = details[node.id] || {}, rl = resolveLicenses(nodes, details, node.id), lic = licenseHtml(rl), bc = crumbs(nodes, node.id, hub.title);
+    // Nút trên trang sản phẩm yêu cầu khách tích "đồng ý chính sách" trước khi mở link (product/js/main.js xử lý popup) — chỉ khi trang có/kế thừa chính sách và không tắt consent:false
+    const gate = rl.list.length && d.consent !== false ? ' data-gate="1"' : "";
     const head = `<header class="blog-title-bar"><h1>${t(node.title)}</h1></header>`;
     const desc = d.description ? `<p class="product-desc">${t(d.description)}</p>` : "";
     if (isCat(node)) return `${bc}${head}${desc}<section class="post-section">${grid(children(nodes, node.id))}</section>${lic}`;
@@ -95,7 +97,7 @@
       (imgSrc(node.thumb) ? `<div class="product-hero"><img src="${a(imgSrc(node.thumb))}" alt="${a(node.title)}" /></div>` : "") + desc +
       (bodyHtml ? `<div class="post-body product-body">${bodyHtml}</div>` : "") +
       (gallery.length ? `<section class="post-section"><h2>🖼️ Hình ảnh</h2><div class="product-gallery">${gallery.map((g, i) => `<a href="${a(g)}" target="_blank" rel="noopener noreferrer"><img src="${a(g)}" alt="${a(node.title + " " + (i + 1))}" loading="lazy" /></a>`).join("")}</div></section>` : "") +
-      (btns.length ? `<div class="product-actions">${btns.map((b) => { const h = safeHref(b.url), ext = isHttp(h) ? ' target="_blank" rel="noopener noreferrer"' : ""; return `<a class="product-btn ${BTN[b.style] || "blue"}" href="${a(h)}"${ext}>${t(b.label || "Mở liên kết")}</a>`; }).join("")}</div>` : "") +
+      (btns.length ? `<div class="product-actions">${btns.map((b) => { const h = safeHref(b.url), ext = isHttp(h) ? ' target="_blank" rel="noopener noreferrer"' : ""; return `<a class="product-btn ${BTN[b.style] || "blue"}" href="${a(h)}"${ext}${gate}>${t(b.label || "Mở liên kết")}</a>`; }).join("")}</div>` : "") +
       `<div class="product-meta" data-views-wrap hidden></div><div class="post-share" data-share></div>${lic}</article>`;
   }
 

@@ -148,6 +148,59 @@
     }
   }
 
+  /* ---------- Popup bắt tích "đồng ý chính sách" trước khi mở link của nút ----------
+     Nút nào có data-gate (do product/js/productgen.js gắn khi trang có/kế thừa chính sách và không tắt consent:false) sẽ chưa mở link ngay:
+     hiện popup có ô tích đồng ý + nút xem chính sách/giấy phép của chính trang này (lấy từ khối .product-license đang hiển thị). Tích xong mới bấm được "Tiếp tục".
+     Đây là bước xác nhận phía trình duyệt (không phải rào chắn bảo mật: link vẫn nằm trong trang). Không có JS thì nút vẫn mở link bình thường. */
+  function openConsent(link) {
+    const policy = document.querySelector(".product-license");
+    if (!policy || document.querySelector(".consent-bg")) return !!document.querySelector(".consent-bg"); // không có chính sách → không chặn; đang mở sẵn → không mở thêm
+    const prev = document.activeElement, label = (link.textContent || "").trim() || "liên kết";
+    const bg = document.createElement("div"); bg.className = "consent-bg";
+    bg.innerHTML = `<div class="consent-box" role="dialog" aria-modal="true" aria-labelledby="cs-t">
+      <div class="consent-head"><h2 id="cs-t">Trước khi tiếp tục</h2><p>Bạn sắp mở “<b data-l></b>”. Vui lòng xem và đồng ý chính sách &amp; giấy phép của trang này.</p></div>
+      <div class="consent-body"><button type="button" class="consent-view" aria-expanded="false" aria-controls="cs-pol">📜 Xem chính sách &amp; giấy phép</button><div class="consent-policy" id="cs-pol" hidden></div></div>
+      <div class="consent-foot"><label class="consent-check"><input type="checkbox" id="cs-ok"><span>Tôi đã đọc và đồng ý với chính sách &amp; giấy phép của trang này.</span></label>
+        <div class="consent-actions"><button type="button" class="consent-cancel">Hủy</button><a class="consent-go" aria-disabled="true">Tiếp tục</a></div></div></div>`;
+    bg.querySelector("[data-l]").textContent = label; // văn bản thuần
+    const box = bg.querySelector(".consent-box"), pol = bg.querySelector(".consent-policy"), view = bg.querySelector(".consent-view"), ok = bg.querySelector("#cs-ok"), go = bg.querySelector(".consent-go");
+    policy.querySelectorAll(".product-note, .license-block").forEach((n) => pol.appendChild(n.cloneNode(true)));
+    go.setAttribute("href", link.href);
+    ["target", "rel"].forEach((k) => { if (link.hasAttribute(k)) go.setAttribute(k, link.getAttribute(k)); });
+    const close = () => { bg.remove(); document.body.classList.remove("consent-open"); document.removeEventListener("keydown", onKey, true); if (prev && prev.focus) prev.focus(); };
+    const onKey = (e) => {
+      if (e.key === "Escape") { e.preventDefault(); return close(); }
+      if (e.key !== "Tab") return;
+      const f = [...box.querySelectorAll("button, input, a[href]")].filter((x) => !x.hidden && x.offsetParent !== null); // giữ Tab quay vòng trong popup
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    };
+    view.onclick = () => { const open = pol.hidden; pol.hidden = !open; view.setAttribute("aria-expanded", String(open)); view.innerHTML = open ? "▲ Ẩn chính sách &amp; giấy phép" : "📜 Xem chính sách &amp; giấy phép"; if (open) pol.scrollTop = 0; };
+    ok.onchange = () => go.setAttribute("aria-disabled", ok.checked ? "false" : "true");
+    go.onclick = (e) => {
+      if (go.getAttribute("aria-disabled") === "true") { e.preventDefault(); ok.focus(); bg.querySelector(".consent-check").animate([{ transform: "translateX(0)" }, { transform: "translateX(-6px)" }, { transform: "translateX(6px)" }, { transform: "translateX(0)" }], { duration: 260 }); return; }
+      setTimeout(close, 0); // để trình duyệt mở link trước rồi mới đóng popup
+    };
+    bg.querySelector(".consent-cancel").onclick = close;
+    bg.addEventListener("mousedown", (e) => { if (e.target === bg) close(); });
+    document.addEventListener("keydown", onKey, true);
+    document.body.classList.add("consent-open");
+    document.body.appendChild(bg);
+    view.focus({ preventScroll: true });
+    return true;
+  }
+  function initConsent() {
+    const onClick = (e) => {
+      const a = e.target && e.target.closest ? e.target.closest("a[data-gate]") : null;
+      if (!a || (e.type === "auxclick" && e.button !== 1)) return;
+      if (openConsent(a)) e.preventDefault();
+    };
+    document.addEventListener("click", onClick);
+    document.addEventListener("auxclick", onClick); // chuột giữa (mở tab mới)
+  }
+
   /* ---------- Hiển thị ---------- */
   async function main() {
     // Danh sách dựng sẵn trong HTML (cho bot không chạy JS, xem tools/prerender.js): JS tự dựng lại bản động nên bỏ bản tĩnh.
@@ -179,5 +232,6 @@
     if (!PG.isCat(node)) { trackViews(id); mountShare(node); mountComments(d); }
   }
 
+  initConsent();
   main();
 })();
