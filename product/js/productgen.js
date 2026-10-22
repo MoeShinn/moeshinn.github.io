@@ -51,7 +51,14 @@
     list.map((l) => `<div class="license-block">${l.title ? `<h3>${t(l.title)}</h3>` : ""}<div class="license-text">${textHtml(l.text)}</div></div>`).join("") + `</section>`;
 
   /* ---------------- Khối HTML ---------------- */
-  const card = (n) => `<a class="post-card" data-type="${a(n.type)}" href="${a(url(n.id))}"><div class="post-card-photo">${imgSrc(n.thumb) ? `<img src="${a(imgSrc(n.thumb))}" alt="${a(n.title)}" loading="lazy" />` : ""}</div><div class="post-card-body"><h3 class="post-card-title">${t(n.title)}</h3></div></a>`;
+  // Giá hiện ngay trên thẻ sản phẩm (node.price được admin ghi cùng lúc lưu sản phẩm, và tools/prerender.js đồng bộ lại từ product/data/<id>.json). Danh mục không có giá.
+  const priceChip = (n) => {
+    const p = isCat(n) ? "" : String(n.price || "").trim();
+    if (!p) return "";
+    const num = priceNumber(p);
+    return `<div class="post-card-price"><span class="card-price ${num === 0 ? "is-free" : num > 0 ? "is-paid" : "is-text"}">${t(p)}</span></div>`;
+  };
+  const card = (n) => `<a class="post-card" data-type="${a(n.type)}" href="${a(url(n.id))}"><div class="post-card-photo">${imgSrc(n.thumb) ? `<img src="${a(imgSrc(n.thumb))}" alt="${a(n.title)}" loading="lazy" />` : ""}</div><div class="post-card-body"><h3 class="post-card-title">${t(n.title)}</h3>${priceChip(n)}</div></a>`;
   const grid = (list) => `<div class="post-grid">${list.map(card).join("") || '<p class="empty-msg">Chưa có mục nào.</p>'}</div>`;
   const crumbs = (nodes, id, hubTitle) => { const p = path(nodes, id); return `<nav class="breadcrumb" aria-label="Breadcrumb"><a href="/product/">${t(hubTitle || HUB)}</a>${p.map((n, i) => i === p.length - 1 ? `<span aria-current="page">${t(n.title)}</span>` : `<a href="${a(url(n.id))}">${t(n.title)}</a>`).join("")}</nav>`; };
   const BTN = { blue: "blue", green: "green", red: "red", gray: "gray" };

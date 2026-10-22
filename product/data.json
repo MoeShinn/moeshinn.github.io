@@ -54,7 +54,8 @@
       "title": "Chuyển đổi định dạng ảnh",
       "thumb": "/product/tools/img/convert-image.webp",
       "order": 0,
-      "updated": "2026-10-22"
+      "updated": "2026-10-22",
+      "price": "Miễn phí"
     },
     {
       "id": "crop-image",
@@ -63,7 +64,8 @@
       "title": "Cắt ảnh theo tỉ lệ",
       "thumb": "/product/tools/img/crop-image.webp",
       "order": 1,
-      "updated": "2026-10-22"
+      "updated": "2026-10-22",
+      "price": "Miễn phí"
     },
     {
       "id": "compress-image",
@@ -72,7 +74,8 @@
       "title": "Nén ảnh giảm dung lượng",
       "thumb": "/product/tools/img/compress-image.webp",
       "order": 2,
-      "updated": "2026-10-22"
+      "updated": "2026-10-22",
+      "price": "Miễn phí"
     },
     {
       "id": "ezy-tuber",
@@ -81,7 +84,8 @@
       "title": "Ezy Tuber",
       "thumb": "/image/vje1d3j6.webp",
       "order": 0,
-      "updated": "2026-10-22"
+      "updated": "2026-10-22",
+      "price": "Miễn phí"
     },
     {
       "id": "ezy-maker",
@@ -90,7 +94,8 @@
       "title": "Ezy Maker",
       "thumb": "/image/8tom4y3p.webp",
       "order": 1,
-      "updated": "2026-10-22"
+      "updated": "2026-10-22",
+      "price": "Miễn phí"
     }
   ]
 }

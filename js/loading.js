@@ -97,7 +97,14 @@
     function cachedTheme() {
         try { return localStorage.getItem(CACHE_KEY); } catch (e) { return null; }
     }
-    applyTheme(PREVIEW || cachedTheme() || DEFAULT_THEME); // vẽ ngay, chưa cần chờ mạng
+    /* Đã nhớ theme từ lần trước → vẽ ngay. CHƯA nhớ (lần ghé đầu tiên / xóa dữ liệu trình duyệt) → KHÔNG vẽ "hoàng hôn" rồi mới đổi (gây nháy ~0,1 giây):
+       giữ nền tối trung tính (.t-pending, cùng màu tấm màn trong <head>) cho tới khi /status.json về; quá 1,5 giây vẫn chưa có thì dùng mặc định. */
+    const firstTheme = PREVIEW || cachedTheme();
+    if (firstTheme) applyTheme(firstTheme);
+    else {
+        overlay.classList.add("t-pending");
+        setTimeout(() => { if (!currentTheme) applyTheme(DEFAULT_THEME); }, 1500);
+    }
 
     /* ---------------- Trạng thái: tải /status.json + /moods.json ---------------- */
     function isActive(status) {
@@ -121,14 +128,15 @@
         return DEFAULT_THEME;
     }
     const getJson = (url) => window.siteJSON(url);
-    const statusReady = Promise.all([getJson("/status.json"), getJson("/moods.json")]).then(([status, moods]) => ({ status: status || {}, moods: moods || { moods: [] } }));
+    const statusReady = Promise.all([getJson("/status.json"), getJson("/moods.json")]).then(([status, moods]) => ({ status: status || {}, moods: moods || { moods: [] }, ok: !!status }));
     window.SiteStatus = statusReady;
 
-    statusReady.then(({ status, moods }) => {
+    statusReady.then(({ status, moods, ok }) => {
         if (!PREVIEW) {
             const t = themeFor(status, moods);
-            try { localStorage.setItem(CACHE_KEY, t); } catch (e) { /* bỏ qua */ }
-            applyTheme(t);
+            // Tải status.json lỗi (mạng yếu) thì KHÔNG ghi nhớ theme mặc định — nếu không lần sau sẽ hiện nhầm "hoàng hôn" dù đã đặt theme khác.
+            if (ok) { try { localStorage.setItem(CACHE_KEY, t); } catch (e) { /* bỏ qua */ } }
+            if (ok || !currentTheme) applyTheme(t);
         }
         const start = () => showBubble(status, moods);
         if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);

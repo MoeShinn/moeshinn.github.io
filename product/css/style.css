@@ -355,3 +355,10 @@ body.lb-open{overflow:hidden}
 .lb-hint{flex:none;padding:6px 12px max(12px,env(safe-area-inset-bottom));text-align:center;font-size:13px;color:rgba(255,255,255,.72);transition:opacity .4s}
 .lb-bg.is-used .lb-hint{opacity:0}
 @media (prefers-reduced-motion:reduce){.lb-bg{animation:none}}
+
+/* ---------- Giá hiện trên thẻ sản phẩm (nút vào trang sản phẩm) ---------- */
+.post-card-price{margin-top:2px}
+.card-price{display:inline-block;max-width:100%;padding:3px 12px;border-radius:999px;font-weight:800;font-size:13px;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:top;border:1px solid transparent}
+.card-price.is-free{color:#f4fff0;background:linear-gradient(180deg,var(--green-1),var(--green-2))}
+.card-price.is-paid{color:#2b1a00;background:linear-gradient(180deg,#ffd166,#f2a516)}
+.card-price.is-text{color:var(--text-cream);background:rgba(255,255,255,.1);border-color:var(--panel-border)}

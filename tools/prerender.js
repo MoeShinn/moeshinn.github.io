@@ -87,6 +87,15 @@ const renderPostBody = RENDER.renderPostBody;
 const productIdx = json("product/data.json", { nodes: [] });
 const pnodes = Array.isArray(productIdx.nodes) ? productIdx.nodes : [];
 const pdetails = Object.fromEntries(pnodes.map((n) => [n.id, json(`product/data/${n.id}.json`, {})]));
+// Giá hiện trên thẻ sản phẩm: sao từ product/data/<id>.json (nguồn gốc) sang node.price trong product/data.json. Sản phẩm cũ (chưa có price ở node) hoặc sửa tay file chi tiết cũng tự khớp lại.
+let priceSynced = false;
+pnodes.forEach((n) => {
+  if (PG.isCat(n)) return;
+  const want = String((pdetails[n.id] || {}).price || "").trim();
+  if ((n.price || "") === want) return;
+  if (want) n.price = want; else delete n.price;
+  priceSynced = true;
+});
 const phub = { title: productIdx.title, intro: productIdx.intro };
 const pseo = { ...seo, siteUrl: SITE, siteName: SITE_NAME, favicon: seo.favicon || {}, ogImage: seo.ogImage || "" };
 const VFS = {}; // trang tĩnh được tạo ra trong lần chạy này (chưa nằm trên đĩa)
@@ -351,6 +360,7 @@ const pages = new Set(walk("").filter((r) => !orphans.some((o) => r.startsWith(o
 Object.keys(VFS).forEach((k) => pages.add(k));
 [...pages].filter((r) => !/^(404|offline|google[^/]*)\.html$/.test(r)).forEach((rel) => put(rel, transform(rel, rel in VFS ? VFS[rel] : rd(rel))));
 orphans.forEach((o) => { changed.push(o + "/ (xóa)"); if (!CHECK) fs.rmSync(path.join(ROOT, o), { recursive: true, force: true }); });
+if (priceSynced) put("product/data.json", JSON.stringify({ ...productIdx, nodes: pnodes }, null, 2) + "\n");
 put("llms.txt", buildLlms());
 if (exists("sitemap.xml")) put("sitemap.xml", patchSitemap(rd("sitemap.xml")));
 

@@ -48,6 +48,14 @@
     --bar-border: #3a1450;
 }
 
+/* Chưa biết theme (lần ghé đầu tiên, đang chờ /status.json): nền tối trung tính, không vẽ "hoàng hôn" rồi đổi → không bị nháy. js/loading.js gỡ lớp này khi chọn được theme. */
+.site-loading.t-pending {
+    background: #050b16;
+    --stroke: #0a1730;
+    --bar: #3b82f6;
+    --bar-border: #17325c;
+}
+
 .site-loading--hide {
     opacity: 0;
     pointer-events: none;
