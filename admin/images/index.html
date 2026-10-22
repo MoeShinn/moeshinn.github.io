@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Kho ảnh</title>
+<link rel="stylesheet" href="/admin/css/admin.css">
+<style>.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}.chip{background:#16304f;border:1px solid #2a4a74;color:#fff;border-radius:999px;padding:6px 12px;cursor:pointer;font-size:14px}.chip.on{background:var(--blue)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.im{background:#0a1626;border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:12px}.im.sel{outline:2px solid var(--blue)}
+.im .th{aspect-ratio:1;background:#050b16 center/cover no-repeat;display:grid;place-items:center;color:var(--mute);position:relative}.im .th img{width:100%;height:100%;object-fit:cover;display:block}
+.im .th input{position:absolute;left:6px;top:6px;width:18px;height:18px}.im .mt{padding:6px 8px;display:grid;gap:4px}.im .mt b{font-size:13px;word-break:break-all}
+.im .ac{display:flex;gap:4px}.im .ac button{flex:1;padding:5px 6px;font-size:12px}.im select{padding:4px;font-size:12px}
+.drop{border:2px dashed var(--line);border-radius:12px;padding:14px;text-align:center;color:var(--mute);margin-bottom:12px}.drop.over{border-color:var(--blue);color:#fff}</style></head>
+<body><div id="app"></div><div id="toast"></div>
+<script src="/admin/js/core.js"></script>
+<script src="/admin/js/seo.js"></script>
+<script src="/admin/js/postgen.js"></script>
+<script src="/admin/js/imgutil.js"></script>
+<script>
+Admin.boot({ id: "images", title: "Kho ảnh", async render(main) {
+  const { esc, $ } = Admin, IDX = "image/index.json", U = ImgUtil;
+  main.innerHTML = `<h2>Kho ảnh</h2><p class="hint">Đang tải…</p>`;
+  let idx, tree, S;
+  try { [idx, tree, S] = await Promise.all([Admin.readJson(IDX, { albums: [], images: [] }), Admin.api("/tree").then((r) => r.files), Admin.readJson("site-settings.json", {})]); }
+  catch (e) { main.innerHTML = `<h2>Kho ảnh</h2><p class="err">${esc(e.message)}</p>`; return; }
+  const site = AdminSeo.merge(S.seo).siteUrl.replace(/\/$/, "");
+  idx.albums = idx.albums || []; idx.images = idx.images || [];
+  // Ảnh đã nằm trong /image nhưng chưa có trong index (bỏ vào tay) vẫn hiện, ở mục "Chưa phân loại"
+  const known = new Set(idx.images.map((i) => i.file));
+  tree.filter((f) => /^image\/[^/]+\.(png|jpe?g|webp|gif|svg|avif)$/i.test(f.path)).forEach((f) => { const file = f.path.slice(6); if (!known.has(file)) idx.images.push({ file, album: "", size: f.size, name: file, added: "" }); });
+  const orig = JSON.stringify(idx), dirty = () => JSON.stringify(idx) !== orig, savedAlbums = new Set(idx.albums.map((a) => a.id));
+  window.onbeforeunload = () => (dirty() ? "Có thay đổi chưa lưu" : undefined);
+  let cur = "all", sel = new Set(), busy = false; const local = new Map(); // file → blob URL (ảnh vừa tải lên, web chưa kịp xuất bản)
+  const O = (() => { try { return { q: 85, raw: false, ...JSON.parse(localStorage.getItem("shinju_img_opts") || "{}") }; } catch (e) { return { q: 85, raw: false }; } })();
+  const urlOf = (f) => `${site}/image/${f}`, albumUrl = (id) => `${site}/album/${encodeURIComponent(id)}/`, hubUrl = `${site}/album/`, nameUsed = () => new Set(idx.images.map((i) => i.file.replace(/\.[^.]+$/, "")));
+  const albumName = (id) => (idx.albums.find((a) => a.id === id) || {}).name || "Chưa phân loại";
+  const inView = () => idx.images.filter((i) => cur === "all" || (cur === "none" ? !i.album : i.album === cur));
+
+  // Chỉ NÉN, không cắt và không thu nhỏ: giữ nguyên số điểm ảnh (rộng × cao), chỉ mã hóa lại sang WebP.
+  // Ảnh quá nặng thì hạ chất lượng dần (không đổi kích thước); nếu bản nén còn nặng hơn bản gốc thì giữ nguyên file gốc.
+  // GIF/SVG giữ nguyên (không mất hoạt ảnh).
+  async function prep(file) {
+    if (O.raw || /gif|svg/.test(file.type)) return { blob: file, ext: U.extFor(file.type) || "png", w: 0, h: 0 };
+    const bm = await createImageBitmap(file), c = document.createElement("canvas");
+    c.width = bm.width; c.height = bm.height; c.getContext("2d").drawImage(bm, 0, 0);
+    let q = O.q, out;
+    for (;;) {
+      const w = await new Promise((r) => c.toBlob(r, "image/webp", q / 100));
+      out = w && w.type === "image/webp" ? w : await new Promise((r) => c.toBlob(r, "image/png"));
+      if (out.size <= 2.4e6 || q <= 50 || out.type !== "image/webp") break;
+      q = Math.max(50, q - 10); // không xuống dưới 50%
+    }
+    const w0 = bm.width, h0 = bm.height; if (bm.close) bm.close();
+    const keep = out.size >= file.size && file.size <= 2.4e6 && ["image/jpeg", "image/png", "image/webp"].includes(file.type);
+    return keep ? { blob: file, ext: U.extFor(file.type), w: w0, h: h0 } : { blob: out, ext: U.extFor(out.type), w: w0, h: h0 };
+  }
+  const b64 = (blob) => new Promise((r) => { const f = new FileReader(); f.onload = () => r(f.result.split(",")[1]); f.readAsDataURL(blob); });
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const indexFile = () => ({ path: IDX, content: JSON.stringify({ albums: idx.albums, images: idx.images.filter((i) => i.added || known.has(i.file)).map((i) => ({ ...i })) }, null, 2) + "\n" });
+
+  async function upload(fileList) {
+    const files = [...fileList].filter((f) => f.type.startsWith("image/"));
+    if (!files.length) return Admin.toast("Hãy chọn file ảnh", true);
+    busy = true; draw(); const used = nameUsed(), items = [];
+    try {
+      for (const [n, f] of files.entries()) {
+        $("#st") && ($("#st").textContent = `Đang nén ${n + 1}/${files.length}…`);
+        if (f.size > 20e6) { Admin.toast(`${f.name}: quá lớn (>20 MB), bỏ qua`, true); continue; }
+        const p = await prep(f); if (p.blob.size > 2.5e6) { Admin.toast(`${f.name}: vẫn >2,5 MB dù đã nén mạnh nhất (giữ nguyên kích thước), bỏ qua`, true); continue; }
+        const stem = U.rand8(used), file = `${stem}.${p.ext}`;
+        items.push({ file, b64: await b64(p.blob), blob: p.blob, meta: { file, album: cur === "all" || cur === "none" ? "" : cur, w: p.w, h: p.h, size: p.blob.size, name: f.name, added: new Date().toISOString() } });
+      }
+      const lots = U.chunk(items, 3000000, 30);
+      for (const [n, lot] of lots.entries()) {
+        $("#st") && ($("#st").textContent = `Đang tải lên lô ${n + 1}/${lots.length}…`);
+        lot.forEach((it) => { idx.images.unshift(it.meta); local.set(it.file, URL.createObjectURL(it.blob)); });
+        await Admin.commitFiles(`Admin: tải ${lot.length} ảnh lên kho ảnh`, [indexFile(), ...lot.map((it) => ({ path: "image/" + it.file, content: it.b64, encoding: "base64" }))]);
+        lot.forEach((it) => known.add(it.file));
+        if (n < lots.length - 1) await sleep(1800); // Worker từ chối hai commit sát nhau (<1,5 giây)
+      }
+      if (items.length) Admin.toast(`Đã tải ${items.length} ảnh. Link hoạt động sau ~1 phút.`);
+    } catch (e) { Admin.toast(e.message, true); await sleep(0); }
+    busy = false; draw();
+  }
+  async function remove(files) {
+    if (!files.length || !confirm(`Xóa ${files.length} ảnh? Link ảnh sẽ hỏng và không khôi phục được ở đây.`)) return;
+    busy = true; draw();
+    try {
+      const have = new Set(tree.map((f) => f.path).concat([...known].map((f) => "image/" + f))), dels = files.map((f) => "image/" + f).filter((p) => have.has(p));
+      idx.images = idx.images.filter((i) => !files.includes(i.file)); files.forEach((f) => { sel.delete(f); local.delete(f); known.delete(f); });
+      await Admin.commitFiles(`Admin: xóa ${files.length} ảnh khỏi kho ảnh`, [indexFile()], dels);
+      Admin.toast("Đã xóa.");
+    } catch (e) { Admin.toast(e.message, true); }
+    busy = false; draw();
+  }
+  async function saveIndex() { busy = true; draw(); try { await Admin.commitFiles("Admin: cập nhật album kho ảnh", [indexFile()]); window.onbeforeunload = null; Admin.toast("Đã lưu."); setTimeout(() => location.reload(), 1000); } catch (e) { Admin.toast(e.message, true); busy = false; draw(); } }
+
+  function draw() {
+    const list = inView(), cnt = (f) => idx.images.filter(f).length;
+    main.innerHTML = `<h2>Kho ảnh</h2>
+    <div class="chips"><span class="chip ${cur === "all" ? "on" : ""}" data-c="all">Tất cả (${idx.images.length})</span><span class="chip ${cur === "none" ? "on" : ""}" data-c="none">Chưa phân loại (${cnt((i) => !i.album)})</span>
+      ${idx.albums.map((a) => `<span class="chip ${cur === a.id ? "on" : ""}" data-c="${esc(a.id)}">${esc(a.name)} (${cnt((i) => i.album === a.id)})</span>`).join("")}
+      <span class="chip" id="al_add">＋ Album</span></div>
+    ${idx.albums.some((a) => a.id === cur)
+      ? `<p><button type="button" id="al_cp">🔗 Chép link album</button> <button type="button" class="ghost" id="al_open">↗ Mở trang album</button> <button type="button" class="ghost" id="al_ren">Đổi tên album</button> <button type="button" class="ghost" id="al_del" style="color:#ff8b8f">Xóa album</button><br><span class="hint">${esc(albumUrl(cur))} · link không đổi khi đổi tên album${savedAlbums.has(cur) ? "" : " · <b>album mới: bấm “Lưu album” rồi chờ ~1 phút link mới chạy</b>"}</span></p>`
+      : `<p><button type="button" class="ghost" id="al_hub">🔗 Chép link trang Album (tất cả album)</button> <span class="hint">${esc(hubUrl)}</span></p>`}
+    <div class="drop" id="drop"><input id="up" type="file" accept="image/*" multiple hidden><button type="button" id="upb" ${busy ? "disabled" : ""}>＋ Chọn ảnh tải lên${cur !== "all" && cur !== "none" ? ` (vào “${esc(albumName(cur))}”)` : ""}</button>
+      <div class="hint" style="margin-top:6px">hoặc kéo thả ảnh vào đây · tên file thành 8 ký tự ngẫu nhiên · ảnh chỉ được nén sang WebP, <b>giữ nguyên kích thước</b> (không cắt, không thu nhỏ) · <span id="st">${busy ? "Đang xử lý…" : ""}</span></div>
+      <div style="margin-top:8px;text-align:left"><label>Chất lượng nén: <b id="qv">${O.q}</b>% (thấp hơn = file nhẹ hơn, ảnh kém nét hơn một chút)<input id="oq" type="range" min="50" max="95" step="5" value="${O.q}"></label></div>
+      <label class="row" style="justify-content:center"><input type="checkbox" id="oraw" ${O.raw ? "checked" : ""}>Giữ nguyên ảnh gốc, không nén (dùng cho mã QR, ảnh pixel)</label></div>
+    ${sel.size ? `<div class="bar">Đã chọn ${sel.size} ảnh. <button type="button" id="del_sel" style="background:var(--red)">Xóa đã chọn</button> <button type="button" class="ghost" id="clr">Bỏ chọn</button></div>` : ""}
+    <div class="grid2">${list.map((i) => { const u = local.get(i.file) || `/image/${i.file}`; return `<div class="im ${sel.has(i.file) ? "sel" : ""}"><div class="th"><input type="checkbox" data-s="${esc(i.file)}" ${sel.has(i.file) ? "checked" : ""}><img loading="lazy" src="${esc(u)}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Đang xuất bản…'}))"></div>
+      <div class="mt"><b>${esc(i.file)}</b><span class="hint">${U.fmtSize(i.size || 0)}${i.w ? ` · ${i.w}×${i.h}` : ""}${i.album ? " · " + esc(albumName(i.album)) : ""}</span>
+        <select data-mv="${esc(i.file)}"><option value="">Chưa phân loại</option>${idx.albums.map((a) => `<option value="${esc(a.id)}" ${i.album === a.id ? "selected" : ""}>${esc(a.name)}</option>`).join("")}</select>
+        <div class="ac"><button type="button" data-cp="${esc(i.file)}">Chép link</button><button type="button" class="ghost" data-dl="${esc(i.file)}" style="color:#ff8b8f">Xóa</button></div></div></div>`; }).join("") || '<p class="hint">Chưa có ảnh nào ở đây.</p>'}</div>
+    <div class="bar" style="position:sticky;bottom:8px;margin-top:12px;${dirty() ? "" : "opacity:.6"}">${dirty() ? "Có thay đổi album chưa lưu." : "Không có thay đổi album."} <button id="sv" ${dirty() && !busy ? "" : "disabled"}>Lưu album</button> <button class="ghost" id="ud" ${dirty() ? "" : "disabled"}>Hoàn tác</button></div>`;
+    main.querySelectorAll("[data-c]").forEach((el) => (el.onclick = () => { cur = el.dataset.c; draw(); }));
+    $("#al_add").onclick = () => { const n = (prompt("Tên album mới:") || "").trim(); if (!n) return; let id = PostGen.slugify(n), k = 2; while (idx.albums.some((a) => a.id === id)) id = PostGen.slugify(n) + "-" + k++; idx.albums.push({ id, name: n }); cur = id; draw(); };
+    const copyLink = async (u, extra) => { try { await navigator.clipboard.writeText(u); } catch (e) { prompt("Sao chép link:", u); } Admin.toast("Đã chép: " + u + (extra || "")); };
+    if ($("#al_cp")) $("#al_cp").onclick = () => copyLink(albumUrl(cur), savedAlbums.has(cur) ? "" : " — album chưa lưu, hãy bấm “Lưu album”");
+    if ($("#al_open")) $("#al_open").onclick = () => window.open(albumUrl(cur), "_blank", "noopener");
+    if ($("#al_hub")) $("#al_hub").onclick = () => copyLink(hubUrl);
+    if ($("#al_ren")) $("#al_ren").onclick = () => { const a = idx.albums.find((x) => x.id === cur), n = (prompt("Tên mới của album:", a.name) || "").trim(); if (n) { a.name = n; draw(); } };
+    if ($("#al_del")) $("#al_del").onclick = () => { const n = cnt((i) => i.album === cur); if (!confirm(`Xóa album “${albumName(cur)}”?${n ? ` ${n} ảnh trong đó sẽ chuyển sang “Chưa phân loại” (không bị xóa).` : ""}`)) return; idx.images.forEach((i) => { if (i.album === cur) i.album = ""; }); idx.albums = idx.albums.filter((a) => a.id !== cur); cur = "all"; draw(); };
+    const inp = $("#up"); $("#upb").onclick = () => inp.click(); inp.onchange = () => { if (inp.files.length) upload(inp.files); };
+    const dz = $("#drop"); dz.ondragover = (e) => { e.preventDefault(); dz.classList.add("over"); }; dz.ondragleave = () => dz.classList.remove("over"); dz.ondrop = (e) => { e.preventDefault(); dz.classList.remove("over"); if (!busy) upload(e.dataTransfer.files); };
+    const saveO = () => { try { localStorage.setItem("shinju_img_opts", JSON.stringify(O)); } catch (e) { /* bỏ qua */ } };
+    $("#oq").oninput = () => { O.q = +$("#oq").value; $("#qv").textContent = O.q; saveO(); }; $("#oraw").onchange = () => { O.raw = $("#oraw").checked; saveO(); };
+    main.querySelectorAll("[data-s]").forEach((el) => (el.onchange = () => { el.checked ? sel.add(el.dataset.s) : sel.delete(el.dataset.s); draw(); }));
+    main.querySelectorAll("[data-mv]").forEach((el) => (el.onchange = () => { idx.images.find((i) => i.file === el.dataset.mv).album = el.value; draw(); }));
+    main.querySelectorAll("[data-cp]").forEach((el) => (el.onclick = async () => { const u = urlOf(el.dataset.cp); try { await navigator.clipboard.writeText(u); } catch (e) { prompt("Sao chép link:", u); } Admin.toast("Đã chép: " + u); }));
+    main.querySelectorAll("[data-dl]").forEach((el) => (el.onclick = () => remove([el.dataset.dl])));
+    if ($("#del_sel")) { $("#del_sel").onclick = () => remove([...sel]); $("#clr").onclick = () => { sel.clear(); draw(); }; }
+    $("#sv").onclick = saveIndex; $("#ud").onclick = () => { if (confirm("Bỏ hết thay đổi album chưa lưu?")) location.reload(); };
+  }
+  draw();
+}});
+</script></body></html>

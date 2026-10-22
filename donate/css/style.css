@@ -1,0 +1,312 @@
+:root {
+    --text-cream: #f4ecd8;
+    --green-1: #3fce3f;
+    --green-2: #1f9a2f;
+    --card-bg: rgba(12, 20, 38, 0.72);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+body {
+    min-height: 100vh;
+    font-family: "Baloo 2", "Comic Sans MS", "Segoe UI", sans-serif;
+    color: var(--text-cream);
+    overflow-x: hidden;
+    position: relative;
+    background-color: #050b16;
+}
+
+/* Same soft vignette / breathing effect as the main page, for readability
+   and a bit of life over the background artwork. */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 50% 40%, rgba(0,0,0,0) 45%, rgba(0,0,0,0.45) 100%);
+    animation: bg-breathe 8s ease-in-out infinite;
+}
+
+@keyframes bg-breathe {
+    0%, 100% { opacity: 0.85; }
+    50%      { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body::before {
+        animation: none;
+    }
+}
+
+/* ---------- Layout ---------- */
+.page {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 24px 32px;
+}
+
+.page-title {
+    font-size: 28px;
+    font-weight: 800;
+    margin: 0 0 34px;
+    text-align: center;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+}
+
+.method-list {
+    width: 100%;
+    max-width: 460px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.method {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+
+/* "-----  Label  -----" divider heading, drawn with CSS so data.json
+   only needs to hold the clean text. */
+.method-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: rgba(244, 236, 216, 0.9);
+    text-transform: uppercase;
+}
+
+    .method-label::before,
+    .method-label::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(244, 236, 216, 0.45), transparent);
+    }
+
+.donate-btn-row {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.donate-btn {
+    flex: 1 1 45%;
+    min-width: 130px;
+    padding: 11px 16px;
+    border: 2px solid rgba(255,255,255,0.25);
+    border-radius: 999px;
+    background: linear-gradient(180deg, var(--green-1), var(--green-2));
+    color: #f4fff0;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.25);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* A group with just one button keeps the original full-width look */
+.donate-btn-row .donate-btn:only-child {
+    flex-basis: 100%;
+    font-size: 16px;
+    padding: 12px 18px;
+}
+
+.donate-btn:hover,
+.donate-btn:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+.donate-btn:active {
+    transform: translateY(0);
+}
+
+.site-footer {
+    margin-top: auto;
+    padding-top: 56px;
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.6;
+    color: rgba(244, 236, 216, 0.75);
+}
+
+/* ---------- Overlay ---------- */
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(3, 6, 14, 0.78);
+    backdrop-filter: blur(3px);
+    animation: fade-in 0.15s ease;
+}
+
+    .overlay[hidden] {
+        display: none;
+    }
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.overlay-card {
+    width: 100%;
+    max-width: 360px;
+    background: var(--card-bg);
+    border: 1px solid rgba(244, 236, 216, 0.2);
+    border-radius: 20px;
+    padding: 26px 22px 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    animation: pop-in 0.18s ease;
+}
+
+@keyframes pop-in {
+    from {
+        transform: scale(0.94);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.overlay-label {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+    text-align: center;
+    color: var(--text-cream);
+}
+
+.overlay-qr,
+.overlay-link {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+    /* The [hidden] attribute must win over the display:flex rule above —
+   author class rules otherwise override the browser's [hidden] style,
+   which was causing both the QR and Link sections to render at once. */
+    .overlay-qr[hidden],
+    .overlay-link[hidden] {
+        display: none;
+    }
+
+    .overlay-qr img {
+        width: 100%;
+        max-width: 260px;
+        aspect-ratio: 1 / 1;
+        border-radius: 12px;
+        background: #fff;
+        object-fit: contain;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    }
+
+.overlay-link-box {
+    display: block;
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(244, 236, 216, 0.25);
+    color: #9fd7ff;
+    font-size: 14px;
+    word-break: break-all;
+    text-decoration: none;
+    text-align: center;
+    transition: background 0.15s ease;
+}
+
+    .overlay-link-box:hover,
+    .overlay-link-box:focus-visible {
+        background: rgba(255,255,255,0.14);
+    }
+
+.overlay-actions {
+    width: 100%;
+    display: flex;
+    gap: 12px;
+}
+
+.overlay-btn {
+    flex: 1;
+    padding: 11px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(244, 236, 216, 0.3);
+    background: rgba(255,255,255,0.06);
+    color: var(--text-cream);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+    .overlay-btn:hover,
+    .overlay-btn:focus-visible {
+        background: rgba(255,255,255,0.14);
+        transform: translateY(-1px);
+    }
+
+    .overlay-btn.primary {
+        background: linear-gradient(180deg, var(--green-1), var(--green-2));
+        border-color: rgba(255,255,255,0.3);
+        color: #f4fff0;
+    }
+
+        .overlay-btn.primary:hover,
+        .overlay-btn.primary:focus-visible {
+            filter: brightness(1.08);
+        }
+
+@media (max-width: 420px) {
+    .page-title {
+        font-size: 24px;
+    }
+
+    .donate-btn {
+        font-size: 16px;
+    }
+}

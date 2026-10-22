@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Cài đặt</title>
+<link rel="stylesheet" href="/admin/css/admin.css">
+<script src="/js/theme.js" data-manual></script></head>
+<body><div id="app"></div><div id="toast"></div>
+<script src="/admin/js/core.js"></script>
+<script src="/post/js/render.js"></script>
+<script src="/admin/js/seo.js"></script>
+<script src="/admin/js/postgen.js"></script>
+<script src="/admin/js/rebuild.js"></script>
+<script>
+const PAGES = AdminSeo.PAGES;
+// Cắt vuông ở giữa, đổi cỡ size×size, xuất WebP (nhẹ, giữ nền trong suốt); trả về { b64, ext }
+const toSquare = (file, size) => new Promise((res, rej) => {
+  const u = URL.createObjectURL(file), im = new Image();
+  im.onload = () => { const c = document.createElement("canvas"); c.width = c.height = size;
+    const w = im.naturalWidth || size, h = im.naturalHeight || size, m = Math.min(w, h);
+    c.getContext("2d").drawImage(im, (w - m) / 2, (h - m) / 2, m, m, 0, 0, size, size); URL.revokeObjectURL(u);
+    const d = c.toDataURL("image/webp", 0.9); if (!d.startsWith("data:image/webp")) return rej(new Error("Trình duyệt này không xuất được WebP, hãy dùng Chrome/Edge/Firefox")); res({ b64: d.split(",")[1], ext: "webp" }); };
+  im.onerror = () => rej(new Error("Không đọc được ảnh đại diện")); im.src = u; });
+// Favicon: "icon" (bo góc kiểu Android / tròn / vuông gốc), "apple" (vuông kín nền, iOS tự bo), "maskable" (vuông kín, ảnh thu vào vùng an toàn 66% để Android cắt hình tròn/giọt nước không mất ảnh)
+const FAV = [["favicon-32.png", 32, "icon"], ["favicon-180.png", 180, "apple"], ["favicon-192.png", 192, "icon"], ["favicon-512.png", 512, "icon"], ["maskable-512.png", 512, "maskable"]];
+const rr = (g, x, y, w, h, r) => { r = Math.min(r, w / 2, h / 2); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
+const toIcon = (file, size, kind, o) => new Promise((res, rej) => {
+  const u = URL.createObjectURL(file), im = new Image();
+  im.onload = () => {
+    const c = document.createElement("canvas"); c.width = c.height = size; const g = c.getContext("2d");
+    const w = im.naturalWidth || size, h = im.naturalHeight || size, m = Math.min(w, h);
+    const pad = kind === "maskable" ? 0.17 : kind === "apple" ? Math.max(o.pad, 0.08) : o.pad;
+    const r = kind !== "icon" ? 0 : o.style === "circle" ? size / 2 : o.style === "rounded" ? size * 0.225 : 0;
+    g.beginPath(); rr(g, 0, 0, size, size, r); g.clip();
+    if (kind !== "icon" || o.bgOn) { g.fillStyle = o.bg; g.fillRect(0, 0, size, size); }
+    const inner = size * (1 - 2 * pad); g.drawImage(im, (w - m) / 2, (h - m) / 2, m, m, size * pad, size * pad, inner, inner);
+    URL.revokeObjectURL(u); res(c.toDataURL("image/png").split(",")[1]); };
+  im.onerror = () => rej(new Error("Không đọc được ảnh favicon")); im.src = u; });
+const favOpts = () => { const $ = Admin.$; return { style: $("#fav_style").value, bgOn: $("#fav_bgon").checked, bg: $("#fav_bg").value, pad: $("#fav_pad").value / 100 }; };
+// Cắt ảnh vuông ở giữa rồi đổi sang PNG (base64) theo kích thước size.
+const toPng = (file, size) => new Promise((res, rej) => {
+  const u = URL.createObjectURL(file), im = new Image();
+  im.onload = () => { const c = document.createElement("canvas"); c.width = c.height = size;
+    const w = im.naturalWidth || size, h = im.naturalHeight || size, m = Math.min(w, h);
+    c.getContext("2d").drawImage(im, (w - m) / 2, (h - m) / 2, m, m, 0, 0, size, size);
+    URL.revokeObjectURL(u); res(c.toDataURL("image/png").split(",")[1]); };
+  im.onerror = () => rej(new Error("Không đọc được ảnh favicon")); im.src = u; });
+const themeOpts = (sel, withDef) => (withDef ? `<option value="" ${!sel ? "selected" : ""}>(Dùng nền mặc định của web)</option>` : "") + ShinjuTheme.list.map(([k, l]) => `<option value="${k}" ${sel === k ? "selected" : ""}>${l}</option>`).join("");
+const mergeTg = (t = {}) => ({ login: true, loginFail: true, ...t, views: { enabled: false, thresholds: [100, 500, 1000], ...t.views }, downloads: { enabled: false, thresholds: [50, 100, 500], ...t.downloads } });
+const DEF = {
+  giscus: { enabled: true, repo: "ShinjuVN/giscus-data", repoId: "", category: "Bình luận", categoryId: "", mapping: "pathname" },
+  announcement: { enabled: false, text: "", url: "", expires: "" },
+  maintenance: { enabled: false, message: "Trang web đang được cập nhật, vui lòng quay lại sau." },
+  theme: { default: "none", intensity: 0.7, wash: 0.6, dim: 0, forceMotion: false, pages: { home: "", post: "", product: "", download: "", channel: "", donate: "" } },
+  seo: AdminSeo.DEFAULT,
+  telegram: mergeTg(),
+  blog: { featuredCount: 10, featuredTitle: "", recentCount: 10 },
+};
+Admin.boot({ id: "setting", title: "Cài đặt", async render(main) {
+  const { esc, $ } = Admin;
+  main.innerHTML = `<h2>Cài đặt</h2><p class="hint">Đang tải…</p>`;
+  let S, D;
+  try { [S, D] = await Promise.all([Admin.readJson("site-settings.json", DEF), Admin.readJson("data.json")]); }
+  catch (e) { main.innerHTML = `<h2>Cài đặt</h2><p class="err">${esc(e.message)}</p>`; return; }
+  S = { ...DEF, ...S, seo: AdminSeo.merge(S.seo), telegram: mergeTg(S.telegram), blog: { ...DEF.blog, ...S.blog }, giscus: { ...DEF.giscus, ...S.giscus }, announcement: { ...DEF.announcement, ...S.announcement }, maintenance: { ...DEF.maintenance, ...S.maintenance },
+    theme: { ...DEF.theme, ...S.theme, pages: { ...DEF.theme.pages, ...((S.theme || {}).pages) } } };
+  const chk = (id, v, t) => `<label class="row"><input type="checkbox" id="${id}" ${v ? "checked" : ""}>${t}</label>`;
+  main.innerHTML = `<h2>Cài đặt</h2>
+  <p><button type="button" class="ghost" data-json="site-settings.json">Sửa file site-settings.json</button> <button type="button" class="ghost" data-json="data.json">Sửa file data.json (menu, nút trang chủ…)</button></p>
+  <div class="card"><h3>Trang chủ</h3>
+    <label>Tên hiển thị<input id="name" value="${esc(D.profile?.name)}"></label>
+    <label>Chân trang (footer)<input id="footer" value="${esc(D.footer)}"></label>
+    <label>Ảnh đại diện (avatar) mới — ảnh vuông càng tốt, tự cắt giữa, thu về 512 px (avatar.webp, dùng cho og:image) và 336 px (avatar-336.webp, dùng để hiển thị), ghi đè lên /assets/avatar/<input id="av_file" type="file" accept="image/*"></label>
+    <img id="av_prev" src="${esc(D.profile?.avatar || "")}" width="72" height="72" alt="" style="border-radius:50%;object-fit:cover;background:#0a1626">
+    <label class="row" style="margin-top:8px"><input type="checkbox" id="pf_online" ${D.profile?.showOnline === false ? "" : "checked"}>Hiện chấm tròn "đang online" ở góc avatar</label>
+    <label>Màu chấm online<input id="pf_color" type="color" value="${esc(D.profile?.statusColor || "#3ddc3d")}" style="height:38px;padding:2px"></label>
+    <label class="row" style="margin-top:8px"><input type="checkbox" id="av_logo" ${(D.nav?.logo || "") === (D.profile?.avatar || "") ? "checked" : ""}>Dùng luôn ảnh này làm logo ở thanh menu</label></div>
+  <div class="card"><h3>SEO từng trang &amp; favicon</h3>
+    <label>Tên site<input id="seo_name" value="${esc(S.seo.siteName)}"></label>
+    <label>Độ dài mã link rút gọn tự sinh (4–24 ký tự: a-z, A-Z, 0-9). Chỉ áp dụng cho link tạo MỚI, link cũ giữ nguyên<input id="sl_len" type="number" min="4" max="24" value="${esc(S.seo.shortLength || 10)}"></label>
+    <label>Ảnh chia sẻ mặc định (URL, tùy chọn)<input id="seo_og" value="${esc(S.seo.ogImage)}" placeholder="https://..."></label>
+    ${Object.entries(PAGES).map(([k, l]) => `<details ${k === "home" ? "open" : ""}><summary>${l}</summary>
+      <label>Tiêu đề (nên ≤ 60 ký tự)<input id="seo_${k}_t" value="${esc(S.seo.pages[k].title)}"></label>
+      <label>Mô tả (nên ≤ 155 ký tự)<textarea id="seo_${k}_d" rows="2">${esc(S.seo.pages[k].description)}</textarea></label>
+      <label>Từ khóa (cách nhau bằng dấu phẩy)<input id="seo_${k}_k" value="${esc(S.seo.pages[k].keywords)}"></label>
+      <button type="button" class="ghost" data-ai="${k}">✨ Gợi ý mô tả và từ khóa bằng AI</button></details>`).join("")}
+    <label style="margin-top:12px">Favicon mới (ảnh vuông, ≥ 512px là đẹp nhất)<input id="fav" type="file" accept="image/*"></label>
+    <div class="cols"><label>Kiểu icon<select id="fav_style"><option value="rounded" ${(S.seo.favicon.style || "rounded") === "rounded" ? "selected" : ""}>Bo góc kiểu Android (khuyên dùng)</option><option value="circle" ${S.seo.favicon.style === "circle" ? "selected" : ""}>Tròn</option><option value="square" ${S.seo.favicon.style === "square" ? "selected" : ""}>Vuông gốc</option></select></label>
+      <label>Viền trống quanh ảnh: <b id="fav_pv">${Math.round((S.seo.favicon.pad ?? 0.08) * 100)}</b>%<input id="fav_pad" type="range" min="0" max="20" step="1" value="${Math.round((S.seo.favicon.pad ?? 0.08) * 100)}"></label>
+      <label class="row"><input type="checkbox" id="fav_bgon" ${S.seo.favicon.bgOn === false ? "" : "checked"}>Có nền màu sau ảnh</label>
+      <label>Màu nền<input id="fav_bg" type="color" value="${esc(S.seo.favicon.bg || "#ffffff")}" style="height:38px;padding:2px"></label></div>
+    <canvas id="favprev2" width="96" height="96" style="width:48px;height:48px;border-radius:8px;background:#0a1626"></canvas> <img id="favprev" src="${esc(S.seo.favicon.icon)}" width="48" height="48" alt="" style="border-radius:8px;background:#0a1626">
+    <p class="hint">Khi lưu, tui tự tạo các cỡ 32 / 180 / 192 / 512 px và ghi thẳng vào thẻ &lt;head&gt; của 5 trang, nên Google và Zalo/Facebook đọc được ngay. Trình duyệt có thể giữ favicon cũ vài phút đến vài giờ.</p></div>
+  <div class="card"><h3>Trang bài đăng (/post)</h3>
+    <label>Số bài nổi bật hiển thị (0 = ẩn mục nổi bật)<input id="bl_f" type="number" min="0" max="30" value="${esc(S.blog.featuredCount)}"></label>
+    <label>Tiêu đề mục nổi bật (để trống: dùng "🔥 Top bài đăng nổi bật"), ví dụ: Top 3 bài được xem nhiều nhất<input id="bl_t" maxlength="60" value="${esc(S.blog.featuredTitle)}"></label>
+    <label>Số bài mới hiển thị trước khi bấm "Xem tất cả" (1–50)<input id="bl_r" type="number" min="1" max="50" value="${esc(S.blog.recentCount)}"></label>
+    <p class="hint">Để tiết kiệm dữ liệu cho người xem, danh sách chỉ hiện bài mới nhất; bấm "Xem tất cả bài đăng" mới hiện hết. Lượt xem chỉ được tải cho các bài mới nhất.</p></div>
+  <div class="card"><h3>Giao diện / nền động</h3>
+    <div id="fxprev" style="position:relative;height:170px;border-radius:10px;overflow:hidden;background:linear-gradient(#050b16,#10243f);margin-bottom:12px"></div>
+    <label>Nền mặc định cho cả web<select id="th_def">${themeOpts(S.theme.default, false)}</select></label>
+    ${Object.entries(PAGES).map(([k, l]) => `<label>${l}<select id="th_${k}">${themeOpts(S.theme.pages[k], true)}</select></label>`).join("")}
+    <label>Độ đậm của hiệu ứng: <b id="th_iv">${Math.round((S.theme.intensity || 0.7) * 100)}</b>% (thấp hơn = dịu mắt hơn)<input id="th_int" type="range" min="20" max="100" step="5" value="${Math.round((S.theme.intensity || 0.7) * 100)}"></label>
+    <label>Phủ màu nền theo theme: <b id="th_wv">${Math.round((S.theme.wash ?? 0.6) * 100)}</b>% (nền ảnh sáng thì tăng lên để thấy rõ hiệu ứng)<input id="th_wash" type="range" min="0" max="100" step="5" value="${Math.round((S.theme.wash ?? 0.6) * 100)}"></label>
+    <label>Làm tối nền chung: <b id="th_dv">${Math.round((S.theme.dim || 0) * 100)}</b>% (áp dụng cả khi không chọn theme, giúp bớt chói trắng)<input id="th_dim" type="range" min="0" max="70" step="5" value="${Math.round((S.theme.dim || 0) * 100)}"></label>
+    <label class="row"><input type="checkbox" id="th_force" ${S.theme.forceMotion ? "checked" : ""}>Luôn chạy chuyển động dù thiết bị đang bật "giảm chuyển động" (Windows: tắt hiệu ứng hoạt cảnh)</label>
+    <p class="hint">Chọn nền thì khung phía trên chạy thử ngay. Hiệu ứng tự giảm số hạt trên điện thoại, tạm dừng khi chuyển tab và đứng yên nếu người xem bật "giảm chuyển động" trong thiết bị.</p></div>
+  <div class="card"><h3>Thông báo qua Telegram</h3>
+    <label class="row"><input type="checkbox" id="tg_login" ${S.telegram.login ? "checked" : ""}>Báo mỗi lần có người đăng nhập admin</label>
+    <label class="row"><input type="checkbox" id="tg_fail" ${S.telegram.loginFail ? "checked" : ""}>Báo khi bị nhập sai mật khẩu 5 lần (bị khóa tạm)</label>
+    <label class="row"><input type="checkbox" id="tg_v" ${S.telegram.views.enabled ? "checked" : ""}>Báo khi một bài đạt mốc lượt xem</label>
+    <label>Các mốc lượt xem (cách nhau bằng dấu phẩy)<input id="tg_vt" value="${esc(S.telegram.views.thresholds.join(", "))}"></label>
+    <label class="row"><input type="checkbox" id="tg_d" ${S.telegram.downloads.enabled ? "checked" : ""}>Báo khi một mục tải đạt mốc lượt tải</label>
+    <label>Các mốc lượt tải (cách nhau bằng dấu phẩy)<input id="tg_dt" value="${esc(S.telegram.downloads.thresholds.join(", "))}"></label>
+    <button type="button" class="ghost" id="tg_test">Gửi tin thử</button>
+    <p class="hint">Token và chat id của bot nằm trong Worker (không nhập ở đây). Đăng nhập báo ngay; mốc lượt xem/tải được kiểm tra mỗi giờ. Xem hướng dẫn trong <code>admin-api/README.md</code>.</p></div>
+  <div class="card"><h3>Thanh thông báo toàn site</h3>${chk("an_on", S.announcement.enabled, "Bật thanh thông báo")}
+    <label>Nội dung<input id="an_text" value="${esc(S.announcement.text)}"></label>
+    <label>Link khi bấm (tùy chọn)<input id="an_url" value="${esc(S.announcement.url)}"></label>
+    <label>Tự tắt sau ngày (để trống = không hết hạn)<input id="an_exp" type="date" value="${esc(S.announcement.expires)}"></label>
+    <p class="hint">Hiện thành thanh ở trên cùng mọi trang. Khách bấm × để ẩn (đổi nội dung thì hiện lại). Hết hạn sau hết ngày đã chọn.</p></div>
+  <div class="card"><h3>Chế độ bảo trì</h3>${chk("mt_on", S.maintenance.enabled, "Bật chế độ bảo trì")}
+    <label>Thông báo hiển thị<textarea id="mt_msg" rows="2">${esc(S.maintenance.message)}</textarea></label>
+    <p class="hint">Khách sẽ thấy màn hình bảo trì thay cho trang. Trình duyệt đang đăng nhập admin vẫn xem được trang bình thường (hết khi đăng xuất/hết phiên); thiết bị khác thêm <code>?bypass=1</code> vào địa chỉ trang. Bot tìm kiếm không bị chặn.</p></div>
+  <div class="card"><h3>Bình luận (Giscus)</h3>${chk("gc_on", S.giscus.enabled, "Bật bình luận mặc định cho bài mới")}
+    <label>Repo<input id="gc_repo" value="${esc(S.giscus.repo)}"></label>
+    <label>repo-id<input id="gc_rid" value="${esc(S.giscus.repoId)}"></label>
+    <label>Danh mục<input id="gc_cat" value="${esc(S.giscus.category)}"></label>
+    <label>category-id<input id="gc_cid" value="${esc(S.giscus.categoryId)}"></label></div>
+  <details class="card"><summary>Nâng cao</summary>
+    <p class="hint">Đổi favicon, tên site hay mô tả mặc định chỉ cập nhật 5 trang chính. Các trang bài viết / download đã đăng trước đó vẫn giữ bản cũ. Bấm nút dưới sau khi <b>đã Lưu</b> để làm mới tất cả trang đó trong một commit (bài đăng mới luôn dùng cài đặt mới nhất).</p>
+    <button type="button" class="ghost" id="rb">Làm mới trang bài viết và download</button> <span class="hint" id="rbs"></span>
+    <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+    <p class="hint"><b>Sitemap.</b> Bấm nút dưới để quét toàn bộ repo và thêm vào <code>sitemap.xml</code> mọi trang công khai (viết gọn dạng <code>/post/…/</code>, không kèm <code>index.html</code>) cùng ảnh png, jpg, webp… chưa có trong sitemap. URL đã có sẽ được giữ nguyên, không đổi <code>lastmod</code>. File .js, .css, .json, .md, trang <code>/admin/</code> và link rút gọn <code>/s/</code> không được thêm. Worker cũng tự quét mỗi ngày lúc 00:30 (giờ Việt Nam). Muốn loại thêm thư mục hoặc tắt quét tự động: sửa <code>sitemap</code> trong <code>site-settings.json</code> (<code>exclude</code>, <code>auto</code>).</p>
+    <button type="button" class="ghost" id="sm">Quét và cập nhật sitemap</button> <span class="hint" id="sms"></span></details>
+  <p class="hint">Lưu ý: nền động và SEO có hiệu lực sau khi lưu (khoảng 1 phút). Các mục thông báo, bảo trì và bình luận đã được lưu vào <code>site-settings.json</code>, nhưng web công khai sẽ đọc chúng ở các giai đoạn sau.</p>
+  <button id="save">Lưu thay đổi</button>`;
+  $("#av_file").onchange = (e) => { const f = e.target.files[0]; if (f) $("#av_prev").src = URL.createObjectURL(f); };
+  const drawFav = async () => { const f = $("#fav").files[0]; if (!f) return; try { const d = await toIcon(f, 96, "icon", favOpts()); $("#favprev").src = "data:image/png;base64," + d; } catch (e) { /* bỏ qua */ } };
+  $("#fav").onchange = drawFav; ["fav_style", "fav_bgon", "fav_bg"].forEach((i) => ($("#" + i).onchange = drawFav)); $("#fav_pad").oninput = () => { $("#fav_pv").textContent = $("#fav_pad").value; drawFav(); };
+  $("#favprev2").style.display = "none";
+  main.querySelectorAll("[data-ai]").forEach((b) => (b.onclick = async () => {
+    const k = b.dataset.ai; b.disabled = true;
+    try {
+      const r = await Admin.api("/ai/seo", { title: $("#seo_" + k + "_t").value, body: `Trang "${PAGES[k]}" của website cá nhân ${$("#seo_name").value}. Mô tả hiện tại: ${$("#seo_" + k + "_d").value}. Từ khóa hiện tại: ${$("#seo_" + k + "_k").value}.` });
+      if (r.description) $("#seo_" + k + "_d").value = r.description;
+      if (r.keywords) $("#seo_" + k + "_k").value = [].concat(r.keywords).join(", ");
+      Admin.toast("AI đã điền gợi ý, xem lại rồi bấm Lưu.");
+    } catch (e) { Admin.toast(e.message, true); }
+    b.disabled = false;
+  }));
+  Admin.bindJson(main, { "site-settings.json": "Sửa trực tiếp không tự cập nhật các trang đã tạo sẵn (SEO, manifest). Sau khi sửa phần SEO/favicon, hãy tải lại Cài đặt và bấm Lưu.", "data.json": "Cấu hình menu, nút, footer của các trang chính." });
+  $("#tg_test").onclick = async () => { const b = $("#tg_test"); b.disabled = true; try { await Admin.api("/notify/test", {}); Admin.toast("Đã gửi tin thử, kiểm tra Telegram."); } catch (e) { Admin.toast(e.message, true); } b.disabled = false; };
+  $("#rb").onclick = async () => {
+    const b = $("#rb"), st = $("#rbs"); b.disabled = true;
+    try {
+      const [posts, saved] = await Promise.all([Admin.readJson("post/data/posts.json", []), Admin.readJson("site-settings.json", {})]);
+      const r = await Rebuild.all(Admin, { posts, seo: AdminSeo.merge(saved.seo), render: { parseFrontmatter, renderPostBody }, onProgress: (i, n) => (st.textContent = `Đang xử lý ${i}/${n}…`) });
+      st.textContent = ""; Admin.toast(`Đã làm mới ${r.posts} bài và ${r.downloads} mục download.`);
+    } catch (e) { st.textContent = ""; Admin.toast(e.message, true); }
+    b.disabled = false;
+  };
+  $("#sm").onclick = async () => {
+    const b = $("#sm"), st = $("#sms"); b.disabled = true; st.textContent = "Đang quét repo…";
+    try {
+      const r = await Admin.api("/sitemap/scan", {});
+      st.textContent = ""; Admin.toast(r.skipped ? "Đã bỏ qua: " + r.skipped : r.added ? `Đã thêm ${r.added} URL mới vào sitemap (tổng ${r.total} URL). Web cập nhật sau ~1 phút.` : `Sitemap đã đầy đủ (${r.total} URL), không có URL mới.`);
+    } catch (e) { st.textContent = ""; Admin.toast(e.message, true); }
+    b.disabled = false;
+  };
+  let stopFx = () => {};
+  let curFx = S.theme.default;
+  const preview = (n = curFx) => { curFx = n; stopFx(); stopFx = ShinjuTheme.mount($("#fxprev"), n, { intensity: $("#th_int").value / 100, wash: $("#th_wash").value / 100, dim: $("#th_dim").value / 100, force: $("#th_force").checked }); };
+  $("#th_int").oninput = () => { $("#th_iv").textContent = $("#th_int").value; preview(); };
+  $("#th_wash").oninput = () => { $("#th_wv").textContent = $("#th_wash").value; preview(); };
+  $("#th_dim").oninput = () => { $("#th_dv").textContent = $("#th_dim").value; preview(); };
+  $("#th_force").onchange = () => preview();
+  main.querySelectorAll("select[id^=th_]").forEach((el) => (el.onchange = () => preview(el.value || $("#th_def").value)));
+  preview(S.theme.default);
+  $("#save").onclick = async () => {
+    const b = $("#save"); b.disabled = true;
+    const val = (i) => $("#" + i).value.trim();
+    D.profile = { ...D.profile, name: val("name"), showOnline: $("#pf_online").checked, statusColor: $("#pf_color").value }; D.footer = val("footer");
+    S.announcement = { enabled: $("#an_on").checked, text: val("an_text"), url: val("an_url"), expires: val("an_exp") };
+    S.maintenance = { enabled: $("#mt_on").checked, message: val("mt_msg") };
+    S.giscus = { ...S.giscus, enabled: $("#gc_on").checked, repo: val("gc_repo"), repoId: val("gc_rid"), category: val("gc_cat"), categoryId: val("gc_cid") };
+    S.theme = { default: val("th_def"), intensity: $("#th_int").value / 100, wash: $("#th_wash").value / 100, dim: $("#th_dim").value / 100, forceMotion: $("#th_force").checked, pages: Object.fromEntries(Object.keys(PAGES).map((k) => [k, val("th_" + k)])) };
+    const th = (id) => [...new Set($(id).value.split(/[,\s]+/).map(Number).filter((n) => n > 0))].sort((a, b) => a - b);
+    S.telegram = { login: $("#tg_login").checked, loginFail: $("#tg_fail").checked, views: { enabled: $("#tg_v").checked, thresholds: th("#tg_vt") }, downloads: { enabled: $("#tg_d").checked, thresholds: th("#tg_dt") } };
+    const num = (id, d, lo, hi) => { const n = Math.round(Number($("#" + id).value)); return Number.isFinite(n) && $("#" + id).value !== "" ? Math.min(hi, Math.max(lo, n)) : d; };
+    S.seo.shortLength = num("sl_len", 10, 4, 24);
+    S.blog = { featuredCount: num("bl_f", 10, 0, 30), featuredTitle: val("bl_t"), recentCount: num("bl_r", 10, 1, 50) };
+    S.seo.siteName = val("seo_name"); S.seo.ogImage = val("seo_og");
+    for (const k of Object.keys(PAGES)) S.seo.pages[k] = { title: val(`seo_${k}_t`), description: val(`seo_${k}_d`), keywords: val(`seo_${k}_k`) };
+    try {
+      const files = [], favFile = $("#fav").files[0];
+      if (favFile) {
+        const v = Date.now().toString(36);
+        const fo = favOpts();
+        for (const [name, size, kind] of FAV) files.push({ path: "assets/favicon/" + name, content: await toIcon(favFile, size, kind, fo), encoding: "base64" });
+        S.seo.favicon = { icon: "/assets/favicon/favicon-32.png?v=" + v, apple: "/assets/favicon/favicon-180.png?v=" + v, v, maskable: true, style: fo.style, bg: fo.bg, bgOn: fo.bgOn, pad: fo.pad };
+      }
+      const deletes = [], avFile = $("#av_file").files[0];
+      if (avFile) { // luôn ghi đè lên MỘT file cố định /assets/avatar/avatar.webp → mọi trang (kể cả HTML tĩnh) tự dùng ảnh mới, không phải sửa trang nào
+        const { b64 } = await toSquare(avFile, 512), { b64: b64s } = await toSquare(avFile, 336), { b64: b64t } = await toSquare(avFile, 168), path = "assets/avatar/avatar.webp", pathS = "assets/avatar/avatar-336.webp", pathT = "assets/avatar/avatar-168.webp", url = "/" + pathS;
+        const old = [D.profile?.avatar, D.nav?.logo].filter((x) => x && x.startsWith("/assets/avatar/")).map((x) => x.split("?")[0].slice(1));
+        files.push({ path, content: b64, encoding: "base64" }, { path: pathS, content: b64s, encoding: "base64" }, { path: pathT, content: b64t, encoding: "base64" }); // 512px (og:image) + 336px (hiển thị)
+        D.profile = { ...D.profile, avatar: url }; D.nav = D.nav || {};
+        if ($("#av_logo").checked || (D.nav.logo || "").startsWith("/assets/avatar/")) D.nav.logo = url;
+        const have = new Set((await Admin.api("/tree")).files.map((f) => f.path));
+        [...new Set(old)].filter((x) => have.has(x) && x !== path && x !== pathS && x !== pathT).forEach((x) => deletes.push(x)); // dọn ảnh avatar kiểu cũ (có mã phiên bản trong tên)
+      } else if ($("#av_logo").checked && D.profile?.avatar) { D.nav = D.nav || {}; D.nav.logo = D.profile.avatar; } // chỉ đồng bộ logo với avatar hiện tại
+      files.push({ path: "manifest.webmanifest", content: AdminSeo.manifest(S.seo) }); // PWA: tên + biểu tượng theo cài đặt
+      files.unshift({ path: "site-settings.json", content: JSON.stringify(S, null, 2) + "\n" }, { path: "data.json", content: JSON.stringify(D, null, 2) + "\n" });
+      for (const k of Object.keys(PAGES)) { // ghi SEO thẳng vào HTML tĩnh của từng trang
+        const path = AdminSeo.FILE[k], html = await Admin.readText(path), out = AdminSeo.apply(html, AdminSeo.block(k, S.seo));
+        if (out === null) throw new Error(path + " chưa có cặp <!-- seo:start --> / <!-- seo:end -->");
+        if (out !== html) files.push({ path, content: out });
+      }
+      await Admin.commitFiles("Admin: cập nhật cài đặt, SEO và favicon", files, deletes);
+      Admin.toast("Đã lưu. Web cập nhật sau khoảng 1 phút.");
+    } catch (e) { Admin.toast(e.message, true); }
+    b.disabled = false;
+  };
+}});
+</script></body></html>

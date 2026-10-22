@@ -1,0 +1,25 @@
+{
+  "title": "Ủng Hộ Shinju Ch.",
+  "methods": [
+    {
+      "id": "ganknow",
+      "label": "Donate qua",
+      "buttons": [
+        {
+          "id": "ganknow",
+          "label": "ZYPAGE",
+          "type": "link",
+          "url": "https://zypage.com/shinjuch",
+          "visible": true
+        },
+        {
+          "id": "btn-mvdm95g3522",
+          "label": "GANK",
+          "type": "link",
+          "url": "https://ganknow.com/shinjuch",
+          "visible": true
+        }
+      ]
+    }
+  ]
+}

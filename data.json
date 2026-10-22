@@ -1,0 +1,65 @@
+{
+  "profile": {
+    "name": "Shinju Ch.",
+    "avatar": "/assets/avatar/avatar-336.webp",
+    "statusColor": "#3ddc3d",
+    "showOnline": true
+  },
+  "nav": {
+    "logo": "/assets/avatar/avatar-336.webp",
+    "home": "/index.html",
+    "pages": [
+      {
+        "label": "Trang chủ",
+        "url": "/index.html"
+      },
+      {
+        "label": "Kênh",
+        "url": "/channel/index.html"
+      },
+      {
+        "label": "Donate",
+        "url": "/donate/index.html"
+      },
+      {
+        "label": "Sản phẩm",
+        "url": "/product/index.html"
+      },
+      {
+        "label": "Bài Đăng",
+        "url": "/post/index.html"
+      }
+    ]
+  },
+  "buttons": [
+    {
+      "id": "social",
+      "icon": "youtube",
+      "url": "channel",
+      "style": "#63B3ED ",
+      "label": "Mạng Xã Hội"
+    },
+    {
+      "id": "donate",
+      "icon": "",
+      "url": "donate",
+      "style": "#F687B3 ",
+      "label": "💰 Donate Tại Đây"
+    },
+    {
+      "id": "posts",
+      "icon": "",
+      "url": "post",
+      "style": "#F6E05E ",
+      "label": "💬 Bài Đăng"
+    },
+    {
+      "id": "product",
+      "icon": "",
+      "url": "product",
+      "style": "#4FD1C5 ",
+      "label": "🎁 Cửa hàng"
+    }
+  ],
+  "footer": "© 2026 Shinju Ch. (@ShinjuVNer). All rights reserved."
+}

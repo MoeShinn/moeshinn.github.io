@@ -1,0 +1,14 @@
+{
+  "description": "Ezy Software bao gồm phần mềm giúp đơn giản hóa các quy trình chạy, rig, build model PNG Tuber nâng cao nhưng được đơn giản hóa thuộc Shinju Ch. [VNer]",
+  "keywords": "Ezy Software, phần mềm, Shinju Ch",
+  "licenses": [
+    {
+      "title": "CHÍNH SÁCH DỊCH VỤ VÀ BẢO MẬT EZY SOFTWARE",
+      "text": "Chính sách này quy định các điều khoản sử dụng và cam kết bảo mật đối với các ứng dụng thuộc hệ sinh thái Ezy Software (bao gồm Ezy Tuber, Ezy Maker và các công cụ liên quan).\n​Thu thập và Sử dụng Dữ liệu\n​Toàn bộ quá trình xử lý hình ảnh, âm thanh, giọng nói và thiết lập cấu hình của người dùng đều được thực hiện trực tiếp trên thiết bị cá nhân (Offline / Local Processing).\n​Ezy Software không thu thập, không lưu trữ và không tải lên máy chủ bất kỳ dữ liệu cá nhân hay tập tin dự án nào của bạn.\n​Quyền Truy cập Thiết bị\n​Quyền truy cập Micro/Thiết bị âm thanh: Chỉ dùng để nhận diện tín hiệu âm thanh phục vụ tính năng chuyển động nói (lip-sync) của nhân vật realtime.\n​Quyền truy cập Thư mục/Tệp tin: Chỉ dùng để đọc file cấu hình và lưu trữ xuất bản nội dung do bạn chỉ định.\n​Miễn trừ Tách biệt\n​Ezy Software cung cấp công cụ kỹ thuật để hỗ trợ bạn tạo và điều khiển model.\n​Chúng tôi không sở hữu và không chịu trách nhiệm pháp lý đối với các nội dung hình ảnh, âm thanh hoặc tài nguyên do người dùng tự nhập vào ứng dụng.\n​Cập nhật và Hỗ trợ\n​Phần mềm có thể được cập nhật định kỳ để sửa lỗi hoặc bổ sung tính năng.\n​Mọi thắc mắc hoặc yêu cầu hỗ trợ kỹ thuật xin vui lòng liên hệ qua các kênh thông tin chính thức trên website."
+    },
+    {
+      "title": "GIẤY PHÉP PHẦN MỀM MIT (MIT LICENSE) - EZY SOFTWARE",
+      "text": "Bản quyền (c) Ezy Software.\n​Bằng văn bản này, quyền cho phép được cấp miễn phí cho bất kỳ ai có được bản sao của phần mềm này và các tệp tài liệu liên quan (gọi chung là \"Phần mềm\"), để xử lý Phần mềm mà không bị hạn chế, bao gồm nhưng không giới hạn ở quyền sử dụng, sao chép, sửa đổi, hợp nhất, xuất bản, phân phối, cấp phép lại và/hoặc bán các bản sao của Phần mềm, và cho phép các cá nhân được cung cấp Phần mềm làm như vậy, tùy thuộc vào các điều kiện sau:\n​Thông báo bản quyền trên và thông báo cấp phép này phải được đưa vào tất cả các bản sao hoặc các phần quan trọng của Phần mềm.\n​PHẦN MỀM ĐƯỢC CUNG CẤP \"NGUYÊN TRẠNG\", KHÔNG CÓ BẤT KỲ BẢO ĐẢM NÀO, DÙ LÀ RÕ RÀNG HOẶC NGỤ Ý, BAO GỒM NHƯNG KHÔNG GIỚI HẠN Ở CÁC BẢO ĐẢM VỀ KHẢ NĂNG BÁN ĐƯỢC, SỰ PHÙ HỢP CHO MỘT MỤC ĐÍCH CỤ THỂ VÀ SỰ KHÔNG VI PHẠM. TRONG BẤT KỲ TRƯỜNG HỢP NÀO, CÁC TÁC GIẢ HOẶC NGƯỜI NẮM GIỮ BẢN QUYỀN SẼ KHÔNG CHỊU TRÁCH NHIỆM CHO BẤT KỲ KHIẾU NẠI, THIỆT HẠI HOẶC TRÁCH NHIỆM PHÁP LÝ NÀO KHÁC, DÙ LÀ TRONG MỘT HÀNH VI HỢP ĐỒNG, TRÁCH NHIỆM PHÁP LÝ NGOÀI HỢP ĐỒNG HOẶC CÁC CÁCH KHÁC, PHÁT SINH TỪ, RA CỦA HOẶC LIÊN QUAN ĐẾN PHẦN MỀM HOẶC VIỆC SỬ DỤNG HOẶC CÁC GIAO DỊCH KHÁC TRONG PHẦN MỀM."
+    }
+  ]
+}

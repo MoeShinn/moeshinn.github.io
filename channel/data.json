@@ -1,0 +1,29 @@
+{
+  "profile": {
+    "name": "Shinju Ch.",
+    "avatar": "/assets/avatar/avatar-336.webp",
+    "statusColor": "#3ddc3d"
+  },
+  "links": [
+    {
+      "id": "discord-mv9ieqk4",
+      "icon": "telegram",
+      "label": "Telegram ✨",
+      "url": "https://t.me/ShinjuCh",
+      "group": "contact"
+    },
+    {
+      "id": "discord-mv9ifzt9",
+      "icon": "discord",
+      "label": "Discord 🔮",
+      "url": "https://discord.gg/eR5eHsks",
+      "group": "contact"
+    },
+    {
+      "id": "youtube-mvdxdf74",
+      "icon": "youtube",
+      "label": "YouTube 🇻🇳",
+      "url": "https://www.youtube.com/channel/UCoZR9unQFHLfqoOQ22lPcGA"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Số liệu</title>
+<link rel="stylesheet" href="/admin/css/admin.css">
+<style>.bar-row{display:grid;grid-template-columns:minmax(90px,36%) 1fr auto;gap:10px;align-items:center;padding:5px 0;font-size:14px}
+.bar-row .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bar-row .b{background:#0a1626;border-radius:6px;height:12px;overflow:hidden}.bar-row .b i{display:block;height:100%;background:var(--blue);border-radius:6px;min-width:2px}
+.bar-row .n{text-align:right;white-space:nowrap}.up{color:var(--green);font-size:12px;margin-left:6px}</style></head>
+<body><div id="app"></div><div id="toast"></div>
+<script src="/admin/js/core.js"></script>
+<script>
+Admin.boot({ id: "stats", title: "Số liệu", async render(main) {
+  const { esc, $ } = Admin;
+  // Bộ đếm lưu thành file trong repo api-counters: view-<id>.json {views}, download-<id>.json {downloads}
+  const RAW = "https://raw.githubusercontent.com/ShinjuVN/api-counters/main", COUNTER_API = "https://n238.git-api.workers.dev", BK = "shinju_stats_baseline";
+  const fmt = (n) => (n == null ? "?" : n.toLocaleString("vi-VN"));
+  async function load() {
+    main.innerHTML = `<h2>Số liệu</h2><p class="hint">Đang tải số liệu…</p>`;
+    let posts, dls;
+    try {
+      const [p, tree] = await Promise.all([Admin.readJson("post/data/posts.json", []), Admin.api("/tree")]);
+      posts = p; const ids = tree.files.map((f) => (f.path.match(/^download\/data\/([^/]+)\.json$/) || [])[1]).filter(Boolean);
+      dls = await Promise.all(ids.map(async (id) => ({ id, title: (await Admin.readJson(`download/data/${id}.json`)).title || id })));
+    } catch (e) { main.innerHTML = `<h2>Số liệu</h2><p class="err">${esc(e.message)}</p>`; return; }
+    const bucket = Math.floor(Date.now() / 60000);
+    const get = async (type, id, key) => { try { const r = await fetch(`${RAW}/${type}-${encodeURIComponent(id)}.json?t=${bucket}`); if (!r.ok) return { n: 0 }; const j = await r.json(); return { n: j[key] || 0, at: j.updatedAt }; } catch (e) { return { n: null }; } };
+    const getUsage = async () => { try { const r = await fetch(`${RAW}/api-usage.json?t=${bucket}`); return r.ok ? await r.json() : null; } catch (e) { return null; } };
+    const [pv, dv, health, usage] = await Promise.all([
+      Promise.all(posts.map((p) => get("view", p.id, "views"))), Promise.all(dls.map((d) => get("download", d.id, "downloads"))),
+      fetch(COUNTER_API + "/health").then((r) => r.ok).catch(() => false), getUsage()]);
+    const today = new Date().toISOString().slice(0, 10);
+    const usageTxt = !usage ? "chưa có dữ liệu lượt gọi Worker" : usage.date !== today ? `lượt gọi Worker hôm nay: 0 / ${fmt(usage.limit)} (file cũ ngày ${esc(usage.date)})` : `lượt gọi Worker hôm nay (UTC): ${fmt(usage.requests)} / ${fmt(usage.limit)}${usage.blocked ? " — <b>đã chạm giới hạn, web ngừng tăng view/tải</b>" : ""}`;
+    const P = posts.map((p, i) => ({ key: "v:" + p.id, label: p.title, sub: p.visibility && p.visibility !== "public" ? p.visibility : "", n: pv[i].n, href: p.visibility === "private" ? "" : `/post/${encodeURIComponent(p.id)}/` }));
+    const D = dls.map((d, i) => ({ key: "d:" + d.id, label: d.title, sub: "", n: dv[i].n, href: `/download/${encodeURIComponent(d.id)}/` }));
+    // Mốc so sánh lưu trên trình duyệt này (bộ đếm chỉ lưu tổng, không lưu theo ngày)
+    let base; try { base = JSON.parse(localStorage.getItem(BK)); } catch (e) { /* bỏ qua */ }
+    const cur = Object.fromEntries([...P, ...D].map((x) => [x.key, x.n || 0]));
+    if (!base) { base = { ts: Date.now(), c: cur }; try { localStorage.setItem(BK, JSON.stringify(base)); } catch (e) { /* bỏ qua */ } }
+    const delta = (x) => (x.n == null ? 0 : x.n - (base.c[x.key] || 0));
+    const sum = (a) => a.reduce((s, x) => s + (x.n || 0), 0), sumD = (a) => a.reduce((s, x) => s + delta(x), 0);
+    const section = (title, arr, unit) => { const rows = [...arr].sort((a, b) => (b.n || 0) - (a.n || 0)), max = Math.max(1, ...rows.map((x) => x.n || 0));
+      return `<div class="card"><h3>${title}</h3>${rows.map((x) => `<div class="bar-row"><div class="t" title="${esc(x.label)}">${x.href ? `<a href="${x.href}" target="_blank">${esc(x.label)}</a>` : esc(x.label)}${x.sub ? ` <small class="hint">(${esc(x.sub)})</small>` : ""}</div>
+        <div class="b"><i style="width:${Math.round(((x.n || 0) / max) * 100)}%"></i></div><div class="n">${fmt(x.n)}${delta(x) > 0 ? `<span class="up">+${fmt(delta(x))}</span>` : ""}</div></div>`).join("") || `<p class="hint">Chưa có ${unit}.</p>`}</div>`; };
+    main.innerHTML = `<h2>Số liệu</h2>
+    <div class="card"><div class="grid">
+      <div class="stat"><b>${fmt(sum(P))}</b><span>lượt xem bài${sumD(P) > 0 ? ` <span class="up">+${fmt(sumD(P))}</span>` : ""}</span></div>
+      <div class="stat"><b>${fmt(sum(D))}</b><span>lượt tải${sumD(D) > 0 ? ` <span class="up">+${fmt(sumD(D))}</span>` : ""}</span></div>
+      <div class="stat"><b>${posts.length}</b><span>bài đăng</span></div><div class="stat"><b>${dls.length}</b><span>mục tải</span></div></div>
+      <p class="hint" style="margin-bottom:0"><span class="dot ${health ? "ok" : "bad"}"></span>Bộ đếm ${health ? "đang hoạt động" : "không phản hồi"} · ${usageTxt} · số “+n” là mức tăng từ ${esc(new Date(base.ts).toLocaleString("vi-VN"))} (mốc lưu trên máy này)</p></div>
+    ${section("Bài đăng — lượt xem", P, "bài đăng")}${section("Download — lượt tải", D, "mục tải")}
+    <button id="s_re">Làm mới</button> <button class="ghost" id="s_base">Đặt mốc mới từ bây giờ</button>
+    <p class="hint">Số liệu chậm vài phút so với thực tế: Worker gom ghi lên GitHub khoảng mỗi phút và GitHub lưu đệm tệp thêm một lúc. Bộ đếm chỉ lưu tổng, nên chưa có biểu đồ theo ngày.</p>`;
+    $("#s_re").onclick = load;
+    $("#s_base").onclick = () => { try { localStorage.setItem(BK, JSON.stringify({ ts: Date.now(), c: cur })); } catch (e) { /* bỏ qua */ } load(); };
+  }
+  load();
+}});
+</script></body></html>
+
