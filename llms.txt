@@ -23,6 +23,7 @@
 - [Ezy Software và Model build sẵn](https://shinjuvn.github.io/product/ezy/) (danh mục): Xem kho sản phẩm Ezy Software và Model EzyTuber build và rig sẵn free trên website Shinju Ch
   - [Ezy Software](https://shinjuvn.github.io/product/ezy-software/) (danh mục): Ezy Software bao gồm phần mềm giúp đơn giản hóa các quy trình chạy, rig, build model PNG Tuber nâng cao nhưng được đơn giản hóa thuộc Shinju Ch. [VNer]
     - [Ezy Tuber](https://shinjuvn.github.io/product/ezy-tuber/)
+    - [Ezy Maker](https://shinjuvn.github.io/product/ezy-maker/)
   - [Ezy Model Free](https://shinjuvn.github.io/product/ezy-model-free/) (danh mục): Nhận Ezy Model Free sử dụng cho phần mềm Ezy Tuber với các chính sách & giấy phép liên quan
   - [Ezy Model Trả phí](https://shinjuvn.github.io/product/ezy-model-paid/) (danh mục): Sở hữu ngay Ezy Model Trả Phí dùng cho Ezy Tuber
 - [Công cụ ảnh](https://shinjuvn.github.io/product/photo-tools/) (danh mục): Bộ công cụ ảnh online miễn phí giúp nén ảnh giảm dung lượng, cắt ảnh theo tỷ lệ tùy chọn và đổi định dạng JPG, PNG, WebP. Xử lý nhanh, an toàn, không cần đăng ký.
