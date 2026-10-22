@@ -22,7 +22,7 @@
     "intensity": 0.85,
     "wash": 0.2,
     "dim": 0.25,
-    "forceMotion": false,
+    "forceMotion": true,
     "pages": {
       "home": "stars",
       "post": "fireflies",
