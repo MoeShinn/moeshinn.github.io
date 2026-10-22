@@ -44,7 +44,7 @@
       "icon": "",
       "url": "donate",
       "style": "#F687B3 ",
-      "label": "💰 Donate Tại Đây"
+      "label": "💰 Donate"
     },
     {
       "id": "posts",
@@ -58,7 +58,7 @@
       "icon": "",
       "url": "product",
       "style": "#4FD1C5 ",
-      "label": "🎁 Cửa hàng"
+      "label": "🛒 Cửa hàng"
     }
   ],
   "footer": "© 2026 Shinju Ch. (@ShinjuVNer). All rights reserved."
