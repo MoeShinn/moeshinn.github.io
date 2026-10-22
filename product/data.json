@@ -73,6 +73,15 @@
       "thumb": "/product/tools/img/compress-image.webp",
       "order": 2,
       "updated": "2026-10-22"
+    },
+    {
+      "id": "ezy-tuber",
+      "type": "product",
+      "parent": "ezy-software",
+      "title": "Ezy Tuber",
+      "thumb": "",
+      "order": 0,
+      "updated": "2026-10-22"
     }
   ]
 }
