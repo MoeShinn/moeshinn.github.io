@@ -296,3 +296,35 @@ body.consent-open{overflow:hidden}
 .consent-actions button,.consent-actions a{width:100%}
 .consent-foot{padding-bottom:max(18px,env(safe-area-inset-bottom))}
 }
+
+/* ---------- Thư viện ảnh dạng vuốt ngang (markup: product/js/productgen.js, điều khiển: product/js/main.js) ----------
+   Chỉ với CSS đã vuốt được (scroll-snap); JS thêm mũi tên, chấm, bộ đếm, gợi ý vuốt và kéo chuột. */
+.pg-carousel{max-width:100%}
+.pg-stage{position:relative}
+.pg-track{position:relative;display:flex;gap:12px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:2px 2px 4px;border-radius:14px}
+.pg-track::-webkit-scrollbar{display:none}
+.pg-track:focus-visible{outline:2px solid #7db4ff;outline-offset:3px}
+.pg-slide{flex:0 0 84%;scroll-snap-align:start;scroll-snap-stop:always;display:block;aspect-ratio:4/3;border-radius:14px;overflow:hidden;background:#050b16;border:1px solid var(--panel-border)}
+.pg-slide img{width:100%;height:100%;object-fit:contain;display:block;-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
+@media (min-width:700px){.pg-slide{flex-basis:min(560px,64%)}}
+.pg-carousel[data-count="1"] .pg-slide{flex-basis:100%;max-width:640px;margin:0 auto}
+/* mờ dần ở mép còn ảnh để người xem biết còn ảnh phía đó */
+.pg-stage::before,.pg-stage::after{content:"";position:absolute;top:2px;bottom:6px;width:34px;z-index:2;pointer-events:none;opacity:0;transition:opacity .25s}
+.pg-stage::before{left:2px;border-radius:14px 0 0 14px;background:linear-gradient(270deg,transparent,rgba(5,11,22,.7))}
+.pg-stage::after{right:2px;border-radius:0 14px 14px 0;background:linear-gradient(90deg,transparent,rgba(5,11,22,.7))}
+.pg-stage.has-prev::before,.pg-stage.has-next::after{opacity:1}
+.pg-count{position:absolute;top:10px;left:12px;z-index:3;padding:3px 11px;border-radius:999px;background:rgba(5,11,22,.75);border:1px solid var(--panel-border);font-size:12px;font-weight:800;letter-spacing:.3px;pointer-events:none}
+.pg-nav{display:none;position:absolute;top:calc(50% - 22px);z-index:3;width:44px;height:44px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(5,11,22,.72);color:#fff;font-size:26px;line-height:1;cursor:pointer;align-items:center;justify-content:center;transition:opacity .2s,transform .15s}
+.pg-nav:hover,.pg-nav:focus-visible{background:rgba(31,111,214,.9);transform:scale(1.07)}
+.pg-nav[disabled]{opacity:0;pointer-events:none}
+.pg-prev{left:8px}.pg-next{right:8px}
+@media (hover:hover) and (pointer:fine){.pg-nav{display:flex}.pg-track{cursor:grab}.pg-track.is-dragging{cursor:grabbing;scroll-snap-type:none}.pg-track.is-dragging .pg-slide{pointer-events:none}}
+.pg-dots{display:flex;justify-content:center;gap:8px;margin-top:10px}
+.pg-dots button{position:relative;width:9px;height:9px;padding:0;border:0;border-radius:999px;background:rgba(244,236,216,.3);cursor:pointer;transition:width .25s,background .25s}
+.pg-dots button::after{content:"";position:absolute;inset:-12px -4px}
+.pg-dots button[aria-current="true"]{width:24px;background:var(--text-cream)}
+.pg-hint{margin-top:6px;text-align:center;font-size:13px;color:rgba(244,236,216,.72);transition:opacity .4s,max-height .4s;max-height:30px;overflow:hidden}
+.pg-hand{display:inline-block;animation:pg-wiggle 1.5s ease-in-out infinite}
+@keyframes pg-wiggle{0%,100%{transform:translateX(-6px)}50%{transform:translateX(6px)}}
+.pg-carousel.is-used .pg-hint{opacity:0;max-height:0;margin:0}
+@media (prefers-reduced-motion:reduce){.pg-hand{animation:none}.pg-track{scroll-behavior:auto}}

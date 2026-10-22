@@ -148,6 +148,65 @@
     }
   }
 
+  /* ---------- Thư viện ảnh vuốt ngang: thêm mũi tên (máy tính), chấm, bộ đếm, gợi ý vuốt, phím ←/→ và kéo bằng chuột ---------- */
+  function initGallery(c) {
+    if (c.dataset.ready) return; c.dataset.ready = "1";
+    const stage = c.querySelector(".pg-stage"), track = c.querySelector(".pg-track"), slides = [...track.children], n = slides.length;
+    if (n < 2) return;
+    const reduced = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const mk = (tag, cls, html, attrs = {}) => { const e = document.createElement(tag); e.className = cls; if (html) e.innerHTML = html; Object.entries(attrs).forEach(([k, v]) => e.setAttribute(k, v)); return e; };
+    const prev = mk("button", "pg-nav pg-prev", "‹", { type: "button", "aria-label": "Ảnh trước" }), next = mk("button", "pg-nav pg-next", "›", { type: "button", "aria-label": "Ảnh sau" });
+    const count = mk("span", "pg-count", "", { "aria-hidden": "true" });
+    const dots = mk("div", "pg-dots"), dotEls = slides.map((_, i) => { const b = mk("button", "", "", { type: "button", "aria-label": `Ảnh ${i + 1} / ${n}` }); b.onclick = () => go(i); dots.appendChild(b); return b; });
+    const hint = mk("div", "pg-hint", '<span class="pg-hand" aria-hidden="true">👆</span> Vuốt ngang để xem thêm ảnh', { "aria-hidden": "true" });
+    stage.append(prev, next, count); c.append(dots, hint);
+
+    const step = () => (slides[1].offsetLeft - slides[0].offsetLeft) || track.clientWidth;
+    const maxLeft = () => track.scrollWidth - track.clientWidth;
+    const current = () => (track.scrollLeft >= maxLeft() - 2 ? n - 1 : Math.min(n - 1, Math.max(0, Math.round(track.scrollLeft / step()))));
+    const go = (i, smooth = true) => track.scrollTo({ left: Math.max(0, Math.min(n - 1, i)) * step(), behavior: smooth && !reduced ? "smooth" : "auto" });
+    let raf = 0;
+    const update = () => {
+      raf = 0; const i = current();
+      count.textContent = `${i + 1} / ${n}`;
+      dotEls.forEach((d, k) => d.setAttribute("aria-current", String(k === i)));
+      prev.disabled = i === 0; next.disabled = i === n - 1;
+      stage.classList.toggle("has-prev", track.scrollLeft > 4); stage.classList.toggle("has-next", track.scrollLeft < maxLeft() - 4);
+    };
+    const used = () => c.classList.add("is-used"); // người xem đã tự thao tác → ẩn dòng gợi ý
+    track.addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
+    window.addEventListener("resize", update);
+    ["touchstart", "wheel", "keydown"].forEach((ev) => track.addEventListener(ev, used, { passive: true, once: true }));
+    prev.onclick = () => { used(); go(current() - 1); }; next.onclick = () => { used(); go(current() + 1); };
+    track.addEventListener("keydown", (e) => {
+      const k = e.key; if (k !== "ArrowLeft" && k !== "ArrowRight" && k !== "Home" && k !== "End") return;
+      e.preventDefault(); go(k === "ArrowLeft" ? current() - 1 : k === "ArrowRight" ? current() + 1 : k === "Home" ? 0 : n - 1);
+    });
+    // Kéo bằng chuột (cảm ứng đã vuốt được sẵn): quá 6px mới tính là kéo, và khi đó bỏ cú nhấp để không mở ảnh nhầm
+    let sx = 0, sl = 0, dragging = false, down = false;
+    track.addEventListener("pointerdown", (e) => { if (e.pointerType !== "mouse" || e.button !== 0) return; down = true; dragging = false; sx = e.clientX; sl = track.scrollLeft; });
+    window.addEventListener("pointermove", (e) => {
+      if (!down) return; const dx = e.clientX - sx;
+      if (!dragging && Math.abs(dx) > 6) { dragging = true; used(); track.classList.add("is-dragging"); }
+      if (dragging) track.scrollLeft = sl - dx;
+    });
+    const end = () => { if (!down) return; down = false; if (!dragging) return; track.classList.remove("is-dragging"); go(current(), true); setTimeout(() => { dragging = false; }, 0); };
+    window.addEventListener("pointerup", end); window.addEventListener("pointercancel", end);
+    track.addEventListener("click", (e) => { if (dragging) { e.preventDefault(); e.stopPropagation(); } }, true);
+    track.addEventListener("dragstart", (e) => e.preventDefault());
+    update();
+    // Lần đầu ảnh hiện ra: kéo thử nhẹ sang trái rồi về để gợi ý có thể vuốt (bỏ qua nếu người dùng chọn giảm chuyển động)
+    if (!reduced && "IntersectionObserver" in window) {
+      const io = new IntersectionObserver((es) => {
+        if (!es.some((x) => x.isIntersecting)) return; io.disconnect();
+        if (c.classList.contains("is-used") || track.scrollLeft > 0) return;
+        track.scrollTo({ left: Math.min(56, step() * 0.3), behavior: "smooth" });
+        setTimeout(() => { if (!c.classList.contains("is-used")) track.scrollTo({ left: 0, behavior: "smooth" }); }, 750);
+      }, { threshold: 0.7 });
+      io.observe(c);
+    }
+  }
+
   /* ---------- Popup bắt tích "đồng ý chính sách" trước khi mở link của nút ----------
      Nút nào có data-gate (do product/js/productgen.js gắn khi trang có/kế thừa chính sách và không tắt consent:false) sẽ chưa mở link ngay:
      hiện popup có ô tích đồng ý + nút xem chính sách/giấy phép của chính trang này (lấy từ khối .product-license đang hiển thị). Tích xong mới bấm được "Tiếp tục".
@@ -229,6 +288,7 @@
     setTitle(`${node.title} — ${(document.title.split(" — ")[1]) || "Shinju Ch."}`);
     if (PG.isTool(node, d)) await mountTool(d.tool);
     if (window.SiteLoading) window.SiteLoading.ready();
+    document.querySelectorAll("[data-gallery]").forEach(initGallery);
     if (!PG.isCat(node)) { trackViews(id); mountShare(node); mountComments(d); }
   }
 

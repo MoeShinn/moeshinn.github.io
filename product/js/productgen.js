@@ -96,7 +96,7 @@
     return `<article class="product-article">${bc}${head}${d.price ? `<div class="product-price">${t(d.price)}</div>` : ""}` +
       (imgSrc(node.thumb) ? `<div class="product-hero"><img src="${a(imgSrc(node.thumb))}" alt="${a(node.title)}" /></div>` : "") + desc +
       (bodyHtml ? `<div class="post-body product-body">${bodyHtml}</div>` : "") +
-      (gallery.length ? `<section class="post-section"><h2>🖼️ Hình ảnh</h2><div class="product-gallery">${gallery.map((g, i) => `<a href="${a(g)}" target="_blank" rel="noopener noreferrer"><img src="${a(g)}" alt="${a(node.title + " " + (i + 1))}" loading="lazy" /></a>`).join("")}</div></section>` : "") +
+      (gallery.length ? `<section class="post-section"><h2>🖼️ Hình ảnh</h2><div class="pg-carousel" data-gallery data-count="${gallery.length}"><div class="pg-stage"><div class="pg-track" tabindex="0" role="group" aria-label="Thư viện ảnh${gallery.length > 1 ? ", vuốt ngang để xem thêm" : ""}">${gallery.map((g, i) => `<a class="pg-slide" href="${a(g)}" target="_blank" rel="noopener noreferrer"><img src="${a(g)}" alt="${a(node.title + " " + (i + 1))}" loading="lazy" decoding="async" draggable="false" /></a>`).join("")}</div></div></div></section>` : "") +
       (btns.length ? `<div class="product-actions">${btns.map((b) => { const h = safeHref(b.url), ext = isHttp(h) ? ' target="_blank" rel="noopener noreferrer"' : ""; return `<a class="product-btn ${BTN[b.style] || "blue"}" href="${a(h)}"${ext}${gate}>${t(b.label || "Mở liên kết")}</a>`; }).join("")}</div>` : "") +
       `<div class="product-meta" data-views-wrap hidden></div><div class="post-share" data-share></div>${lic}</article>`;
   }
