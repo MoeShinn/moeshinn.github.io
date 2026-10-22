@@ -36,28 +36,28 @@
       "id": "social",
       "icon": "youtube",
       "url": "channel",
-      "style": "#63B3ED ",
+      "style": "#5dade2",
       "label": "Mạng Xã Hội"
     },
     {
       "id": "donate",
       "icon": "",
       "url": "donate",
-      "style": "#F687B3 ",
+      "style": "#f1948a",
       "label": "💰 Donate"
     },
     {
       "id": "posts",
       "icon": "",
       "url": "post",
-      "style": "#F6E05E ",
+      "style": "#f4d03f",
       "label": "💬 Bài Đăng"
     },
     {
       "id": "product",
       "icon": "",
       "url": "product",
-      "style": "#4FD1C5 ",
+      "style": "#45b39d",
       "label": "🛒 Mua sắm"
     }
   ],
