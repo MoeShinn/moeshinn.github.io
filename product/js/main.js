@@ -148,10 +148,122 @@
     }
   }
 
+  /* ---------- Popup xem ảnh: bấm ảnh trong thư viện → hiện ảnh vừa khung (mọi tỉ lệ), vuốt/kéo/mũi tên/phím để chuyển ảnh, chạm 2 lần để phóng to ----------
+     Bấm ảnh KHÔNG còn mở tab mới (hay bấm nhầm); nút "Ảnh gốc" trong popup mới mở ảnh gốc. Nút Back của điện thoại đóng popup thay vì rời trang. */
+  function openLightbox(items, start, onClose) {
+    if (document.querySelector(".lb-bg")) return;
+    const n = items.length, prevFocus = document.activeElement;
+    const reduced = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const bg = document.createElement("div"); bg.className = "lb-bg"; bg.setAttribute("role", "dialog"); bg.setAttribute("aria-modal", "true"); bg.setAttribute("aria-label", "Xem ảnh");
+    bg.innerHTML = `<div class="lb-top"><span class="lb-count" aria-live="polite"${n < 2 ? " hidden" : ""}></span><span class="lb-sp"></span><a class="lb-btn lb-orig" target="_blank" rel="noopener noreferrer">↗ Ảnh gốc</a><button type="button" class="lb-btn lb-close" aria-label="Đóng">✕</button></div>
+      <div class="lb-track" tabindex="0"></div>
+      ${n > 1 ? '<button type="button" class="lb-nav lb-prev" aria-label="Ảnh trước">‹</button><button type="button" class="lb-nav lb-next" aria-label="Ảnh sau">›</button>' : ""}
+      <div class="lb-hint">${n > 1 ? "Vuốt ngang để chuyển ảnh · " : ""}Chạm 2 lần để phóng to</div>`;
+    const track = bg.querySelector(".lb-track"), count = bg.querySelector(".lb-count"), orig = bg.querySelector(".lb-orig");
+    items.forEach((it) => {
+      const sl = document.createElement("div"); sl.className = "lb-slide";
+      const im = document.createElement("img"); im.className = "lb-img"; im.src = it.src; im.alt = it.alt || ""; im.draggable = false; im.decoding = "async";
+      sl.appendChild(im); track.appendChild(sl);
+    });
+    const slides = [...track.children];
+    let cur = Math.max(0, Math.min(n - 1, start || 0)), raf = 0, zoomed = null;
+    const used = () => bg.classList.add("is-used");
+
+    const unzoom = () => {
+      if (!zoomed) return; const sl = zoomed, im = sl.firstChild; zoomed = null;
+      sl.classList.remove("is-zoom"); im.style.width = im.style.height = ""; sl.scrollLeft = sl.scrollTop = 0; track.classList.remove("is-locked");
+    };
+    const zoomAt = (sl, cx, cy) => { // phóng ~2.4 lần so với cỡ đang vừa khung, giữ điểm chạm ở giữa
+      const im = sl.firstChild, r = im.getBoundingClientRect(); if (!r.width) return;
+      const fx = (cx - r.left) / r.width, fy = (cy - r.top) / r.height, k = 2.4;
+      im.style.width = r.width * k + "px"; im.style.height = r.height * k + "px";
+      sl.classList.add("is-zoom"); track.classList.add("is-locked"); zoomed = sl; used();
+      sl.scrollLeft = fx * im.offsetWidth - sl.clientWidth / 2; sl.scrollTop = fy * im.offsetHeight - sl.clientHeight / 2;
+    };
+    const update = () => {
+      raf = 0; const i = Math.max(0, Math.min(n - 1, Math.round(track.scrollLeft / (track.clientWidth || 1))));
+      if (i !== cur) { unzoom(); cur = i; }
+      count.textContent = `${cur + 1} / ${n}`; orig.href = items[cur].src;
+      const p = bg.querySelector(".lb-prev"), q = bg.querySelector(".lb-next"); if (p) { p.disabled = cur === 0; q.disabled = cur === n - 1; }
+    };
+    const go = (i, smooth = true) => { unzoom(); track.scrollTo({ left: Math.max(0, Math.min(n - 1, i)) * track.clientWidth, behavior: smooth && !reduced ? "smooth" : "auto" }); };
+
+    let pushed = false, done = false;
+    const teardown = () => {
+      if (done) return; done = true; unzoom();
+      document.removeEventListener("keydown", onKey, true); window.removeEventListener("popstate", onPop); window.removeEventListener("resize", onResize);
+      window.removeEventListener("pointermove", onMove); window.removeEventListener("pointerup", onUp); window.removeEventListener("pointercancel", onUp);
+      bg.remove(); document.body.classList.remove("lb-open");
+      if (onClose) onClose(cur);
+      if (prevFocus && prevFocus.focus) prevFocus.focus({ preventScroll: true });
+    };
+    const onPop = () => { pushed = false; teardown(); };
+    const close = () => { if (pushed && history.state && history.state.pgLightbox) { pushed = false; history.back(); setTimeout(teardown, 0); } else teardown(); };
+    const onResize = () => { unzoom(); go(cur, false); };
+    const onKey = (e) => {
+      if (e.key === "Escape") { e.preventDefault(); return close(); }
+      if (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "Home" || e.key === "End") {
+        if (zoomed && (e.key === "ArrowLeft" || e.key === "ArrowRight")) return; // đang phóng to: phím mũi tên để cuộn trong ảnh
+        e.preventDefault(); used(); go(e.key === "ArrowLeft" ? cur - 1 : e.key === "ArrowRight" ? cur + 1 : e.key === "Home" ? 0 : n - 1); return;
+      }
+      if (e.key !== "Tab") return;
+      const f = [...bg.querySelectorAll("button, a[href], .lb-track")].filter((x) => !x.disabled && x.offsetParent !== null); // giữ Tab quay vòng trong popup
+      if (!f.length) return; const a = f[0], z = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === a) { e.preventDefault(); z.focus(); }
+      else if (!e.shiftKey && document.activeElement === z) { e.preventDefault(); a.focus(); }
+    };
+
+    // Chạm/nhấp 2 lần để phóng to hoặc thu nhỏ; nhấp vào vùng trống quanh ảnh thì đóng
+    let lastT = 0, lastX = 0, lastY = 0, moved = false;
+    track.addEventListener("click", (e) => {
+      if (moved) { e.preventDefault(); return; }
+      const sl = e.target.closest(".lb-slide"); if (!sl) return;
+      const now = Date.now(), dbl = now - lastT < 330 && Math.hypot(e.clientX - lastX, e.clientY - lastY) < 30;
+      lastT = now; lastX = e.clientX; lastY = e.clientY;
+      if (dbl) { lastT = 0; if (zoomed) unzoom(); else if (e.target.classList.contains("lb-img")) zoomAt(sl, e.clientX, e.clientY); return; }
+      if (e.target.classList.contains("lb-slide") && !zoomed) setTimeout(() => { if (lastT && Date.now() - lastT >= 320 && !done) close(); }, 340); // nhấp 1 lần vào nền → đóng (đợi xem có phải nhấp đôi không)
+    });
+    // Chuột: kéo để chuyển ảnh (khi chưa phóng) hoặc để di chuyển trong ảnh (khi đã phóng); cảm ứng dùng cuộn gốc
+    let down = null;
+    track.addEventListener("pointerdown", (e) => {
+      if (e.pointerType !== "mouse" || e.button !== 0) return;
+      down = { x: e.clientX, y: e.clientY, tl: track.scrollLeft, sl: zoomed ? zoomed.scrollLeft : 0, st: zoomed ? zoomed.scrollTop : 0, drag: false }; moved = false;
+    });
+    const onMove = (e) => {
+      if (!down) return; const dx = e.clientX - down.x, dy = e.clientY - down.y;
+      if (!down.drag && Math.hypot(dx, dy) > 6) { down.drag = true; moved = true; used(); if (!zoomed) track.classList.add("is-dragging"); }
+      if (!down.drag) return;
+      if (zoomed) { zoomed.scrollLeft = down.sl - dx; zoomed.scrollTop = down.st - dy; } else track.scrollLeft = down.tl - dx;
+    };
+    const onUp = () => {
+      if (!down) return; const d = down.drag; down = null;
+      if (d) { track.classList.remove("is-dragging"); if (!zoomed) go(Math.round(track.scrollLeft / (track.clientWidth || 1)), true); setTimeout(() => { moved = false; }, 0); }
+    };
+    window.addEventListener("pointermove", onMove); window.addEventListener("pointerup", onUp); window.addEventListener("pointercancel", onUp);
+    track.addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
+    ["touchstart", "wheel"].forEach((ev) => track.addEventListener(ev, used, { passive: true, once: true }));
+    const pv = bg.querySelector(".lb-prev"), nx = bg.querySelector(".lb-next");
+    if (pv) { pv.onclick = () => { used(); go(cur - 1); }; nx.onclick = () => { used(); go(cur + 1); }; }
+    bg.querySelector(".lb-close").onclick = close;
+    track.addEventListener("dragstart", (e) => e.preventDefault());
+
+    document.body.classList.add("lb-open"); document.body.appendChild(bg);
+    track.scrollLeft = cur * track.clientWidth; update(); track.focus({ preventScroll: true });
+    document.addEventListener("keydown", onKey, true); window.addEventListener("resize", onResize); window.addEventListener("popstate", onPop);
+    try { history.pushState({ pgLightbox: 1 }, ""); pushed = true; } catch (e) { /* bỏ qua */ }
+  }
+
   /* ---------- Thư viện ảnh vuốt ngang: thêm mũi tên (máy tính), chấm, bộ đếm, gợi ý vuốt, phím ←/→ và kéo bằng chuột ---------- */
   function initGallery(c) {
     if (c.dataset.ready) return; c.dataset.ready = "1";
     const stage = c.querySelector(".pg-stage"), track = c.querySelector(".pg-track"), slides = [...track.children], n = slides.length;
+    let sync = () => {};
+    // Bấm ảnh → popup xem ảnh (không mở tab mới). Nhấp có phím Ctrl/Shift/Alt/Cmd hoặc chuột giữa thì giữ hành vi mở link của trình duyệt.
+    track.addEventListener("click", (e) => {
+      const a = e.target.closest && e.target.closest("a.pg-slide"); if (!a || e.defaultPrevented || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      openLightbox(slides.map((s) => ({ src: s.href, alt: (s.querySelector("img") || {}).alt || "" })), slides.indexOf(a), (i) => sync(i));
+    });
     if (n < 2) return;
     const reduced = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
     const mk = (tag, cls, html, attrs = {}) => { const e = document.createElement(tag); e.className = cls; if (html) e.innerHTML = html; Object.entries(attrs).forEach(([k, v]) => e.setAttribute(k, v)); return e; };
@@ -173,6 +285,7 @@
       prev.disabled = i === 0; next.disabled = i === n - 1;
       stage.classList.toggle("has-prev", track.scrollLeft > 4); stage.classList.toggle("has-next", track.scrollLeft < maxLeft() - 4);
     };
+    sync = (i) => go(i, false); // đóng popup → dải ảnh nhảy tới ảnh vừa xem
     const used = () => c.classList.add("is-used"); // người xem đã tự thao tác → ẩn dòng gợi ý
     track.addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
     window.addEventListener("resize", update);

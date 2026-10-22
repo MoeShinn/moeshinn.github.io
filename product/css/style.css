@@ -218,7 +218,7 @@ body::before {
             text-decoration: none;
         }
 
-/* Minecraft obfuscated (§k) placeholder styling — no runtime scramble,
+/* Minecraft obfuscated (&k) placeholder styling — no runtime scramble,
    just a subtle visual cue that the text is "magic"/hidden. */
 .mc-obfuscated {
     letter-spacing: 1px;
@@ -328,3 +328,30 @@ body.consent-open{overflow:hidden}
 @keyframes pg-wiggle{0%,100%{transform:translateX(-6px)}50%{transform:translateX(6px)}}
 .pg-carousel.is-used .pg-hint{opacity:0;max-height:0;margin:0}
 @media (prefers-reduced-motion:reduce){.pg-hand{animation:none}.pg-track{scroll-behavior:auto}}
+
+/* ---------- Popup xem ảnh (lightbox) — mở khi bấm ảnh trong thư viện (product/js/main.js) ---------- */
+body.lb-open{overflow:hidden}
+.pg-slide{cursor:zoom-in}
+.lb-bg{position:fixed;inset:0;z-index:400;display:flex;flex-direction:column;background:rgba(2,6,14,.96);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);animation:lb-in .18s ease-out}
+@keyframes lb-in{from{opacity:0}to{opacity:1}}
+.lb-top{flex:none;display:flex;align-items:center;gap:8px;padding:max(10px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) 8px max(12px,env(safe-area-inset-left))}
+.lb-count{padding:5px 13px;border-radius:999px;background:rgba(255,255,255,.1);font-weight:800;font-size:14px}
+.lb-sp{flex:1}
+.lb-btn{display:inline-flex;align-items:center;justify-content:center;min-width:42px;min-height:42px;padding:0 15px;border-radius:999px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-weight:700;font-size:14px;text-decoration:none;cursor:pointer}
+.lb-btn:hover,.lb-btn:focus-visible{background:rgba(255,255,255,.2)}
+.lb-track{flex:1 1 auto;min-height:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;outline:none}
+.lb-track::-webkit-scrollbar{display:none}
+.lb-track.is-locked{overflow-x:hidden}
+.lb-track.is-dragging{scroll-snap-type:none;cursor:grabbing}
+.lb-slide{flex:0 0 100%;scroll-snap-align:start;scroll-snap-stop:always;display:flex;overflow:hidden;padding:0 10px}
+.lb-img{margin:auto;max-width:100%;max-height:100%;object-fit:contain;cursor:zoom-in;-webkit-user-drag:none;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.lb-slide.is-zoom{overflow:auto;padding:0;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:thin}
+.lb-slide.is-zoom .lb-img{max-width:none;max-height:none;cursor:grab}
+.lb-nav{display:none;position:absolute;top:50%;z-index:2;width:50px;height:50px;margin-top:-25px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(5,11,22,.7);color:#fff;font-size:30px;line-height:1;align-items:center;justify-content:center;cursor:pointer;transition:opacity .2s}
+.lb-nav:hover,.lb-nav:focus-visible{background:rgba(31,111,214,.9)}
+.lb-nav[disabled]{opacity:0;pointer-events:none}
+.lb-prev{left:14px}.lb-next{right:14px}
+@media (hover:hover) and (pointer:fine){.lb-nav{display:flex}.lb-track:not(.is-locked){cursor:grab}}
+.lb-hint{flex:none;padding:6px 12px max(12px,env(safe-area-inset-bottom));text-align:center;font-size:13px;color:rgba(255,255,255,.72);transition:opacity .4s}
+.lb-bg.is-used .lb-hint{opacity:0}
+@media (prefers-reduced-motion:reduce){.lb-bg{animation:none}}
