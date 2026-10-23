@@ -325,7 +325,7 @@ function renderCards(container, posts) {
 
 function homeTemplate() {
     return `
-    <header class="blog-title-bar"><h1>Shinju Ch.</h1></header>
+    <header class="blog-title-bar"><h1>Bài viết &amp; hướng dẫn</h1></header>
 
     <div class="search-wrap">
       <input type="search" class="search-input" data-search

@@ -213,8 +213,15 @@ const postCard = (p) =>
   `<a class="post-card" href="/post/${encodeURIComponent(p.id)}/"><div class="post-card-photo">` +
   (p.photo ? `<img src="${a(photoUrl(p.photo))}" alt="${a(p.title)}" loading="lazy" />` : "") +
   `</div><div class="post-card-body"><h3 class="post-card-title">${t(p.title)}</h3><div class="post-card-meta"><span>${t(p.date || "")}</span></div></div></a>`;
-const postListHtml = `<div class="page" data-prerender><header class="blog-title-bar"><h1>${t(SITE_NAME)}</h1></header>` +
+const postListHtml = `<div class="page" data-prerender><header class="blog-title-bar"><h1>Bài viết &amp; hướng dẫn</h1></header>` +
   `<section class="post-section"><h2>📝 Bài đăng</h2><div class="post-grid">${publicPosts.map(postCard).join("")}</div></section></div>`;
+
+// Trang chủ: khối "Bài viết mới" có link thẳng tới từng bài (bot thấy bài ngay từ trang chủ, không phải qua /post/).
+const homePostsHtml = publicPosts.length
+  ? `<section class="home-posts" aria-labelledby="home-posts-title"><h2 id="home-posts-title">Bài viết mới</h2><ul>` +
+    publicPosts.slice(0, 6).map((p) => `<li><a href="/post/${encodeURIComponent(p.id)}/">${t(p.title)}</a>${p.date ? ` <time datetime="${a(isoDate(p.date))}">${t(p.date)}</time>` : ""}</li>`).join("") +
+    `</ul><a class="home-posts-all" href="/post/">Xem tất cả bài viết →</a></section>`
+  : "";
 
 const productListHtml = `<div class="page" data-prerender>${PG.bodyHub({ nodes: pnodes, hub: phub })}</div>`;
 const productLd = `<script type="application/ld+json" id="product-jsonld">${ld(PG.ldFor({ seo: pseo, node: null, nodes: pnodes, details: {}, hub: phub }))}</script>`;
@@ -280,6 +287,7 @@ function transform(rel, html) {
     html = html.replace(/(<h1 class="display-name" data-name>)[^<]*(<\/h1>)/, (_m, h, c) => h + t(profile.name || SITE_NAME) + c);
     html = slotAfter(html, /<h1 class="display-name" data-name>[^<]*<\/h1>/, "tagline", homeDesc ? `<p class="site-tagline">${t(homeDesc)}</p>` : "");
     html = slotAfter(html, '<div class="link-list" data-link-list>', "links", homeButtons);
+    html = slotAfter(html, /<!--\/pre:links--><\/div>/, "homeposts", homePostsHtml);
     html = slotAfter(html, "<!-- seo:end -->", "jsonld", jsonLd);
     html = slotAfter(html, "<!--/pre:jsonld-->", "css", inlineCss());
   } else if (rel === "channel/index.html") {

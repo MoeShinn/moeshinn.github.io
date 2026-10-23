@@ -244,3 +244,49 @@ body::before {
     opacity: 0.78;
     text-shadow: 0 1px 4px rgba(0,0,0,0.5);
 }
+
+/* ---------- Khối "Bài viết mới" ở trang chủ (dựng sẵn bởi tools/prerender.js, để bot/AI thấy link bài ngay từ trang chủ) ---------- */
+.home-posts {
+    width: 100%;
+    max-width: 360px;
+    margin: 28px 0 0;
+    text-align: left;
+    color: var(--text-cream);
+}
+.home-posts h2 {
+    margin: 0 0 10px;
+    font-size: 17px;
+    text-align: center;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+.home-posts ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.home-posts li {
+    font-size: 14px;
+    line-height: 1.4;
+    opacity: 0.9;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+.home-posts li a,
+.home-posts-all {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+.home-posts time {
+    opacity: 0.65;
+    font-size: 12px;
+    white-space: nowrap;
+}
+.home-posts-all {
+    display: block;
+    margin-top: 12px;
+    font-size: 14px;
+    text-align: center;
+}
