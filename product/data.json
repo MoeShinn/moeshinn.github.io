@@ -96,6 +96,16 @@
       "order": 1,
       "updated": "2026-10-22",
       "price": "Miễn phí"
+    },
+    {
+      "id": "shikiri-model",
+      "type": "product",
+      "parent": "ezy-model-paid",
+      "title": "Shikiri Model",
+      "thumb": "/image/g8o45mom.webp",
+      "order": 0,
+      "updated": "2026-10-23",
+      "price": "50.000đ"
     }
   ]
 }
