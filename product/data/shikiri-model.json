@@ -8,7 +8,7 @@
   ],
   "buttons": [
     {
-      "label": "Liên hệ",
+      "label": "Liên hệ để mua",
       "url": "/channel",
       "style": "red"
     }
