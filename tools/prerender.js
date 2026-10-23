@@ -138,8 +138,9 @@ if (exists("post/index.html")) {
 
 /* ---- Tải xuống: danh sách cho /download/ (trang từng mục /download/<id>/ do admin tạo) ---- */
 const downloads = (exists("download/data") ? fs.readdirSync(path.join(ROOT, "download/data")).filter((f) => f.endsWith(".json")).sort() : [])
-  .map((f) => { const id = f.replace(/\.json$/, ""), d = json(`download/data/${f}`, {}); return { id, title: d.title || id, description: d.description || "", createdAt: d.createdAt || "" }; })
+  .map((f) => { const id = f.replace(/\.json$/, ""), d = json(`download/data/${f}`, {}); return { id, title: d.title || id, description: d.description || "", keywords: d.keywords || "", createdAt: d.createdAt || "", files: Array.isArray(d.downloads) ? d.downloads.length : 0 }; })
   .filter((d) => exists(`download/${d.id}/index.html`))
+  .sort((x, y) => (Date.parse(y.createdAt) || 0) - (Date.parse(x.createdAt) || 0) || x.id.localeCompare(y.id)) // mới nhất lên đầu
   .sort((x, y) => String(y.createdAt).localeCompare(String(x.createdAt)));
 
 // js/icons.js gán window.MEDIA_ICONS → chạy trong sandbox để lấy màu nền từng nền tảng
@@ -220,10 +221,28 @@ const productLd = `<script type="application/ld+json" id="product-jsonld">${ld(P
 const albumListHtml = AG.bodyHub({ idx: albumIdx });
 const albumLd = `<script type="application/ld+json" id="album-jsonld">${ld(AG.ldFor({ seo: pseo, idx: albumIdx, album: null }))}</script>`;
 
-const downloadListHtml = `<div class="download-card download-index" data-prerender><h1 class="download-title">Tải xuống</h1>` +
-  (downloads.length ? `<p class="download-hint">Chọn một mục để xem chi tiết và tải về.</p><ul class="download-list">${downloads.map((d) =>
-    `<li><a class="download-item" href="/download/${encodeURIComponent(d.id)}/"><span class="download-item-title">${t(d.title)}</span>${d.description ? `<span class="download-item-desc">${t(d.description)}</span>` : ""}</a></li>`).join("")}</ul>`
-    : `<p class="download-hint">Chưa có mục tải xuống nào.</p>`) + `</div>`;
+// Biểu tượng cho thẻ: đoán nhẹ theo từ khóa trong tiêu đề/mô tả/từ khóa của mục tải.
+const dlIcon = (d) => {
+  const x = `${d.title} ${d.keywords} ${d.description}`.toLowerCase();
+  if (/plugin|minecraft|paper|purpur|leaf|spigot/.test(x)) return "🧩";
+  if (/model|vtuber|pngtuber|live2d/.test(x)) return "🎭";
+  if (/tool|công cụ|extractor|picture|nén ảnh|tối ưu/.test(x)) return "🛠️";
+  if (/\bmod\b|fabric|forge/.test(x)) return "⛏️";
+  return "📦";
+};
+const dlDate = (iso) => { const ms = Date.parse(iso); return ms ? new Date(ms + 7 * 3600e3).toISOString().slice(0, 10).split("-").reverse().join("/") : ""; }; // giờ Việt Nam (UTC+7)
+// Trang /download/: lưới thẻ (1 cột trên điện thoại, 2 cột trên màn rộng). download/js/main.js bổ sung: nhãn "Mới", ô tìm kiếm (≥ 4 mục), lượt tải.
+const downloadListHtml = `<div class="dl-hub download-index" data-prerender><header class="dl-hero"><h1 class="download-title">Tải xuống</h1>` +
+  (downloads.length
+    ? `<p class="dl-sub">Chọn một mục để xem chi tiết và tải về.</p><span class="dl-count">${downloads.length} mục</span></header>` +
+      `<div class="dl-search" hidden><input type="search" placeholder="🔍 Tìm trong ${downloads.length} mục…" aria-label="Tìm mục tải xuống" autocomplete="off" /></div>` +
+      `<ul class="dl-grid">${downloads.map((d) =>
+        `<li data-q="${a(`${d.title} ${d.description} ${d.keywords}`)}" data-date="${a(d.createdAt)}"><a class="dl-card" href="/download/${encodeURIComponent(d.id)}/" data-id="${a(d.id)}">` +
+        `<span class="dl-top"><span class="dl-icon" aria-hidden="true">${dlIcon(d)}</span><span class="dl-new" hidden>Mới</span></span>` +
+        `<span class="dl-title">${t(d.title)}</span>${d.description ? `<span class="dl-desc">${t(d.description)}</span>` : ""}` +
+        `<span class="dl-meta">${dlDate(d.createdAt) ? `<span class="dl-chip">📅 ${dlDate(d.createdAt)}</span>` : ""}${d.files ? `<span class="dl-chip">📦 ${d.files} tệp</span>` : ""}<span class="dl-chip dl-dl" hidden>⬇ <b></b></span></span>` +
+        `<span class="dl-cta">Xem &amp; tải về <i aria-hidden="true">›</i></span></a></li>`).join("")}</ul><p class="dl-empty" hidden>Không tìm thấy mục phù hợp.</p>`
+    : `<p class="dl-sub">Chưa có mục tải xuống nào.</p></header>`) + `</div>`;
 
 const sameAs = [...new Set([
   ...(channel.links || []).filter((l) => l.visible !== false).map((l) => l.url),

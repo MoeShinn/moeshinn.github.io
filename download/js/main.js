@@ -342,6 +342,37 @@ async function mountShare(config, fileId) {
     if (window.SiteShare) window.SiteShare.mount(host, { url, title: config.title || document.title });
 }
 
+// Trang danh sách /download/: HTML (lưới thẻ) đã dựng sẵn bởi tools/prerender.js; ở đây chỉ thêm phần cần JS:
+// nhãn "Mới" (14 ngày gần nhất, tính theo giờ người xem nên không bị cũ), ô tìm kiếm (từ 4 mục, không cần gõ dấu) và số lượt tải.
+function initList(root) {
+    const hub = root && root.querySelector(".dl-hub");
+    if (!hub) return;
+    const items = [...hub.querySelectorAll(".dl-grid > li")];
+    const fold = (t) => String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").toLowerCase();
+    const now = Date.now();
+    items.forEach((li) => {
+        const ms = Date.parse(li.dataset.date);
+        if (ms && now >= ms && now - ms < 14 * 864e5) li.querySelector(".dl-new").hidden = false;
+        li._q = fold(li.dataset.q);
+    });
+    const box = hub.querySelector(".dl-search"), input = box && box.querySelector("input"), empty = hub.querySelector(".dl-empty"), countEl = hub.querySelector(".dl-count");
+    if (box && items.length >= 4) {
+        box.hidden = false;
+        input.addEventListener("input", () => {
+            const k = fold(input.value.trim());
+            let n = 0;
+            items.forEach((li) => { const hit = !k || li._q.includes(k); li.hidden = !hit; if (hit) n++; });
+            empty.hidden = n > 0;
+            countEl.textContent = k ? `${n} / ${items.length} mục` : `${items.length} mục`;
+        });
+    }
+    // Lượt tải đọc từ bộ đếm (mỗi mục 1 file nhỏ, chia sẻ cache theo phút); chỉ làm cho 12 mục đầu, lỗi thì bỏ qua.
+    items.slice(0, 12).forEach(async (li) => {
+        const n = await getDownloadCount(li.querySelector(".dl-card").dataset.id);
+        if (n > 0) { const chip = li.querySelector(".dl-dl"); chip.querySelector("b").textContent = formatCount(n); chip.hidden = false; }
+    });
+}
+
 async function main() {
     const fileId = getFileId();
     if (!fileId) {
@@ -351,6 +382,7 @@ async function main() {
             if (root && !root.querySelector(".download-index")) {
                 root.innerHTML = `<div class="download-card download-index"><h1 class="download-title">Tải xuống</h1><p class="download-hint">Danh sách đang được cập nhật, bạn quay lại sau ít phút nhé.</p></div>`;
             }
+            initList(root);
             if (window.SiteLoading) window.SiteLoading.ready();
             return;
         }
