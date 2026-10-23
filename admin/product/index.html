@@ -317,7 +317,8 @@ Admin.boot({ id: "product", title: "Sản phẩm", async render(main) {
       put("description", v("e_desc")); put("keywords", v("e_kw"));
       const lc = lics.map((l) => ({ title: (l.title || "").trim(), text: (l.text || "").trim() })).filter((l) => l.title || l.text); if (lc.length) det.licenses = lc;
       if (!cat) {
-        put("price", v("e_price")); if (det.price) node.price = det.price; // giá cũng ghi vào node để thẻ sản phẩm hiện giá mà không phải tải từng file chi tiết put("body", $("#e_body").value.replace(/\r\n/g, "\n").trim());
+        put("price", v("e_price")); if (det.price) node.price = det.price; /* giá cũng ghi vào node để thẻ sản phẩm hiện giá mà không phải tải từng file chi tiết */
+        put("body", $("#e_body").value.replace(/\r\n/g, "\n").trim());
         if (gal.length) det.gallery = gal;
         if (bt.length) det.buttons = bt.map((b) => ({ label: (b.label || "").trim() || "Mở liên kết", url: b.url.trim(), style: b.style || "blue" }));
         if (!$("#e_cm").checked) det.comments = false;
