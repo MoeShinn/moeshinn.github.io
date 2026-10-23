@@ -26,7 +26,7 @@
     - [Ezy Maker](https://shinjuvn.github.io/product/ezy-maker/): Ezy Maker là công cụ rig layer để biến tranh nhân vật nhiều lớp (PSD, PNG) thành model PNGTuber hoàn chỉnh, thao tác trực quan, không cần kỹ năng kỹ thuật phức tạp. Giá: Miễn phí.
   - [Ezy Model Free](https://shinjuvn.github.io/product/ezy-model-free/) (danh mục): Nhận Ezy Model Free sử dụng cho phần mềm Ezy Tuber với các chính sách & giấy phép liên quan
   - [Ezy Model Trả phí](https://shinjuvn.github.io/product/ezy-model-paid/) (danh mục): Sở hữu ngay Ezy Model Trả Phí dùng cho Ezy Tuber
-    - [Shikiri Model](https://shinjuvn.github.io/product/shikiri-model/) Giá: 50.000đ.
+    - [Shikiri Model](https://shinjuvn.github.io/product/shikiri-model/): Shikiri - EzyTuber Model xanh mint với mái tóc mềm mại, đôi mắt xanh ngọc long và phong cách anime pastel đáng yêu. Giá: 50.000đ.
 - [Công cụ ảnh](https://shinjuvn.github.io/product/photo-tools/) (danh mục): Bộ công cụ ảnh online miễn phí giúp nén ảnh giảm dung lượng, cắt ảnh theo tỷ lệ tùy chọn và đổi định dạng JPG, PNG, WebP. Xử lý nhanh, an toàn, không cần đăng ký.
   - [Chuyển đổi định dạng ảnh](https://shinjuvn.github.io/product/convert-image/): Chuyển đổi định dạng ảnh online miễn phí: đổi JPG, PNG, WebP, AVIF hàng loạt ngay trên trình duyệt, không tải ảnh lên máy chủ, xuất zip một lần. Giá: Miễn phí.
   - [Cắt ảnh theo tỉ lệ](https://shinjuvn.github.io/product/crop-image/): Cắt ảnh online miễn phí theo tỉ lệ tùy chọn (1:1, 4:3, 16:9, 9:16, 4:5…), chọn nhiều ảnh, chỉnh vùng cắt từng ảnh trực tiếp và xuất zip. Chạy ngay trên trình duyệt. Giá: Miễn phí.
