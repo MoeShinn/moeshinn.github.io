@@ -7,7 +7,8 @@
    Dữ liệu (cây danh mục không giới hạn tầng):
    • product/data.json        { title?, intro?, nodes: [ { id, type: "category"|"product", parent: ""|<id>, title, thumb, order, updated } ] }
    • product/data/<id>.json   chi tiết từng mục: description, keywords, licenses[{title,text}], consent (false = không bắt tích đồng ý chính sách trước khi bấm nút); sản phẩm thêm: price, body (Markdown-lite),
-                               gallery[], buttons[{label,url,style}], comments:false
+                               gallery[], buttons[{label,url,style}], comments:false,
+                               illustrative:true (hiện chữ nổi bật "Hình ảnh chỉ mang tính chất minh hoạ"), aiImage:true (hiện "Ảnh được tạo bởi AI") — tích 1, cả 2 hoặc không cái nào
    Địa chỉ mọi mục đều phẳng: /product/<id>/ (id là slug duy nhất trên toàn cây). */
 (function (root, factory) { if (typeof module === "object" && module.exports) module.exports = factory(); else root.ProductGen = factory(); })(typeof window !== "undefined" ? window : this, function () {
   const t = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -62,6 +63,11 @@
   const grid = (list) => `<div class="post-grid">${list.map(card).join("") || '<p class="empty-msg">Chưa có mục nào.</p>'}</div>`;
   const crumbs = (nodes, id, hubTitle) => { const p = path(nodes, id); return `<nav class="breadcrumb" aria-label="Breadcrumb"><a href="/product/">${t(hubTitle || HUB)}</a>${p.map((n, i) => i === p.length - 1 ? `<span aria-current="page">${t(n.title)}</span>` : `<a href="${a(url(n.id))}">${t(n.title)}</a>`).join("")}</nav>`; };
   const BTN = { blue: "blue", green: "green", red: "red", gray: "gray" };
+  // Chữ nổi bật dưới ảnh sản phẩm: "chỉ mang tính minh hoạ" và/hoặc "ảnh do AI tạo" (tích 1, cả 2 hoặc không cái nào)
+  const imgNoteHtml = (d) => {
+    const L = []; if (d && d.illustrative === true) L.push("⚠️ Hình ảnh chỉ mang tính chất minh hoạ"); if (d && d.aiImage === true) L.push("🤖 Ảnh được tạo bởi AI");
+    return L.length ? `<div class="img-note" role="note">${L.map((x) => `<p>${t(x)}</p>`).join("")}</div>` : "";
+  };
 
 
   /* ---------------- Trang công cụ (chi tiết có trường "tool") ----------------
@@ -80,7 +86,7 @@
       (faq.length ? `<section class="post-section tool-faq"><h2>❓ Câu hỏi thường gặp</h2>${faq.map((f) => `<details class="faq-item"><summary>${t(f.q)}</summary><div>${textHtml(f.a)}</div></details>`).join("")}</section>` : "");
   }
   function bodyTool({ node, d, bc, head, desc, bodyHtml, lic }) {
-    return `<article class="product-article tool-article" data-tool="${a(d.tool)}">${bc}${head}${d.price ? `<div class="product-price">${t(d.price)}</div>` : ""}${desc}` +
+    return `<article class="product-article tool-article" data-tool="${a(d.tool)}">${bc}${head}${d.price ? `<div class="product-price">${t(d.price)}</div>` : ""}${imgNoteHtml(d)}${desc}` +
       `<section class="tool-app" data-tool-root aria-label="${a(node.title)}"><p class="t-boot">Công cụ chạy ngay trên trình duyệt của bạn, ảnh không bị tải lên máy chủ.</p><noscript><p class="empty-msg">Hãy bật JavaScript để dùng công cụ này.</p></noscript></section>` +
       `<div class="tool-info">${toolInfoHtml(d)}</div>` + (bodyHtml ? `<div class="post-body product-body">${bodyHtml}</div>` : "") +
       `<div class="product-meta" data-views-wrap hidden></div><div class="post-share" data-share></div>${lic}</article>`;
@@ -101,7 +107,7 @@
     if (isTool(node, d)) return bodyTool({ node, d, bc, head, desc, bodyHtml, lic });
     const gallery = (d.gallery || []).filter(imgOk), btns = (d.buttons || []).filter((b) => b && String(b.url || "").trim());
     return `<article class="product-article">${bc}${head}${d.price ? `<div class="product-price">${t(d.price)}</div>` : ""}` +
-      (imgSrc(node.thumb) ? `<div class="product-hero"><img src="${a(imgSrc(node.thumb))}" alt="${a(node.title)}" /></div>` : "") + desc +
+      (imgSrc(node.thumb) ? `<div class="product-hero"><img src="${a(imgSrc(node.thumb))}" alt="${a(node.title)}" /></div>` : "") + imgNoteHtml(d) + desc +
       (bodyHtml ? `<div class="post-body product-body">${bodyHtml}</div>` : "") +
       (gallery.length ? `<section class="post-section"><h2>🖼️ Hình ảnh</h2><div class="pg-carousel" data-gallery data-count="${gallery.length}"><div class="pg-stage"><div class="pg-track" tabindex="0" role="group" aria-label="Thư viện ảnh${gallery.length > 1 ? ", vuốt ngang để xem thêm" : ""}">${gallery.map((g, i) => `<a class="pg-slide" href="${a(g)}" target="_blank" rel="noopener noreferrer"><img src="${a(g)}" alt="${a(node.title + " " + (i + 1))}" loading="lazy" decoding="async" draggable="false" /></a>`).join("")}</div></div></div></section>` : "") +
       (btns.length ? `<div class="product-actions">${btns.map((b) => { const h = safeHref(b.url), ext = isHttp(h) ? ' target="_blank" rel="noopener noreferrer"' : ""; return `<a class="product-btn ${BTN[b.style] || "blue"}" href="${a(h)}"${ext}${gate}>${t(b.label || "Mở liên kết")}</a>`; }).join("")}</div>` : "") +

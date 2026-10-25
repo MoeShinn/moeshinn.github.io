@@ -217,6 +217,9 @@ Admin.boot({ id: "product", title: "Sản phẩm", async render(main) {
       <button type="button" class="ghost" id="e_ai">✨ AI gợi ý mô tả và từ khóa</button> <span class="hint">AI chỉ điền gợi ý, ông xem lại rồi mới lưu.</span></div>
     ${cat ? "" : `<div class="card"><h3>Thông tin sản phẩm</h3>
       <label>Giá (tuỳ chọn, ví dụ: Miễn phí, 50.000đ)<input id="e_price" value="${esc(d.price || "")}" placeholder="Miễn phí"></label>
+      <div class="fld" style="margin:10px 0 4px">Chữ nổi bật dưới ảnh (tích 1, cả 2 hoặc không cái nào)
+        <label class="row"><input type="checkbox" id="e_il" ${d.illustrative === true ? "checked" : ""}>⚠️ Hình ảnh chỉ mang tính chất minh hoạ</label>
+        <label class="row"><input type="checkbox" id="e_aiimg" ${d.aiImage === true ? "checked" : ""}>🤖 Ảnh được tạo bởi AI</label></div>
       <label>Nội dung giới thiệu (Markdown-lite giống bài đăng: ảnh, link, nút, mã màu §a…)</label>
       <div class="tb"><button type="button" data-ins="img">🖼 Ảnh</button><button type="button" data-ins="link">🔗 Link</button><button type="button" data-ins="btn">🔘 Nút</button><button type="button" data-ins="b">B Đậm</button><button type="button" data-ins="color">🎨 Màu</button><button type="button" class="ghost" id="e_prev">👁 Xem trước</button></div>
       <div id="e_sw" style="display:none;gap:4px;flex-wrap:wrap;margin:6px 0"></div>
@@ -312,13 +315,15 @@ Admin.boot({ id: "product", title: "Sản phẩm", async render(main) {
       const prev = old && (old.parent || "") === parent ? old.order : (sibs.reduce((m, n) => Math.max(m, n.order ?? 0), -1) + 1);
       const node = { id, type, parent, title, thumb: th, order: prev ?? 0, updated: today() };
       if (old) nodes[nodes.findIndex((n) => n.id === id)] = node; else nodes.push(node);
-      const det = { ...d }; for (const k of ["price", "body", "gallery", "buttons", "licenses", "description", "keywords", "comments", "consent"]) delete det[k];
+      const det = { ...d }; for (const k of ["price", "body", "gallery", "buttons", "licenses", "description", "keywords", "comments", "consent", "illustrative", "aiImage"]) delete det[k];
       const put = (k, val) => { if (val) det[k] = val; };
       put("description", v("e_desc")); put("keywords", v("e_kw"));
       const lc = lics.map((l) => ({ title: (l.title || "").trim(), text: (l.text || "").trim() })).filter((l) => l.title || l.text); if (lc.length) det.licenses = lc;
       if (!cat) {
         put("price", v("e_price")); if (det.price) node.price = det.price; /* giá cũng ghi vào node để thẻ sản phẩm hiện giá mà không phải tải từng file chi tiết */
         put("body", $("#e_body").value.replace(/\r\n/g, "\n").trim());
+        if ($("#e_il").checked) det.illustrative = true;
+        if ($("#e_aiimg").checked) det.aiImage = true;
         if (gal.length) det.gallery = gal;
         if (bt.length) det.buttons = bt.map((b) => ({ label: (b.label || "").trim() || "Mở liên kết", url: b.url.trim(), style: b.style || "blue" }));
         if (!$("#e_cm").checked) det.comments = false;

@@ -241,6 +241,9 @@ body::before {
 .product-article .blog-title-bar{margin-bottom:12px}
 .product-article .blog-title-bar h1{font-size:26px;line-height:1.35}
 .product-price{width:fit-content;margin:0 auto 18px;padding:5px 16px;border-radius:999px;font-weight:800;font-size:15px;color:#f4fff0;background:linear-gradient(180deg,var(--green-1),var(--green-2))}
+.img-note{width:fit-content;max-width:100%;margin:-8px auto 18px;padding:8px 16px;border-radius:12px;text-align:center;background:rgba(255,196,64,.14);border:1px solid rgba(255,196,64,.55)}
+.img-note p{margin:0;font-weight:800;font-size:15px;line-height:1.5;color:#ffd466;text-shadow:0 1px 6px rgba(0,0,0,.45)}
+.img-note p+p{margin-top:2px}
 .product-hero{margin:0 auto 20px;max-width:420px}
 .product-hero img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:14px;display:block;box-shadow:0 10px 26px rgba(0,0,0,.4)}
 .product-article .product-desc{margin-bottom:20px}
