@@ -93,7 +93,7 @@
       "parent": "ezy-software",
       "title": "Ezy Maker",
       "thumb": "/image/8tom4y3p.webp",
-      "order": 1,
+      "order": 2,
       "updated": "2026-10-22",
       "price": "Miễn phí"
     },
@@ -113,7 +113,7 @@
       "parent": "ezy-software",
       "title": "Ezy All in 1",
       "thumb": "/image/ewloog8v.webp",
-      "order": 2,
+      "order": 1,
       "updated": "2026-10-25"
     }
   ]
