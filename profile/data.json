@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "theme": {
+    "primary": "#4cc9f0",
+    "accent": "#ffd23f",
+    "ink": "#15171c"
+  },
+  "background": {
+    "mode": "pattern",
+    "image": "",
+    "color": "#4cc9f0",
+    "fit": "cover",
+    "fixed": true,
+    "dim": 0
+  },
+  "hero": {
+    "avatar": "/assets/avatar/avatar-336.webp",
+    "name": "Shinju Ch.",
+    "tagline": "PNGtuber (Ezy Tuber) Việt Nam",
+    "intro": "Xin chào, mình là **Shinn Moeji**, người đứng sau kênh **Shinju Ch. [VNer]**. Mình là một PNGtuber Việt Nam dùng **Ezy Tuber** (ảnh tĩnh gắn khớp để chuyển động, kiểu PNGTuber+), làm nội dung game, trò chuyện, reaction và livestream trên **YouTube**."
+  },
+  "sections": [
+    {
+      "id": "lore",
+      "type": "text",
+      "enabled": true,
+      "nav": "Lore",
+      "title": "Lore",
+      "body": "",
+      "image": ""
+    },
+    {
+      "id": "info",
+      "type": "info",
+      "enabled": true,
+      "nav": "Thông tin",
+      "title": "Thông tin cơ bản",
+      "rows": [
+        {
+          "label": "Tên",
+          "value": "Shinn Moeji"
+        },
+        {
+          "label": "Tên kênh",
+          "value": "Shinju Ch. [VNer]"
+        },
+        {
+          "label": "Thể loại",
+          "value": "PNGtuber, dùng Ezy Tuber (ảnh tĩnh gắn khớp chuyển động, kiểu PNGTuber+)"
+        },
+        {
+          "label": "Quốc gia",
+          "value": "Việt Nam"
+        },
+        {
+          "label": "Nền tảng",
+          "value": "YouTube"
+        },
+        {
+          "label": "Nội dung",
+          "value": "Game, trò chuyện, reaction, livestream"
+        }
+      ],
+      "image": ""
+    },
+    {
+      "id": "fan",
+      "type": "fan",
+      "enabled": true,
+      "nav": "Fan name",
+      "title": "Fan name",
+      "body": "",
+      "oshiLabel": "Oshi mark",
+      "oshi": "",
+      "images": []
+    },
+    {
+      "id": "models",
+      "type": "models",
+      "enabled": true,
+      "nav": "Outfits",
+      "title": "Outfits",
+      "items": []
+    },
+    {
+      "id": "social",
+      "type": "social",
+      "enabled": true,
+      "nav": "Social media",
+      "title": "Social media"
+    }
+  ]
+}

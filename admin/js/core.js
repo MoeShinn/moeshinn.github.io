@@ -9,6 +9,7 @@
     ["product", "Sản phẩm", "/admin/product/"],
     ["download", "Download", "/admin/download/"],
     ["channel", "Kênh", "/admin/channel/"],
+    ["profile", "Hồ sơ Vtuber", "/admin/profile/"],
     ["donate", "Donate", "/admin/donate/"],
     ["links", "Link rút gọn", "/admin/links/"],
     ["images", "Kho ảnh", "/admin/images/"],
@@ -92,10 +93,12 @@
     try { localStorage.setItem(BYPASS, String(session().exp * 1000)); } catch {}
     const nav = NAV.map(([k, label, url, soon]) =>
       soon ? `<span class="soon">${label}<small>sắp có</small></span>` : `<a href="${url}" class="${k === id ? "on" : ""}">${label}</a>`).join("");
-    root.innerHTML = `<div class="layout"><nav class="side"><div class="brand">Shinju Admin</div>${nav}
+    root.innerHTML = `<div class="layout"><nav class="side"><div class="brand">Shinju Admin</div><div class="navlist" id="navlist">${nav}</div>
       <div class="foot"><span id="left"></span><button class="ghost" id="out">Đăng xuất</button></div></nav><main id="main"></main></div>`;
     const tick = () => { const s = session(); if (!s) return location.reload(); $("#left").textContent = "Phiên còn " + Math.max(1, Math.round((s.exp * 1000 - Date.now()) / 60000)) + " phút"; };
     tick(); setInterval(tick, 30000);
+    const nl = $("#navlist"), on = nl && nl.querySelector("a.on"); // mục đang mở nằm ngoài tầm nhìn (danh sách dài) → tự cuộn tới giữa khung
+    if (on) { if (nl.scrollHeight > nl.clientHeight) nl.scrollTop = on.offsetTop - nl.clientHeight / 2 + on.offsetHeight / 2; else nl.scrollLeft = on.offsetLeft - nl.clientWidth / 2 + on.offsetWidth / 2; }
     $("#out").onclick = () => { sessionStorage.removeItem(KEY); location.reload(); };
     render($("#main"));
   }

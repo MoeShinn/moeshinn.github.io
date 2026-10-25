@@ -9,6 +9,7 @@
      1. Gỡ markup màn hình chờ khỏi mọi trang HTML (js/loading.js tự dựng overlay cho người dùng thật).
      2. Điền sẵn vào HTML: menu, avatar + tên + các nút trang chủ, trang Kênh, trang Donate,
         danh sách bài ở /post/, JSON-LD (WebSite + Person) ở trang chủ.
+     2b. Trang /profile (hồ sơ Vtuber): dựng sẵn nội dung thật từ profile/data.json + JSON-LD ProfilePage + biến màu (dùng chung profile/js/profilegen.js).
      3. Tạo llms.txt (mục lục dạng văn bản cho các công cụ AI).
    3b. Dựng lại trang tĩnh /post/<id>/ từ post/data/<id>.md (dùng chung admin/js/postgen.js + post/js/render.js) để sửa bộ render
        là mọi bài cũ tự cập nhật theo, không phải mở admin bấm lưu lại từng bài; dựng danh sách /download/ từ download/data/*.json.
@@ -27,6 +28,7 @@ const vm = require("vm");
 const PG = require("../product/js/productgen.js");
 const AG = require("../assets/album/albumgen.js");
 const POSTGEN = require("../admin/js/postgen.js");
+let PF = null; try { PF = require("../profile/js/profilegen.js"); } catch (e) { console.warn("Bỏ qua trang /profile: " + e.message); }
 
 const ROOT = path.resolve(__dirname, "..");
 const CHECK = process.argv.includes("--check");
@@ -147,6 +149,14 @@ const downloads = (exists("download/data") ? fs.readdirSync(path.join(ROOT, "dow
 const ICONS = (() => {
   try { const w = {}; vm.runInNewContext(rd("js/icons.js"), { window: w }); return w.MEDIA_ICONS || {}; } catch (e) { return {}; }
 })();
+
+/* ---- Hồ sơ Vtuber: profile/data.json + mạng xã hội từ channel/data.json (bỏ mục Liên hệ) → HTML thật + JSON-LD + biến màu ---- */
+const profileData = PF ? PF.normalize(json("profile/data.json", {})) : null;
+const pfCtx = PF ? { links: PF.socialLinks(channel, ICONS), icons: ICONS, site: SITE, url: SITE + "/profile/", siteName: SITE_NAME } : null;
+const pfSeo = ((seo.pages || {}).profile) || {};
+const pfHtml = PF && exists("profile/index.html") ? PF.page(profileData, pfCtx) : "";
+const pfLd = PF ? `<script type="application/ld+json" id="profile-jsonld">${ld(PF.ldFor(profileData, pfCtx, { title: pfSeo.title, description: pfSeo.description }))}</script>` : "";
+const pfVars = PF ? `<style id="pf-vars">${PF.varsCss(profileData)}</style>` : "";
 
 const publicPosts = posts
   .filter((p) => !p.visibility || p.visibility === "public")
@@ -294,6 +304,10 @@ function transform(rel, html) {
     html = html.replace(/<img data-avatar src="[^"]*" alt="[^"]*"(?: width="\d+" height="\d+" fetchpriority="high"(?: srcset="[^"]*")?)? \/>/, `<img data-avatar src="${a(avatar)}" alt="${a(profile.name || SITE_NAME)}" width="168" height="168" fetchpriority="high"${srcsetFor(avatar)} />`);
     html = html.replace(/(<h1 class="display-name" data-name>)[^<]*(<\/h1>)/, (_m, h, c) => h + t(profile.name || SITE_NAME) + c);
     html = slotAfter(html, '<div class="link-list" data-link-list>', "links", channelHtml);
+  } else if (rel === "profile/index.html" && PF) {
+    html = slotAfter(html, '<div id="pf-root" class="pf-root">', "profile", pfHtml);
+    html = slotAfter(html, "<!-- seo:end -->", "jsonld", pfLd);
+    html = slotAfter(html, "<!--/pre:jsonld-->", "pfvars", pfVars);
   } else if (rel === "donate/index.html") {
     if (donate.title) html = html.replace(/(<h1 class="page-title" data-title>)[^<]*(<\/h1>)/, (_m, h, c) => h + t(donate.title) + c);
     html = slotAfter(html, '<div class="method-list" data-method-list>', "methods", donateHtml);
@@ -331,6 +345,7 @@ function buildLlms() {
     const u = clean(p.url);
     L.push(`- [${p.label}](${SITE}${u.startsWith("/") ? u : "/" + u})`);
   });
+  if (PF && exists("profile/index.html")) L.push("", "## Hồ sơ Vtuber", "", ...PF.llmsLines(profileData, pfCtx));
   if (publicPosts.length) {
     L.push("", "## Bài đăng", "");
     publicPosts.forEach((p) => {
@@ -378,6 +393,7 @@ function patchSitemap(xml) {
   let out = xml.replace(/[ \t]*<url><loc>([^<]*)<\/loc>(?:<lastmod>[^<]*<\/lastmod>)?<\/url>\r?\n?/g, (m, loc) => (dropPath(loc) || (prefixes.some((p) => loc.startsWith(p)) && /\/$/.test(loc)) ? "" : m));
   if (!downloads.length) out = out.replace(new RegExp(`[ \\t]*<url><loc>${escRe(SITE)}/download/</loc>(?:<lastmod>[^<]*</lastmod>)?</url>\\r?\\n?`), "");
   else if (!out.includes(`<loc>${SITE}/download/</loc>`)) out = out.replace(/<\/urlset>/, () => `  <url><loc>${SITE}/download/</loc></url>\n</urlset>`);
+  if (PF && exists("profile/index.html") && !out.includes(`<loc>${SITE}/profile/</loc>`)) out = out.replace(/<\/urlset>/, () => `  <url><loc>${SITE}/profile/</loc></url>\n</urlset>`);
   const urls = (pnodes.length ? PG.allUrls(pseo, pnodes) : []).concat(AG.allUrls(pseo, albumIdx));
   if (!urls.length) return out;
   const lines = urls.map((u) => `  <url><loc>${t(u.loc)}</loc>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ""}</url>\n`).join("");

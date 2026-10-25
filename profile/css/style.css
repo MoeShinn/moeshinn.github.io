@@ -1,0 +1,132 @@
+/* profile/css/style.css — trang /profile.
+   Phong cách riêng theo bộ model "New Model": tóc xanh da trời, áo trắng–đen–vàng, họa tiết dấu × / dây đai / thẻ tam giác.
+   → viền đen dày, bóng cứng (không mờ), băng cảnh báo vàng–đen, nút nhấn như tem dán.
+   Ba màu chính đổi được ở /admin/profile (biến --pf-*). */
+:root{--pf-primary:#4cc9f0;--pf-accent:#ffd23f;--pf-ink:#15171c;--pf-paper:#fff;--pf-soft:#e8f8fe;--pf-font:"Baloo 2","Baloo 2 Fallback","Segoe UI",system-ui,sans-serif}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{margin:0;min-height:100vh;position:relative;background:var(--pf-primary);color:var(--pf-ink);font-family:var(--pf-font);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+img{max-width:100%}
+a{color:inherit}
+
+/* ---------- Nền (đặt z-index -3 để nền động của js/theme.js, nếu bật, nằm phía trên) ---------- */
+.pf-bg{position:fixed;inset:0;z-index:-3;background-color:var(--pf-primary);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 22l16 16M38 22L22 38' stroke='%23fff' stroke-opacity='.8' stroke-width='6'/%3E%3Cpath d='M112 98l12 12M124 98l-12 12' stroke='%2315171c' stroke-opacity='.8' stroke-width='5'/%3E%3Cpath d='M118 26l10 17h-20z' stroke='%23fff' stroke-opacity='.65' stroke-width='3'/%3E%3Cpath d='M52 112l10 10M62 112l-10 10' stroke='%23ffd23f' stroke-width='5'/%3E%3C/g%3E%3Ccircle cx='86' cy='70' r='3.5' fill='%23fff' fill-opacity='.75'/%3E%3Ccircle cx='24' cy='128' r='3' fill='%23fff' fill-opacity='.55'/%3E%3Ccircle cx='140' cy='140' r='3' fill='%23ffd23f'/%3E%3C/svg%3E");
+  background-size:160px 160px}
+.pf-bg--scroll{position:absolute}
+.pf-bg--cover{background-size:cover;background-position:center;background-repeat:no-repeat}
+.pf-bg--contain{background-size:contain;background-position:center;background-repeat:no-repeat}
+.pf-bg--tile{background-size:auto;background-repeat:repeat}
+.pf-bg--color{background-image:none}
+.pf-dim{position:fixed;inset:0;z-index:-2;background:#000;opacity:0;pointer-events:none}
+
+/* ---------- Khung trang ---------- */
+.pf-page{position:relative;z-index:1;width:100%;max-width:860px;margin:0 auto;padding:34px 18px calc(34px + env(safe-area-inset-bottom,0px))}
+.pf-root{display:flex;flex-direction:column;align-items:center;gap:28px;width:100%}
+.pf-hero,.pf-sec{width:100%}
+.pf-sec{display:flex;flex-direction:column;align-items:center;gap:28px}
+
+/* ---------- Thẻ (card) ---------- */
+.pf-card{position:relative;width:100%;background:var(--pf-paper);border:4px solid var(--pf-ink);border-radius:34px 8px 34px 8px;box-shadow:9px 9px 0 var(--pf-ink);
+  padding:clamp(28px,5vw,46px) clamp(18px,5vw,44px) clamp(24px,4vw,40px);text-align:center}
+.pf-card::before{content:"";position:absolute;top:-17px;left:28px;width:104px;height:18px;border:3px solid var(--pf-ink);border-radius:4px;transform:rotate(-3deg);
+  background:repeating-linear-gradient(-45deg,var(--pf-accent) 0 9px,var(--pf-ink) 9px 18px)}
+@media(max-width:560px){.pf-card{box-shadow:6px 6px 0 var(--pf-ink);border-width:3px;border-radius:26px 6px 26px 6px}}
+
+/* ---------- Đầu trang ---------- */
+.pf-hero{display:flex;flex-direction:column;align-items:center}
+.pf-avatar{position:relative;z-index:2;width:clamp(124px,30vw,168px);aspect-ratio:1;margin-bottom:-46px;border-radius:50%;border:5px solid var(--pf-ink);background:var(--pf-paper);
+  box-shadow:0 0 0 7px var(--pf-accent),8px 10px 0 7px var(--pf-ink);animation:pf-pop .75s cubic-bezier(.2,1.5,.4,1) both}
+.pf-avatar img{display:block;width:100%;height:100%;border-radius:50%;object-fit:cover}
+.pf-avatar::after{content:"";position:absolute;right:-8px;bottom:4px;width:40px;height:40px;border-radius:50%;border:3px solid var(--pf-accent);
+  background:var(--pf-ink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 6l12 12M18 6L6 18' stroke='%23fff' stroke-width='4.5' stroke-linecap='round'/%3E%3C/svg%3E") center/58% no-repeat}
+.pf-hero-card.pf-has-avatar{padding-top:clamp(66px,12vw,80px)}
+.pf-name{margin:0 0 4px;font-size:clamp(34px,9.5vw,66px);line-height:1;font-weight:800;text-transform:uppercase;overflow-wrap:anywhere;
+  text-shadow:3px 3px 0 var(--pf-primary),6px 6px 0 var(--pf-accent)}
+.pf-tagline{display:inline-block;margin:12px 0 16px;padding:3px 16px 4px;background:var(--pf-ink);color:var(--pf-accent);border-radius:999px;font-weight:700;font-size:clamp(14px,3.6vw,18px);transform:rotate(-1deg)}
+@keyframes pf-pop{from{opacity:0;transform:scale(.6) rotate(-14deg)}to{opacity:1;transform:none}}
+
+/* ---------- Chữ ---------- */
+.pf-rich{font-size:clamp(16px,3.9vw,18.5px);line-height:1.7;font-weight:500;overflow-wrap:anywhere}
+.pf-rich p{margin:0 0 14px}.pf-rich>:last-child{margin-bottom:0}
+.pf-rich strong{font-weight:800}
+.pf-hr{border:0;height:6px;width:96px;margin:22px auto;background:repeating-linear-gradient(90deg,var(--pf-ink) 0 10px,transparent 10px 18px)}
+.pf-title{margin:0 0 22px;font-size:clamp(28px,7.4vw,46px);line-height:1.08;font-weight:800;text-transform:uppercase;overflow-wrap:anywhere}
+.pf-title span{padding:0 .16em;background:linear-gradient(transparent 56%,var(--pf-accent) 56% 92%,transparent 92%);-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.pf-model .pf-title{margin-bottom:12px}
+.pf-sticker{align-self:center;margin:0 0 -4px;padding:6px 22px 8px;background:var(--pf-ink);color:#fff;border:4px solid var(--pf-ink);border-radius:6px 22px 6px 22px;
+  box-shadow:5px 5px 0 var(--pf-accent);font-size:clamp(22px,6vw,32px);font-weight:800;line-height:1.1;text-transform:uppercase;transform:rotate(-1.5deg);text-align:center}
+
+/* ---------- Nút ---------- */
+.pf-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:13px 22px 12px;border:4px solid var(--pf-ink);border-radius:16px 4px 16px 4px;background:var(--pf-accent);color:var(--pf-ink);
+  font:800 17px/1.1 var(--pf-font);letter-spacing:.05em;text-transform:uppercase;text-decoration:none;text-align:center;cursor:pointer;box-shadow:0 7px 0 var(--pf-ink);
+  transition:transform .12s ease,box-shadow .12s ease,background .12s ease,color .12s ease}
+.pf-btn:hover{transform:translateY(3px);box-shadow:0 4px 0 var(--pf-ink);background:#fff}
+.pf-btn:active{transform:translateY(7px);box-shadow:0 0 0 var(--pf-ink)}
+.pf-btn:focus-visible,.pf-zoom:focus-visible,.pf-soc:focus-visible{outline:4px solid #fff;outline-offset:3px;box-shadow:0 0 0 7px var(--pf-ink)}
+.pf-x{width:1.05em;height:1.05em;flex:none}
+.pf-nav{display:flex;flex-wrap:wrap;justify-content:center;width:100%;gap:18px 14px;margin:6px 0 4px}
+.pf-nav .pf-btn{flex:1 1 190px;max-width:260px}
+.pf-nav .pf-btn:nth-child(even){background:#fff}
+.pf-nav .pf-btn:nth-child(even):hover{background:var(--pf-accent)}
+.pf-next{min-width:min(100%,280px);background:var(--pf-ink);color:#fff}
+.pf-next:hover{background:var(--pf-accent);color:var(--pf-ink)}
+.pf-next .pf-x{color:var(--pf-accent)}.pf-next:hover .pf-x{color:var(--pf-ink)}
+
+/* ---------- Bảng thông tin ---------- */
+.pf-rows{display:grid;gap:12px;margin:0;text-align:left}
+.pf-row{display:grid;grid-template-columns:minmax(112px,32%) 1fr;border:3px solid var(--pf-ink);border-radius:14px 4px 14px 4px;overflow:hidden;background:var(--pf-soft)}
+.pf-row--solo{grid-template-columns:1fr}
+.pf-row dt{margin:0;padding:9px 14px;display:flex;align-items:center;background:var(--pf-ink);color:var(--pf-accent);font-size:14px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;overflow-wrap:anywhere}
+.pf-row dd{margin:0;padding:9px 16px;display:flex;align-items:center;font-size:clamp(16px,3.9vw,18px);font-weight:600;overflow-wrap:anywhere}
+@media(max-width:520px){.pf-row{grid-template-columns:1fr}}
+
+/* ---------- Ảnh ---------- */
+.pf-media{margin:26px 0 0;padding:12px;border:3px dashed var(--pf-primary);border-radius:20px;background:radial-gradient(circle at 50% 30%,#fff,var(--pf-soft))}
+.pf-model>.pf-media:first-of-type,.pf-card>.pf-media:first-child{margin-top:0}
+.pf-zoom{display:block;width:100%;padding:0;border:0;background:none;cursor:zoom-in;border-radius:12px}
+.pf-media img{display:block;margin:0 auto;max-width:100%;height:auto;max-height:min(86vh,980px);object-fit:contain;border-radius:12px}
+.pf-wide{padding:0;border:4px solid var(--pf-ink);border-radius:16px 4px 16px 4px;background:var(--pf-soft);overflow:hidden}
+.pf-wide .pf-zoom{border-radius:0}.pf-wide img{width:100%;max-height:none;border-radius:0}
+.pf-card>.pf-rich+.pf-media,.pf-card>.pf-rows+.pf-media,.pf-card>.pf-reveal+.pf-media{margin-top:26px}
+.pf-model .pf-media+.pf-rows,.pf-model .pf-media+.pf-note,.pf-model .pf-rows+.pf-note{margin-top:22px}
+.pf-reveal{margin:0 0 20px;display:inline-block;padding:2px 16px;border:3px solid var(--pf-ink);border-radius:999px;background:var(--pf-soft);font-size:18px}
+.pf-model .pf-title+.pf-media{margin-top:6px}
+
+/* ---------- Fan name ---------- */
+.pf-fan{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:26px;align-items:center}
+.pf-fan--solo{grid-template-columns:1fr}
+.pf-fan-imgs{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:14px}
+.pf-fan-imgs li{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0}
+.pf-fan-imgs .pf-media{margin:0;width:100%;padding:8px}
+.pf-tag{display:inline-block;padding:1px 14px 2px;border:3px solid var(--pf-ink);border-radius:999px;background:var(--pf-accent);font-size:15px;font-weight:800;transform:rotate(-2deg)}
+.pf-oshi{display:inline-flex;align-items:center;flex-wrap:wrap;justify-content:center;gap:8px;margin:12px 0 0;padding:5px 18px;border:3px solid var(--pf-ink);border-radius:999px;background:var(--pf-soft);font-size:20px}
+.pf-fan-text .pf-rich+.pf-oshi{margin-top:14px}
+@media(max-width:640px){.pf-fan{grid-template-columns:1fr}}
+
+/* ---------- Outfits / model ---------- */
+.pf-sec-models{gap:30px}
+.pf-model{padding-top:clamp(30px,5vw,44px)}
+
+/* ---------- Mạng xã hội ---------- */
+.pf-sec-social{gap:22px}
+.pf-social{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;justify-content:center;gap:20px 18px}
+.pf-social li{display:flex;flex-direction:column;align-items:center;gap:8px;width:96px}
+.pf-soc{width:74px;height:74px;display:grid;place-items:center;border-radius:50%;border:4px solid var(--pf-ink);box-shadow:0 0 0 5px var(--pf-accent),6px 8px 0 5px var(--pf-ink);text-decoration:none;
+  transition:transform .15s cubic-bezier(.3,1.6,.5,1)}
+.pf-soc:hover{transform:translateY(-4px) rotate(-6deg) scale(1.06)}
+.pf-soc-ic{display:block;width:56%;height:56%}.pf-soc-ic svg{display:block;width:100%;height:100%}
+.pf-soc-label{max-width:100%;padding:0 10px;border:2px solid var(--pf-ink);border-radius:999px;background:#fff;font-size:13px;font-weight:700;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ---------- Chân trang ---------- */
+.pf-page .site-footer{margin:34px auto 0;width:fit-content;max-width:100%;padding:5px 20px 6px;border:3px solid var(--pf-ink);border-radius:999px;background:#fff;color:var(--pf-ink);box-shadow:4px 4px 0 var(--pf-ink);font-size:14px;font-weight:700;text-align:center}
+
+/* ---------- Phóng to ảnh ---------- */
+.pf-lb{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:16px;background:rgba(10,12,16,.9);cursor:zoom-out}
+.pf-lb img{max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;background:#fff}
+
+/* ---------- Hiện dần khi cuộn (chỉ bật khi JS chạy được và thiết bị không tắt hiệu ứng) ---------- */
+.pf-anim .pf-rv{transition:opacity .55s ease,translate .55s cubic-bezier(.2,.8,.2,1)}
+.pf-anim .pf-rv:not(.in){opacity:0;translate:0 24px}
+.pf-anim .pf-btn.pf-rv{transition:opacity .5s ease,translate .5s cubic-bezier(.2,.8,.2,1),transform .12s ease,box-shadow .12s ease,background .12s ease,color .12s ease}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.pf-avatar{animation:none}.pf-soc{transition:none}}

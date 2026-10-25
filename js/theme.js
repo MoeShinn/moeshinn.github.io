@@ -114,14 +114,16 @@ background:radial-gradient(60% 50% at 20% 30%,rgba(60,200,170,.45),transparent 6
     return () => { off = true; cancelAnimationFrame(raf); removeEventListener("resize", size); document.removeEventListener("visibilitychange", vis); if (ro) ro.disconnect(); cv.remove(); };
   }
 
-  const pageKey = () => { const p = location.pathname; return p.startsWith("/post") ? "post" : p.startsWith("/product") ? "product" : p.startsWith("/download") ? "download" : p.startsWith("/channel") ? "channel" : p.startsWith("/donate") ? "donate" : "home"; };
+  const pageKey = () => { const p = location.pathname; return p.startsWith("/post") ? "post" : p.startsWith("/product") ? "product" : p.startsWith("/download") ? "download" : p.startsWith("/channel") ? "channel" : p.startsWith("/profile") ? "profile" : p.startsWith("/donate") ? "donate" : "home"; };
   window.ShinjuTheme = { list: LIST, mount, pageKey };
 
   if (!manual) {
     (window.siteJSON ? window.siteJSON("/site-settings.json") : fetch("/site-settings.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : null)).catch(() => null)).then((s) => {
       s = s || {};
       const t = s.theme || {}, test = new URLSearchParams(location.search).get("fx"); // ?fx=night: thử nhanh một theme trên trang này (không cần lưu)
-      mount(null, test || (t.pages && t.pages[pageKey()]) || t.default || "none", { intensity: t.intensity, force: !!t.forceMotion, wash: t.wash, dim: t.dim });
+      // /profile có nền riêng (ảnh/GIF/hoạ tiết do admin chọn): chỉ bật nền động khi Cài đặt chọn riêng cho trang này, không kế thừa theme mặc định và không làm tối nền.
+      const k = pageKey(), own = t.pages && t.pages[k];
+      mount(null, test || own || (k === "profile" ? "none" : t.default || "none"), { intensity: t.intensity, force: !!t.forceMotion, wash: t.wash, dim: k === "profile" ? 0 : t.dim });
     }).catch(() => {});
   }
 })();

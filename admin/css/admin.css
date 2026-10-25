@@ -6,12 +6,15 @@ a{color:#7db4ff;text-decoration:none}
 .login form{width:100%;max-width:360px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px;display:grid;gap:12px}
 .login h1{margin:0 0 4px;font-size:20px}
 .layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
-.side{background:#08121f;border-right:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
+.side{background:#08121f;border-right:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;height:100dvh;overflow:hidden}
 .side .brand{font-weight:700;margin-bottom:10px}
 .side a,.side .soon{padding:8px 10px;border-radius:8px;color:var(--text);display:block}
 .side a:hover{background:#12233b}.side a.on{background:var(--blue)}
 .side .soon{color:var(--mute);opacity:.6;cursor:default}.side .soon small{font-size:11px;margin-left:6px}
-.side .foot{margin-top:auto;font-size:12px;color:var(--mute);display:grid;gap:8px}
+/* Danh sách mục cuộn riêng → nút Đăng xuất (.foot) luôn nằm đáy khung, không bị đẩy ra ngoài màn hình khi có nhiều mục */
+.navlist{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:4px;position:relative;overflow-y:auto;overscroll-behavior:contain;margin:0 -8px;padding:0 8px 4px;scrollbar-width:thin;scrollbar-color:#2a456b transparent}
+.navlist::-webkit-scrollbar{width:6px}.navlist::-webkit-scrollbar-thumb{background:#2a456b;border-radius:6px}
+.side .foot{flex:none;margin-top:6px;padding-top:10px;border-top:1px solid var(--line);font-size:12px;color:var(--mute);display:grid;gap:8px}
 main{padding:24px;max-width:960px;width:100%}
 h2{margin:0 0 16px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
@@ -28,7 +31,10 @@ details{border-top:1px solid var(--line);padding:10px 0}summary{cursor:pointer;m
 .hint{color:var(--mute);font-size:13px}.err{color:#ff8b8f;font-size:13px;min-height:18px}
 #toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#16304f;border:1px solid var(--line);padding:10px 16px;border-radius:10px;display:none;z-index:9}
 #toast.bad{background:#4a1a1d}
-@media(max-width:720px){.layout{grid-template-columns:1fr}.side{position:static;height:auto;flex-direction:row;overflow-x:auto;padding:10px;align-items:center}.side .brand,.side .foot{display:none}.side a,.side .soon{white-space:nowrap}main{padding:16px}}
+@media(max-width:720px){.layout{grid-template-columns:1fr}.side{position:sticky;top:0;z-index:20;height:auto;flex-direction:row;gap:8px;overflow:hidden;padding:10px;align-items:center}
+.side .brand{display:none}.navlist{flex-direction:row;overflow-x:auto;overflow-y:hidden;margin:0;padding:0 0 2px;gap:6px}
+.side .foot{margin:0;padding:0;border:0;display:block}.side .foot #left{display:none}.side .foot button{white-space:nowrap}
+.side a,.side .soon{white-space:nowrap}main{padding:16px}}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}.editor{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .tb{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}.tb button{padding:6px 9px;background:#16304f;font-size:13px}
 .sw{display:none;flex-wrap:wrap;gap:4px;margin-bottom:6px}.sw.on{display:flex}.sw i{width:22px;height:22px;border-radius:5px;cursor:pointer;border:1px solid #fff3}

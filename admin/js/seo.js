@@ -1,8 +1,8 @@
 /* Dựng khối SEO <head> cho các trang công khai (dùng chung cho admin và script di chuyển). */
 (function (root, factory) { if (typeof module === "object" && module.exports) module.exports = factory(); else root.AdminSeo = factory(); })(typeof window !== "undefined" ? window : this, function () {
-  const PAGES = { home: "Trang chủ", post: "Bài đăng", product: "Sản phẩm", download: "Download", channel: "Mạng xã hội", donate: "Donate" };
-  const URLS = { home: "/", post: "/post/", product: "/product/", download: "/download/", channel: "/channel/", donate: "/donate/" };
-  const FILE = { home: "index.html", post: "post/index.html", product: "product/index.html", download: "download/index.html", channel: "channel/index.html", donate: "donate/index.html" };
+  const PAGES = { home: "Trang chủ", post: "Bài đăng", product: "Sản phẩm", download: "Download", channel: "Mạng xã hội", profile: "Hồ sơ Vtuber", donate: "Donate" };
+  const URLS = { home: "/", post: "/post/", product: "/product/", download: "/download/", channel: "/channel/", profile: "/profile/", donate: "/donate/" };
+  const FILE = { home: "index.html", post: "post/index.html", product: "product/index.html", download: "download/index.html", channel: "channel/index.html", profile: "profile/index.html", donate: "donate/index.html" };
   const DEFAULT = {
     siteUrl: "https://shinjuvn.github.io", siteName: "Shinju Ch.", ogImage: "", shortLength: 10, // shortLength: số ký tự mã rút gọn /s/ tự sinh
     favicon: { icon: "/assets/favicon.png", apple: "", v: "" },
@@ -12,6 +12,7 @@
       product: { title: "Sản phẩm — Shinju Ch.", description: "Sản phẩm số của Shinju Ch.: phần mềm và model PNGTuber/Vtuber (Ezy Tuber), kèm chính sách sử dụng rõ ràng.", keywords: "sản phẩm số, phần mềm, model Ezy Tuber, PNGTuber, Vtuber, Shinju Ch." },
       download: { title: "Tải xuống — Shinju Ch.", description: "Tải xuống các tệp và tài nguyên do Shinju Ch. chia sẻ.", keywords: "tải xuống, download, Shinju Ch." },
       channel: { title: "Shinju Ch. — Channel", description: "Các kênh mạng xã hội của Shinju Ch.: YouTube và các nền tảng khác.", keywords: "Shinju Ch., ShinjuVNer, YouTube, mạng xã hội" },
+      profile: { title: "Hồ sơ Vtuber Shinju Ch. — Model, fan name, thông tin", description: "Hồ sơ PNGtuber Việt Nam Shinju Ch. [VNer] (Shinn Moeji, dùng Ezy Tuber): thông tin cơ bản, lore, fan name, các model và kênh mạng xã hội chính thức.", keywords: "Shinju Ch., ShinjuVNer, hồ sơ Vtuber, Shinn Moeji, Ezy Tuber, PNGTuber+, Vtuber Việt Nam, PNGtuber, model Vtuber, fan name, lore" },
       donate: { title: "Ủng Hộ — Shinju Ch.", description: "Ủng hộ Shinju Ch. để duy trì và phát triển nội dung.", keywords: "ủng hộ, donate, Shinju Ch." },
     },
   };
