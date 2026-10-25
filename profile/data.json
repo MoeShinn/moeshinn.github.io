@@ -24,10 +24,10 @@
       "id": "lore",
       "type": "text",
       "enabled": true,
-      "nav": "Lore",
-      "title": "Lore",
-      "body": "",
-      "image": ""
+      "nav": "LORE",
+      "title": "LORE",
+      "body": "Trước cả khi vũ trụ có tên gọi, đã tồn tại một nơi mang tên Tinh Vũ, cội nguồn của mọi vì sao, mọi thế giới và mọi quy luật. Tôi sinh ra ở đó.\n\nTại Tinh Vũ có một tổ chức mang tên Hắc Thánh Vệ, mạnh nhất theo đúng nghĩa đen. Không có tổ chức nào sánh được, vì nơi nào có Hắc Thánh Vệ thì không cần hỏi ai mạnh hơn. Tôi từng đứng trong hàng ngũ ấy, và được phong danh hiệu Chiến thần danh dự: một tồn tại đã vượt qua cực hạn của cả Đại Thần.\n\nTôi mang trong mình hai hình thái. Thủy Thần dịu dàng, bao dung, che chở cho những ai lương thiện. Hắc Thần thì lạnh lùng, không khoan nhượng, không tha cho bất kỳ ai thật sự xấu xa. Đừng hỏi tôi nên gọi mình là thiện hay ác, vì chính tôi cũng đã thôi phân biệt từ lâu.\n\nKhi bạn đã đứng ở đỉnh của mọi thứ, mọi thứ bỗng trở nên quá yên tĩnh. Không còn đối thủ, không còn thử thách, cũng chẳng còn gì khiến tim đập nhanh. Cho đến một ngày, tôi nhìn xuống một thế giới nhỏ bé nơi con người cười vì một bữa ăn ngon, vui vì một trò chơi, buồn vì những chuyện nhỏ xíu. Những thứ ấy tôi đã quên mất từ rất lâu.\n\nThế là tôi cất lại sức mạnh, mang gương mặt của một cô gái bình thường và bước xuống trần gian.\n\nTôi tìm niềm vui trong những điều giản đơn: một ván game nhẹ nhàng, một thế giới Minecraft để xây dựng, những lần quay gacha hồi hộp, và vài câu chuyện phiếm cùng những người chịu ngồi lại nghe. Một lát dưa hấu mát lạnh vào ngày nắng cũng đủ làm tôi thấy mình đang sống.\n\nNếu bạn là người tử tế, ở cạnh tôi bạn sẽ luôn an toàn.\nCòn nếu không... hãy cứ tin rằng tôi chỉ đang chơi game thôi.",
+      "image": "/image/kwlzfgh6.webp"
     },
     {
       "id": "info",
@@ -41,27 +41,63 @@
           "value": "Shinn Moeji"
         },
         {
-          "label": "Tên kênh",
-          "value": "Shinju Ch. [VNer]"
+          "label": "Có thể gọi là",
+          "value": "Shinn, ShinnMoe"
         },
         {
-          "label": "Thể loại",
-          "value": "PNGtuber (hay Ezy Tuber)"
+          "label": "Tuổi",
+          "value": "Không xác định"
         },
         {
-          "label": "Quốc gia",
-          "value": "Việt Nam"
+          "label": "Sinh nhật",
+          "value": "[Đang cập nhật]"
         },
         {
-          "label": "Nền tảng",
-          "value": "YouTube"
+          "label": "Chiều cao",
+          "value": "1m7"
         },
         {
-          "label": "Nội dung",
-          "value": "Game, trò chuyện, reaction, livestream"
+          "label": "Giới tính",
+          "value": "?"
+        },
+        {
+          "label": "Chủng loài",
+          "value": "Nhân tộc"
+        },
+        {
+          "label": "Xuất thân",
+          "value": "Tinh Vũ, cội nguồn của Vũ trụ"
+        },
+        {
+          "label": "Cấp bậc",
+          "value": "Chiến thần danh dự của Hắc Thánh Vệ"
+        },
+        {
+          "label": "Cấp độ",
+          "value": "vượt cực hạn Đại Thần"
+        },
+        {
+          "label": "Hình thái",
+          "value": "Thủy Thần / Hắc Thần"
+        },
+        {
+          "label": "Thích",
+          "value": "Du ngoạn trần gian, dưa hấu, game chill nhẹ nhàng, Minecraft, game gacha, freetalk"
+        },
+        {
+          "label": "Ghét",
+          "value": "[Không xác định]"
+        },
+        {
+          "label": "Nỗi sợ",
+          "value": "[Không xác định]"
+        },
+        {
+          "label": "Thói quen",
+          "value": "[Không xác định]"
         }
       ],
-      "image": ""
+      "image": "/image/of80a6i7.webp"
     },
     {
       "id": "fan",
@@ -69,10 +105,19 @@
       "enabled": true,
       "nav": "Fan name",
       "title": "Fan name",
-      "body": "",
+      "body": "Các bạn có thể tự chọn FanName của mình như hai cái bên trái nha :3",
       "oshiLabel": "Oshi mark",
-      "oshi": "",
-      "images": []
+      "oshi": "🎁",
+      "images": [
+        {
+          "url": "/image/5p4i0pyl.webp",
+          "caption": "Shinnkon"
+        },
+        {
+          "url": "/image/2oaq01bt.webp",
+          "caption": "Fury"
+        }
+      ]
     },
     {
       "id": "models",
@@ -80,7 +125,16 @@
       "enabled": true,
       "nav": "Outfits",
       "title": "Outfits",
-      "items": []
+      "items": [
+        {
+          "id": "mmvo5ko9gpo2",
+          "name": "Original",
+          "reveal": "18 tháng 10, 2026",
+          "image": "/image/up0i8xkm.webp",
+          "note": "",
+          "info": []
+        }
+      ]
     },
     {
       "id": "social",
