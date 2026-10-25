@@ -106,6 +106,15 @@
       "order": 0,
       "updated": "2026-10-25",
       "price": "39.000đ"
+    },
+    {
+      "id": "ezy-all-in-1",
+      "type": "product",
+      "parent": "ezy-software",
+      "title": "Ezy All in 1",
+      "thumb": "/image/ewloog8v.webp",
+      "order": 2,
+      "updated": "2026-10-25"
     }
   ]
 }
