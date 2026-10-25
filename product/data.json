@@ -83,7 +83,7 @@
       "parent": "ezy-software",
       "title": "Ezy Tuber",
       "thumb": "/image/vje1d3j6.webp",
-      "order": 0,
+      "order": 1,
       "updated": "2026-10-25",
       "price": "Miễn phí"
     },
@@ -113,7 +113,7 @@
       "parent": "ezy-software",
       "title": "Ezy All in 1",
       "thumb": "/image/ewloog8v.webp",
-      "order": 1,
+      "order": 0,
       "updated": "2026-10-25"
     }
   ]
