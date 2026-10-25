@@ -47,7 +47,7 @@
   // Hộp thoại sửa trực tiếp một file JSON (cho trường hợp giao diện không có ô tương ứng). Kiểm tra JSON trước khi commit.
   async function jsonEditor(path, note) {
     const ov = document.createElement("div"); ov.className = "modal";
-    ov.innerHTML = `<div class="mbox"><h3>${esc(path)}</h3><p class="hint">${esc(note || "")}</p><textarea id="je_t" spellcheck="false" disabled>Đang tải…</textarea><div class="err" id="je_e"></div>
+    ov.innerHTML = `<div class="mbox je"><h3>${esc(path)}</h3><p class="hint">${esc(note || "")}</p><textarea id="je_t" spellcheck="false" disabled>Đang tải…</textarea><div class="err" id="je_e"></div>
       <div class="mact"><button class="ghost" id="je_f">Định dạng lại</button> <button id="je_s">Lưu lên GitHub</button> <button class="ghost" id="je_c">Đóng</button></div></div>`;
     document.body.appendChild(ov);
     const t = $("#je_t", ov), err = $("#je_e", ov);

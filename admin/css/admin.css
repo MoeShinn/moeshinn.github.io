@@ -47,3 +47,15 @@ iframe#pv{width:100%;height:100%;min-height:420px;border:1px solid var(--line);b
 .mbox textarea{flex:1 1 auto;min-height:120px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
 .mbox>h3,.mbox>p,.mbox>.err,.mbox>.mact{flex:none;margin-top:0;margin-bottom:0}
 .mact{display:flex;flex-wrap:wrap;gap:8px}
+/* Hộp sửa JSON: cao gần hết màn hình cho ô nhập rộng rãi; điện thoại = nút nằm hàng ngang ở dưới */
+.mbox.je{height:calc(100vh - 24px);height:calc(100dvh - 24px)}
+.mbox.je textarea{min-height:160px}
+/* Máy tính / máy tính bảng: ô nhập bên trái, các nút xếp dọc bên phải */
+@media(min-width:721px){
+  .mbox.je{max-width:1120px;display:grid;grid-template-columns:minmax(0,1fr) 180px;grid-template-rows:auto auto minmax(0,1fr) auto;column-gap:14px;row-gap:8px}
+  .mbox.je>h3,.mbox.je>p{grid-column:1/-1}
+  .mbox.je>textarea{grid-column:1;grid-row:3;height:100%;min-height:0;resize:none}
+  .mbox.je>.err{grid-column:1;grid-row:4}
+  .mbox.je>.mact{grid-column:2;grid-row:3;flex-direction:column;flex-wrap:nowrap;align-self:start}
+  .mbox.je>.mact button{width:100%}
+}
