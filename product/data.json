@@ -116,6 +116,16 @@
       "order": 0,
       "updated": "2026-10-25",
       "price": "Miễn phí"
+    },
+    {
+      "id": "yue-model",
+      "type": "product",
+      "parent": "ezy-model-paid",
+      "title": "Yue Model",
+      "thumb": "/image/kxio0r1w.webp",
+      "order": 1,
+      "updated": "2026-10-25",
+      "price": "50000đ"
     }
   ]
 }
