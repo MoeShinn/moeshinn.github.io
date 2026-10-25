@@ -15,9 +15,9 @@
   },
   "hero": {
     "avatar": "/assets/avatar/avatar-336.webp",
-    "name": "Shinju Ch.",
+    "name": "Shinn Moeji",
     "tagline": "PNGtuber (Ezy Tuber) Việt Nam",
-    "intro": "Xin chào, mình là **Shinn Moeji**, người đứng sau kênh **Shinju Ch. [VNer]**. Mình là một PNGtuber Việt Nam dùng **Ezy Tuber** (ảnh tĩnh gắn khớp để chuyển động, kiểu PNGTuber+), làm nội dung game, trò chuyện, reaction và livestream trên **YouTube**."
+    "intro": "Xin chào, mình là **Shinn Moeji**, người đứng sau kênh **Shinju Ch. [VNer]**. Mình là một PNGtuber Việt Nam dùng **Ezy Tuber**, làm nội dung game, trò chuyện, reaction và livestream trên **YouTube**."
   },
   "sections": [
     {
@@ -46,7 +46,7 @@
         },
         {
           "label": "Thể loại",
-          "value": "PNGtuber, dùng Ezy Tuber (ảnh tĩnh gắn khớp chuyển động, kiểu PNGTuber+)"
+          "value": "PNGtuber (hay Ezy Tuber)"
         },
         {
           "label": "Quốc gia",
