@@ -29,6 +29,7 @@
       "product": "aurora",
       "download": "aurora",
       "channel": "stars",
+      "profile": "",
       "donate": "snow"
     }
   },
@@ -72,6 +73,11 @@
         "title": "Shinju Ch. Channel",
         "description": "Trang mạng xã hội cá nhân Shinju Ch.",
         "keywords": "Shinju Ch., ShinjuVNer, YouTube, mạng xã hội"
+      },
+      "profile": {
+        "title": "Hồ sơ Vtuber Shinju Ch. — Model, fan name, thông tin",
+        "description": "Hồ sơ PNGtuber Việt Nam Shinju Ch. [VNer] (Shinn Moeji, Ezy Tuber): thông tin cơ bản, lore, fan name, các model và kênh mạng xã hội chính thức.",
+        "keywords": "Shinju Ch., ShinjuVNer, hồ sơ Vtuber, Shinn Moeji, Ezy Tuber, PNGTuber+, Vtuber Việt Nam, PNGtuber, model Vtuber, fan name, lore"
       },
       "donate": {
         "title": "Ủng Hộ — Shinju Ch.",
