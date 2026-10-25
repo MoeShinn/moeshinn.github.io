@@ -42,6 +42,8 @@ textarea#p_body{min-height:420px;font-family:ui-monospace,Menlo,Consolas,monospa
 iframe#pv{width:100%;height:100%;min-height:420px;border:1px solid var(--line);border-radius:8px;background:#050b16}
 .bar{background:#3a2d12;border:1px solid #6b5420;border-radius:8px;padding:8px 12px;margin-bottom:12px}
 @media(max-width:720px){.cols,.editor{grid-template-columns:1fr}}
-.modal{position:fixed;inset:0;background:#000b;z-index:50;display:grid;place-items:center;padding:12px}
-.mbox{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;width:100%;max-width:760px;max-height:92vh;display:flex;flex-direction:column;gap:8px}
-.mbox textarea{flex:1;min-height:50vh;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
+.modal{position:fixed;inset:0;background:#000b;z-index:50;display:flex;align-items:center;justify-content:center;padding:12px;overflow:auto}
+.mbox{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;width:100%;max-width:760px;max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:8px}
+.mbox textarea{flex:1 1 auto;min-height:120px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
+.mbox>h3,.mbox>p,.mbox>.err,.mbox>.mact{flex:none;margin-top:0;margin-bottom:0}
+.mact{display:flex;flex-wrap:wrap;gap:8px}
