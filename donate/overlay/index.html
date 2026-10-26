@@ -37,9 +37,9 @@
     if (t.on && al.audio) {
       await sleep((+t.delay || 0) * 1000);
       const v = new Audio(al.audio); v.volume = 1;
-      for (let k = 0; k < 8; k++) { // file FPT cần vài giây để sẵn sàng
+      for (let k = 0; k < 15; k++) { // file FPT cần vài giây để sẵn sàng
         const ok = await new Promise((r) => { v.onended = () => r("end"); v.onplaying = () => r("play"); v.onerror = () => r("err"); v.src = al.audio + (k ? "?r=" + k : ""); v.play().catch(() => r("err")); });
-        if (ok === "err") { await sleep(1000); continue; }
+        if (ok === "err") { await sleep(1500); continue; }
         if (ok === "play") { await new Promise((r) => (v.onended = r)); end = Math.max(end, Date.now() - t0 + 1000); }
         break;
       }
