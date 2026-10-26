@@ -14,8 +14,8 @@
   "bank": {
     "id": "mbbank",
     "name": "MB Bank",
-    "acc": "0000000000",
-    "holder": "TEN CHU TAI KHOAN"
+    "acc": "VQRQAMYLN8586",
+    "holder": "NGUYEN QUOC THIEN AN"
   },
   "template": "DONATE {ORDER CODE}",
   "ai": true,
