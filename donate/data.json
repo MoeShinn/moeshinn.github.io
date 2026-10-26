@@ -28,10 +28,10 @@
     "volume": 80,
     "imgW": 200,
     "imgH": 200,
-    "image": "",
+    "image": "https://media4.giphy.com/media/v1.Y2lkPTZjMDliOTUyaTF2MjYyN2wwZjF2cnVoZG5hdTR2a3Iya3QxNTA3ZjZmc2FxNDlmNSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/JFys5DN3aRmY3Iy5yL/200.gif",
     "h1": "§l§c{DISPLAY NAME}§r §fđã donate §o§a{AMOUNT}§r§evnđ§r",
     "mes": "§f{MESSENGER}",
-    "sound": "",
+    "sound": "https://files.catbox.moe/orvmr7.mp3",
     "css": ".alert{gap:12px;padding:16px;max-width:900px}\n.h1{font-size:44px;font-weight:700;text-shadow:0 2px 6px #000}\n.mes{font-size:30px;text-shadow:0 2px 6px #000;word-break:break-word}"
   },
   "tts": {
