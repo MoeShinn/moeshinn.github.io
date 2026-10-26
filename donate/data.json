@@ -1,25 +1,19 @@
 {
   "title": "Ủng Hộ Shinju Ch.",
-  "methods": [
-    {
-      "id": "ganknow",
-      "label": "Donate qua",
-      "buttons": [
-        {
-          "id": "ganknow",
-          "label": "ZYPAGE",
-          "type": "link",
-          "url": "https://zypage.com/shinjuch",
-          "visible": true
-        },
-        {
-          "id": "btn-mvdm95g3522",
-          "label": "GANK",
-          "type": "link",
-          "url": "https://ganknow.com/shinjuch",
-          "visible": true
-        }
-      ]
-    }
-  ]
+  "intro": "Mỗi ly cà phê là động lực để mình làm nội dung đều hơn. Cảm ơn bạn rất nhiều!",
+  "api": "https://shinju-donate.git-api.workers.dev",
+  "min": 10000, "nameMax": 24, "msgMax": 120, "presets": [10000, 20000, 50000, 100000],
+  "bank": { "id": "mbbank", "name": "MB Bank", "acc": "0000000000", "holder": "TEN CHU TAI KHOAN" },
+  "template": "DONATE {ORDER CODE}", "ai": true,
+  "alert": {
+    "image": "", "imgW": 200, "imgH": 200,
+    "h1": "§l§c{DISPLAY NAME}§r §fđã donate §o§a{AMOUNT}§r§evnđ§r",
+    "mes": "§f{MESSENGER}", "sound": "", "volume": 80,
+    "layout": "v", "posX": "center", "posY": "top", "duration": 15, "minShow": 6,
+    "css": ".alert{gap:12px;padding:16px;max-width:900px}\n.h1{font-size:44px;font-weight:700;text-shadow:0 2px 6px #000}\n.mes{font-size:30px;text-shadow:0 2px 6px #000;word-break:break-word}"
+  },
+  "tts": { "on": true, "voice": "banmai", "speed": "0", "delay": 2.0, "min": 10000, "maxChars": 100,
+    "text": "{DISPLAY NAME} đã tặng bạn 1 ly cà phê giá {AMOUNT} đồng.",
+    "textMsg": "{DISPLAY NAME} đã tặng bạn 1 ly cà phê giá {AMOUNT} đồng. Lời nhắn gửi từ {DISPLAY NAME}: {MESSENGER}" },
+  "seo": { "description": "Ủng hộ Shinju Ch. qua chuyển khoản ngân hàng, quét mã QR, không phí phụ thu. Donate hiện alert ngay trên stream.", "keywords": "donate, ủng hộ, ủng hộ streamer, donate qua QR, donate VTuber, Shinju Ch., ShinjuVNer, chuyển khoản, cà phê" }
 }

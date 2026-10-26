@@ -1,0 +1,77 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><title>Donate overlay</title>
+<style>html,body{margin:0;height:100%;background:transparent!important;overflow:hidden;font-family:"Baloo 2","Segoe UI",sans-serif;color:#fff}
+#stage{position:fixed;inset:0;display:flex;padding:24px;box-sizing:border-box}
+.alert{display:flex;align-items:center;text-align:center;animation:in .4s ease-out}.alert.v{flex-direction:column}.alert.h{flex-direction:row;text-align:left}
+.alert img{object-fit:contain;flex:none}.alert .t{display:flex;flex-direction:column;gap:6px;min-width:0}.alert.h .t{flex:1}
+@keyframes in{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:none}}.alert.out{opacity:0;transition:opacity .5s}</style>
+<style id="usercss"></style></head><body><div id="stage"></div>
+<script>
+(() => {
+  const Q = new URLSearchParams(location.search), TOKEN = Q.get("t") || "", PREVIEW = Q.has("preview"), $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const COL = { 0: "#000", 1: "#00a", 2: "#0a0", 3: "#0aa", 4: "#a00", 5: "#a0a", 6: "#fa0", 7: "#aaa", 8: "#555", 9: "#55f", a: "#5f5", b: "#5ff", c: "#f55", d: "#f5f", e: "#ff5", f: "#fff" };
+  // Mã § kiểu Minecraft: 0-f màu, l đậm, o nghiêng, n gạch chân, m gạch ngang, r reset. Giá trị người donate bị thay SAU khi tách mã nên không thể chèn §.
+  function mc(tpl, vars) {
+    const parts = String(tpl || "").split(/§([0-9a-fk-or])/i); let st = {}, h = "";
+    for (let i = 0; i < parts.length; i++) {
+      if (i % 2) { const c = parts[i].toLowerCase(); if (COL[c]) st = { ...st, c: COL[c] }; else if (c === "r") st = {}; else if ("lonm".includes(c)) st = { ...st, [c]: 1 }; continue; }
+      const t = esc(parts[i]).replace(/\{(DISPLAY NAME|AMOUNT|MESSENGER)\}/g, (_, k) => esc(vars[k])); if (!t) continue;
+      const css = (st.c ? `color:${st.c};` : "") + (st.l ? "font-weight:700;" : "") + (st.o ? "font-style:italic;" : "") + ((st.n || st.m) ? `text-decoration:${[st.n && "underline", st.m && "line-through"].filter(Boolean).join(" ")};` : "");
+      h += css ? `<span style="${css}">${t}</span>` : t;
+    }
+    return h.replace(/\n/g, "<br>");
+  }
+  let cfg, queue = [], busy = false;
+  const apply = (c) => { cfg = c; $("#usercss").textContent = c.alert.css || ""; const s = $("#stage").style, a = c.alert;
+    s.justifyContent = { left: "flex-start", center: "center", right: "flex-end" }[a.posX]; s.alignItems = { top: "flex-start", middle: "center", bottom: "flex-end" }[a.posY]; };
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  async function show(al) {
+    const a = cfg.alert, t = cfg.tts, vars = { "DISPLAY NAME": al.name, AMOUNT: Number(al.amount).toLocaleString("vi-VN"), MESSENGER: al.msg || "" };
+    const el = document.createElement("div"); el.className = "alert " + (a.layout === "h" ? "h" : "v");
+    const img = a.image ? `<img src="${esc(a.image)}" style="width:${+a.imgW || 200}px;${a.layout === "h" ? "" : `height:${+a.imgH || 200}px`}" alt="">` : "";
+    el.innerHTML = img + `<div class="t"><div class="h1">${mc(a.h1, vars)}</div>${al.msg ? `<div class="mes">${mc(a.mes, vars)}</div>` : ""}</div>`;
+    if (a.layout === "h") { const i = el.querySelector("img"); if (i) i.style.alignSelf = "stretch"; }
+    $("#stage").replaceChildren(el);
+    const t0 = Date.now(), max = (+a.duration || 15) * 1000; let end = (+a.minShow || 6) * 1000;
+    if (a.sound) { const s = new Audio(a.sound); s.volume = Math.min(1, (+a.volume || 80) / 100); s.play().catch(() => {}); }
+    if (t.on && al.audio) {
+      await sleep((+t.delay || 0) * 1000);
+      const v = new Audio(al.audio); v.volume = 1;
+      for (let k = 0; k < 8; k++) { // file FPT cần vài giây để sẵn sàng
+        const ok = await new Promise((r) => { v.onended = () => r("end"); v.onplaying = () => r("play"); v.onerror = () => r("err"); v.src = al.audio + (k ? "?r=" + k : ""); v.play().catch(() => r("err")); });
+        if (ok === "err") { await sleep(1000); continue; }
+        if (ok === "play") { await new Promise((r) => (v.onended = r)); end = Math.max(end, Date.now() - t0 + 1000); }
+        break;
+      }
+    }
+    await sleep(Math.max(0, Math.min(max, end) - (Date.now() - t0)));
+    el.classList.add("out"); await sleep(500); el.remove();
+  }
+  async function pump() { if (busy) return; busy = true; while (queue.length) { try { await show(queue.shift()); } catch {} } busy = false; }
+  window.addEventListener("message", (e) => { if (!PREVIEW || !e.data) return; if (e.data.cfg) apply(e.data.cfg); if (e.data.alert) { queue.push(e.data.alert); pump(); } });
+  async function main() {
+    cfg0 = await (await fetch("/donate/data.json", { cache: "no-cache" })).json(); apply(cfg0);
+    if (PREVIEW) return parent.postMessage({ ready: 1 }, "*");
+    const API = cfg0.api; let cursor = null, timer = 0, streaming = !window.obsstudio, visible = true; const t0 = Date.now(), inObs = !!window.obsstudio;
+    const active = () => streaming && visible && (inObs || (document.visibilityState === "visible" && Date.now() - t0 < 6 * 3600e3));
+    async function tick() {
+      timer = 0; if (!active()) { cursor = null; return; }
+      try {
+        const r = await (await fetch(`${API}/api/alerts?t=${encodeURIComponent(TOKEN)}&after=${cursor ?? "latest"}`)).json();
+        if (r.items) { cursor = r.last; queue.push(...r.items); pump(); }
+      } catch {}
+      timer = setTimeout(tick, 5000);
+    }
+    const kick = () => { if (!timer && active()) tick(); };
+    if (inObs) {
+      obsstudio.getStatus && obsstudio.getStatus((s) => { streaming = !!s.streaming; kick(); });
+      addEventListener("obsStreamingStarted", () => { streaming = true; cursor = null; kick(); });
+      addEventListener("obsStreamingStopped", () => { streaming = false; });
+      addEventListener("obsSourceVisibleChanged", (e) => { visible = e.detail.visible; if (!visible) cursor = null; kick(); });
+    }
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState !== "visible") cursor = null; kick(); });
+    kick();
+  }
+  let cfg0; main();
+})();
+</script></body></html>
