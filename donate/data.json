@@ -36,11 +36,14 @@
   },
   "tts": {
     "on": false,
-    "voice": "banmai",
-    "speed": "0",
+    "engine": "auto",
+    "rate": 1,
+    "pitch": 1,
+    "volume": 100,
+    "voiceURI": "",
     "delay": 2,
     "min": 10000,
-    "maxChars": 100,
+    "maxChars": 120,
     "text": "{DISPLAY NAME} đã tặng bạn 1 ly kem giá {AMOUNT} đồng.",
     "textMsg": "{DISPLAY NAME} đã tặng bạn 1 ly kem giá {AMOUNT} đồng. {MESSENGER}"
   },
