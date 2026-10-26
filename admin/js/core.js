@@ -7,6 +7,7 @@
     ["dashboard", "Dashboard", "/admin/"],
     ["post", "Bài đăng", "/admin/post/"],
     ["product", "Sản phẩm", "/admin/product/"],
+    ["buy", "Bán hàng", "/admin/buy/"],
     ["download", "Download", "/admin/download/"],
     ["channel", "Kênh", "/admin/channel/"],
     ["profile", "Hồ sơ Vtuber", "/admin/profile/"],
@@ -33,6 +34,24 @@
     if (res.status === 401 && path !== "/login") { sessionStorage.removeItem(KEY); location.reload(); }
     if (!res.ok) throw Object.assign(new Error(data.error || "Lỗi " + res.status), { status: res.status });
     return data;
+  }
+  // Tải file lớn lên Worker (thân yêu cầu là chính file, có thanh tiến trình). Dùng cho /admin/buy/.
+  function upload(path, file, onProgress) {
+    const s = session();
+    return new Promise((resolve, reject) => {
+      const x = new XMLHttpRequest();
+      x.open("POST", API + path);
+      if (s) x.setRequestHeader("Authorization", "Bearer " + s.token);
+      x.setRequestHeader("Content-Type", "application/octet-stream");
+      x.upload.onprogress = (e) => { if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total); };
+      x.onload = () => {
+        let d = {}; try { d = JSON.parse(x.responseText); } catch {}
+        if (x.status === 401) { sessionStorage.removeItem(KEY); location.reload(); return; }
+        if (x.status >= 200 && x.status < 300) resolve(d); else reject(Object.assign(new Error(d.error || "Lỗi " + x.status), { status: x.status }));
+      };
+      x.onerror = () => reject(new Error("Mất kết nối khi tải lên (mạng ngắt, hoặc file vượt giới hạn của Cloudflare)."));
+      x.send(file);
+    });
   }
   async function readJson(path, fallback) {
     try { return JSON.parse((await api("/file?path=" + encodeURIComponent(path))).content); }
@@ -103,5 +122,5 @@
     render($("#main"));
   }
 
-  window.Admin = { api, readJson, readText, commitJson, commitFiles, jsonEditor, bindJson, toast, boot, esc, $ };
+  window.Admin = { api, upload, API, readJson, readText, commitJson, commitFiles, jsonEditor, bindJson, toast, boot, esc, $ };
 })();

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Bán hàng</title>
+<link rel="stylesheet" href="/admin/css/admin.css">
+<style>
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px}.tbl th,.tbl td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+.tbl th{color:var(--mute);font-weight:600;font-size:12px;white-space:nowrap}.tblw{overflow-x:auto;margin:0 -4px}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.03em}
+.badge{display:inline-block;padding:1px 9px;border-radius:999px;font-size:12px;border:1px solid var(--line);white-space:nowrap}
+.badge.active{background:#12351a;color:#7be07b;border-color:#1f6a2f}.badge.downloading{background:#3a2d12;color:#ffc861;border-color:#6b5420}
+.badge.used{background:#1d2a40;color:#9db8e6}.badge.expired,.badge.revoked{background:#3d1a1d;color:#ff9a9e;border-color:#6b2a2e}
+.acts{display:flex;flex-wrap:wrap;gap:4px}.acts button{padding:3px 8px;font-size:12px;background:#16304f}.acts button.dng{background:#4a1a1d}
+.frow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0 12px}
+.bar2{height:8px;background:#0a1626;border:1px solid var(--line);border-radius:6px;overflow:hidden;margin:8px 0}.bar2 i{display:block;height:100%;width:0;background:var(--blue);transition:width .2s}
+.codebox{display:flex;align-items:center;gap:8px;background:#0a1626;border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:6px;flex-wrap:wrap}
+.codebox b{font-size:17px;flex:1;min-width:190px}.codebox button{padding:5px 10px;font-size:12.5px}
+.warn{background:#3d1a1d;border:1px solid #6b2a2e;border-radius:8px;padding:8px 12px;margin:8px 0;color:#ffb3b6;font-size:13.5px}
+.okln{margin:3px 0;font-size:14px}
+</style></head>
+<body><div id="app"></div><div id="toast"></div>
+<script src="/admin/js/core.js"></script>
+<script>
+Admin.boot({ id: "buy", title: "Bán hàng", async render(main) {
+  const { esc, $, api, toast } = Admin;
+  const SITE = location.origin, LINK = SITE + "/buy/";
+  const fmtSize = (n) => (n >= 1e9 ? (n / 1e9).toFixed(2) + " GB" : (n / 1e6).toFixed(1) + " MB");
+  const fmtDate = (t) => (t ? new Date(t).toLocaleDateString("vi-VN") : "—");
+  const fmtDT = (t) => (t ? new Date(t).toLocaleString("vi-VN", { dateStyle: "short", timeStyle: "short" }) : "—");
+  const pretty = (c) => String(c).match(/.{1,5}/g).join("-");
+  const STATE = { active: "Chưa dùng hết", downloading: "Đang tải", used: "Hết lượt", expired: "Hết hạn", revoked: "Đã thu hồi" };
+  const stateOf = (c) => (c.s === "revoked" ? "revoked" : c.e && c.e < Date.now() ? "expired" : c.u >= c.m ? "used" : c.l > Date.now() ? "downloading" : "active");
+  const copy = async (text, ok = "Đã sao chép") => {
+    try { await navigator.clipboard.writeText(text); } catch { const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select(); document.execCommand("copy"); t.remove(); }
+    toast(ok);
+  };
+  const message = (prodName, code, max, exp) =>
+    `Cảm ơn bạn đã mua ${prodName}! 🎉\nMã tải: ${pretty(code)}\nVào ${LINK} và dán mã để tải file.\nMã dùng được ${max} lần${exp ? `, hết hạn ${fmtDate(exp)}` : ""}. Vui lòng không chia sẻ mã cho người khác.`;
+
+  let products = [], codes = [], cursor = null, info = null, filter = { st: "", prod: "", q: "" };
+
+  main.innerHTML = `<h2>Bán hàng (mã tải)</h2>
+    <p class="hint">Khách mua xong → bạn tạo mã gửi cho khách → khách vào <a href="/buy/" target="_blank" class="mono">${esc(LINK)}</a>, dán mã và tải file. File nằm trong release của repo private, không có link công khai nào.</p>
+    <div class="card"><h3>Kết nối</h3><div id="b_conn"><span class="dot"></span>Đang kiểm tra…</div></div>
+    <div class="card"><h3>1. Sản phẩm (model)</h3><div id="b_prods"></div>
+      <h3 style="margin-top:18px">Thêm sản phẩm mới</h3>
+      <div class="frow"><label>Chọn tệp (mọi định dạng)<input type="file" id="b_file"></label><label>Tên hiển thị cho khách<input id="b_pname" placeholder="Model Shinju v2" maxlength="100"></label></div>
+      <div class="hint" id="b_fhint"></div><div class="bar2" id="b_bar" hidden><i></i></div>
+      <button id="b_up" disabled>Tải lên &amp; tạo sản phẩm</button> <span class="err" id="b_uerr"></span>
+      <details><summary>Dùng tệp đã có trong release (file lớn hơn giới hạn tải lên)</summary>
+        <p class="hint">Cloudflare chặn mỗi lần tải lên quá ~100 MB. Với file lớn hơn, hãy vào GitHub → repo release → Releases → thêm tệp vào release <b class="mono" id="b_tag"></b> bằng giao diện web, rồi chọn lại ở đây.</p>
+        <div class="frow"><label>Tệp trong release<select id="b_asset"><option value="">Bấm “Làm mới danh sách”…</option></select></label><label>Tên hiển thị cho khách<input id="b_lname" maxlength="100"></label></div>
+        <button class="ghost" id="b_rf">Làm mới danh sách</button> <button id="b_link" disabled>Tạo sản phẩm từ tệp này</button> <span class="err" id="b_lerr"></span>
+      </details></div>
+    <div class="card"><h3>2. Tạo mã</h3>
+      <div class="frow"><label>Sản phẩm<select id="c_prod"></select></label><label>Số mã (1–20)<input id="c_n" type="number" min="1" max="20" value="1"></label>
+        <label>Số lượt tải mỗi mã<input id="c_max" type="number" min="1" max="10" value="2"></label>
+        <label>Hạn dùng mã<select id="c_days"><option value="0">Không hết hạn</option><option value="3">3 ngày</option><option value="7">7 ngày</option><option value="30" selected>30 ngày</option><option value="90">90 ngày</option></select></label></div>
+      <label>Ghi chú (tên người mua, mã đơn… chỉ bạn thấy)<input id="c_note" maxlength="200" placeholder="Zalo: Nguyễn A — chuyển khoản 12/10"></label>
+      <button id="c_go">Tạo mã</button> <span class="err" id="c_err"></span><div id="c_out" style="margin-top:12px"></div></div>
+    <div class="card"><h3>3. Danh sách mã</h3>
+      <div class="frow"><label>Trạng thái<select id="f_st"><option value="">Tất cả</option>${Object.entries(STATE).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select></label>
+        <label>Sản phẩm<select id="f_prod"></select></label><label>Tìm (mã hoặc ghi chú)<input id="f_q" placeholder="ABCDE hoặc tên khách"></label></div>
+      <div id="b_codes"><span class="hint">Đang tải…</span></div><div style="margin-top:10px"><button class="ghost" id="b_more" hidden>Tải thêm</button> <button class="ghost" id="b_reload">Làm mới</button></div></div>`;
+
+  // ---------- kết nối ----------
+  async function loadConn() {
+    const box = $("#b_conn");
+    try {
+      info = await api("/buy-admin/check"); const r = info.release || {};
+      $("#b_tag").textContent = info.tag;
+      box.innerHTML = `<div class="okln"><span class="dot ok"></span>KV lưu mã: đã gắn</div>` +
+        (r.ok ? `<div class="okln"><span class="dot ${r.canPush === false ? "bad" : "ok"}"></span>Repo release: <span class="mono">${esc(r.repo)}</span> ${r.private ? "(private)" : ""}${r.canPush === false ? " — token KHÔNG có quyền ghi (cần Contents: Read and write cho repo này)" : ""}${r.hasTag === false ? `<br><small class="hint">Chưa có release “${esc(info.tag)}”: sẽ tự tạo khi bạn tải file đầu tiên (repo cần có ít nhất 1 commit).</small>` : ""}</div>` +
+          (r.private === false ? `<div class="warn">⚠️ Repo release đang ở chế độ PUBLIC: ai cũng tải được file thẳng từ GitHub. Chuyển repo sang Private (Settings → Danger Zone → Change visibility) trước khi bán.</div>` : "")
+          : `<div class="okln"><span class="dot bad"></span>Repo release: ${esc(r.error || "lỗi")}</div>`) +
+        `<div class="okln"><span class="dot ok"></span>Chỉ chấp nhận gọi từ: <span class="mono">${esc((info.origins || []).join(", "))}</span></div>` +
+        `<div class="okln"><span class="dot ok"></span>Tải lên tối đa mỗi lần: ${fmtSize(info.maxUpload)}</div>`;
+      uploadHint();
+    } catch (e) { box.innerHTML = `<span class="dot bad"></span>${esc(e.message)}`; }
+  }
+
+  // ---------- sản phẩm ----------
+  function drawProducts() {
+    const cnt = {}; codes.forEach((c) => (cnt[c.p] = (cnt[c.p] || 0) + 1));
+    $("#b_prods").innerHTML = products.length ? `<div class="tblw"><table class="tbl"><thead><tr><th>Tên</th><th>Tệp</th><th>Dung lượng</th><th>Mã đã tạo</th><th></th></tr></thead><tbody>` +
+      products.map((p) => `<tr><td><b>${esc(p.name)}</b></td><td class="mono">${esc(p.file)}</td><td>${fmtSize(p.size || 0)}</td><td>${cnt[p.id] || 0}</td>
+        <td><div class="acts"><button data-pa="rename" data-id="${esc(p.id)}">Đổi tên</button><button class="dng" data-pa="del" data-id="${esc(p.id)}">Xoá</button></div></td></tr>`).join("") + `</tbody></table></div>`
+      : `<p class="hint">Chưa có sản phẩm nào. Thêm bên dưới.</p>`;
+    const opts = products.map((p) => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join("");
+    const keep = $("#c_prod").value, keepF = $("#f_prod").value;
+    $("#c_prod").innerHTML = opts || `<option value="">(chưa có sản phẩm)</option>`;
+    $("#f_prod").innerHTML = `<option value="">Tất cả</option>` + opts;
+    if (keep) $("#c_prod").value = keep; if (keepF) $("#f_prod").value = keepF;
+  }
+  $("#b_prods").addEventListener("click", async (e) => {
+    const b = e.target.closest("button[data-pa]"); if (!b) return;
+    const p = products.find((x) => x.id === b.dataset.id); if (!p) return;
+    try {
+      if (b.dataset.pa === "rename") { const n = prompt("Tên mới:", p.name); if (!n || !n.trim()) return; await api("/buy-admin/product/rename", { id: p.id, name: n.trim() }); toast("Đã đổi tên"); }
+      else {
+        const n = codes.filter((c) => c.p === p.id).length;
+        if (!confirm(`Xoá sản phẩm “${p.name}”?` + (n ? `\n\nCó ${n} mã đang trỏ tới sản phẩm này; khách dán mã sẽ báo “không còn trong kho”.` : ""))) return;
+        const delFile = confirm("Xoá luôn tệp trong release GitHub?\n\nOK = xoá tệp (không khôi phục được)\nHuỷ = giữ tệp trong release");
+        await api("/buy-admin/product/delete", { id: p.id, deleteAsset: delFile }); toast("Đã xoá sản phẩm");
+      }
+      await loadAll();
+    } catch (er) { toast(er.message, true); }
+  });
+
+  // tải lên
+  function uploadHint() {
+    const f = $("#b_file").files[0], h = $("#b_fhint"), max = info ? info.maxUpload : 95e6;
+    $("#b_up").disabled = !f || (f && f.size > max) || !$("#b_pname").value.trim();
+    h.textContent = f ? `${f.name} · ${fmtSize(f.size)}${f.size > max ? ` — vượt giới hạn ${fmtSize(max)}, hãy dùng mục “Dùng tệp đã có trong release”.` : ""}` : "";
+    h.className = "hint" + (f && f.size > max ? " err" : "");
+  }
+  $("#b_file").addEventListener("change", () => { const f = $("#b_file").files[0]; if (f && !$("#b_pname").value.trim()) $("#b_pname").value = f.name.replace(/\.[^.]+$/, ""); uploadHint(); });
+  $("#b_pname").addEventListener("input", uploadHint);
+  $("#b_up").onclick = async () => {
+    const f = $("#b_file").files[0]; if (!f) return;
+    const btn = $("#b_up"), bar = $("#b_bar"); btn.disabled = true; $("#b_uerr").textContent = ""; bar.hidden = false; bar.firstChild.style.width = "0";
+    try {
+      await Admin.upload(`/buy-admin/product/upload?name=${encodeURIComponent($("#b_pname").value.trim())}&file=${encodeURIComponent(f.name)}`, f, (x) => (bar.firstChild.style.width = Math.round(x * 100) + "%"));
+      toast("Đã tải lên và tạo sản phẩm"); $("#b_file").value = ""; $("#b_pname").value = ""; await loadAll();
+    } catch (e) { $("#b_uerr").textContent = e.message; }
+    bar.hidden = true; uploadHint();
+  };
+  // dùng tệp có sẵn
+  $("#b_rf").onclick = async () => {
+    try {
+      const { assets } = await api("/buy-admin/assets"), used = new Set(products.map((p) => String(p.asset)));
+      $("#b_asset").innerHTML = `<option value="">— chọn —</option>` + assets.map((a) => `<option value="${a.id}" data-n="${esc(a.name)}">${esc(a.name)} · ${fmtSize(a.size)}${used.has(String(a.id)) ? " (đã có sản phẩm)" : ""}</option>`).join("");
+    } catch (e) { $("#b_lerr").textContent = e.message; }
+  };
+  $("#b_asset").onchange = () => { const o = $("#b_asset").selectedOptions[0]; if (o && o.value && !$("#b_lname").value.trim()) $("#b_lname").value = o.dataset.n.replace(/^[a-z0-9]{8}-/, "").replace(/\.[^.]+$/, ""); $("#b_link").disabled = !$("#b_asset").value; };
+  $("#b_link").onclick = async () => {
+    $("#b_lerr").textContent = "";
+    try { await api("/buy-admin/product/link", { name: $("#b_lname").value.trim(), assetId: $("#b_asset").value }); toast("Đã tạo sản phẩm"); $("#b_lname").value = ""; $("#b_link").disabled = true; await loadAll(); }
+    catch (e) { $("#b_lerr").textContent = e.message; }
+  };
+
+  // ---------- tạo mã ----------
+  $("#c_go").onclick = async () => {
+    const btn = $("#c_go"); $("#c_err").textContent = ""; btn.disabled = true;
+    try {
+      const r = await api("/buy-admin/codes/create", { product: $("#c_prod").value, count: +$("#c_n").value, max: +$("#c_max").value, days: +$("#c_days").value, note: $("#c_note").value });
+      $("#c_out").innerHTML = `<p class="hint">Đã tạo ${r.codes.length} mã cho <b>${esc(r.product.name)}</b>. Mã chỉ hiện đầy đủ ở đây và trong danh sách bên dưới.</p>` +
+        r.codes.map((c) => `<div class="codebox"><b class="mono">${esc(c)}</b><button data-cp="${esc(c)}">Sao chép mã</button><button class="ghost" data-cm="${esc(c)}">Sao chép tin nhắn gửi khách</button></div>`).join("") +
+        (r.codes.length > 1 ? `<button class="ghost" data-all="1">Sao chép tất cả mã</button>` : "");
+      $("#c_out").onclick = (e) => {
+        const b = e.target.closest("button"); if (!b) return;
+        if (b.dataset.cp) copy(b.dataset.cp); else if (b.dataset.cm) copy(message(r.product.name, b.dataset.cm, r.max, r.exp), "Đã sao chép tin nhắn"); else if (b.dataset.all) copy(r.codes.join("\n"), "Đã sao chép tất cả mã");
+      };
+      toast("Đã tạo mã"); await loadCodes();
+    } catch (e) { $("#c_err").textContent = e.message; }
+    btn.disabled = false;
+  };
+
+  // ---------- danh sách mã ----------
+  const pname = (id) => (products.find((p) => p.id === id) || {}).name || "(đã xoá)";
+  function drawCodes() {
+    const q = filter.q.trim().toLowerCase().replace(/[^a-z0-9\u00c0-\u1ef9 ]/g, "");
+    const rows = codes.filter((c) => (!filter.st || stateOf(c) === filter.st) && (!filter.prod || c.p === filter.prod) && (!q || c.code.toLowerCase().includes(q.replace(/ /g, "")) || (c.n || "").toLowerCase().includes(q))).sort((a, b) => (b.c || 0) - (a.c || 0));
+    $("#b_codes").innerHTML = rows.length ? `<div class="tblw"><table class="tbl"><thead><tr><th>Mã</th><th>Sản phẩm</th><th>Trạng thái</th><th>Lượt</th><th>Hạn</th><th>Ghi chú</th><th>Tạo lúc</th><th>Thao tác</th></tr></thead><tbody>` +
+      rows.map((c) => { const st = stateOf(c); return `<tr data-code="${esc(c.code)}"><td class="mono">${esc(pretty(c.code))}</td><td>${esc(pname(c.p))}</td><td><span class="badge ${st}">${STATE[st]}</span></td><td>${c.u}/${c.m}</td><td>${c.e ? fmtDate(c.e) : "—"}</td><td>${esc(c.n || "")}</td><td>${fmtDT(c.c)}</td>
+        <td><div class="acts"><button data-a="copy">Mã</button><button data-a="msg">Tin nhắn</button>${c.s === "revoked" ? `<button data-a="restore">Khôi phục</button>` : `<button data-a="revoke">Thu hồi</button>`}<button data-a="plus">+1 lượt</button>${st === "downloading" ? `<button data-a="unlock">Mở khoá</button>` : ""}<button data-a="expiry">Hạn</button><button data-a="note">Ghi chú</button><button class="dng" data-a="delete">Xoá</button></div></td></tr>`; }).join("") + `</tbody></table></div><p class="hint">${rows.length}/${codes.length} mã${cursor ? " (còn nữa, bấm Tải thêm)" : ""}</p>`
+      : `<p class="hint">Không có mã nào${codes.length ? " khớp bộ lọc" : ""}.</p>`;
+    $("#b_more").hidden = !cursor;
+  }
+  $("#b_codes").addEventListener("click", async (e) => {
+    const b = e.target.closest("button[data-a]"); if (!b) return;
+    const code = b.closest("tr").dataset.code, c = codes.find((x) => x.code === code), a = b.dataset.a, body = { code, action: a };
+    try {
+      if (a === "copy") return copy(pretty(code));
+      if (a === "msg") { const p = products.find((x) => x.id === c.p); return copy(message(p ? p.name : "sản phẩm", code, c.m, c.e), "Đã sao chép tin nhắn"); }
+      if (a === "delete" && !confirm(`Xoá hẳn mã ${pretty(code)}?\nKhách còn giữ mã này sẽ không tải được nữa.`)) return;
+      if (a === "revoke" && !confirm(`Thu hồi mã ${pretty(code)}? Khách sẽ không tải được nữa (có thể khôi phục).`)) return;
+      if (a === "expiry") { const d = prompt("Hạn mới: số ngày kể từ hôm nay (0 = không hết hạn)", "30"); if (d === null) return; body.days = +d; }
+      if (a === "note") { const n = prompt("Ghi chú:", c.n || ""); if (n === null) return; body.note = n; }
+      if (a === "plus") body.n = 1;
+      await api("/buy-admin/code", body); toast("Đã cập nhật"); await loadCodes();
+    } catch (er) { toast(er.message, true); }
+  });
+  ["#f_st", "#f_prod"].forEach((s) => ($(s).onchange = () => { filter.st = $("#f_st").value; filter.prod = $("#f_prod").value; drawCodes(); }));
+  $("#f_q").oninput = () => { filter.q = $("#f_q").value; drawCodes(); };
+  $("#b_reload").onclick = () => loadAll();
+  $("#b_more").onclick = async () => { try { const r = await api("/buy-admin/overview?cursor=" + encodeURIComponent(cursor)); codes = codes.concat(r.codes); cursor = r.cursor; drawCodes(); } catch (e) { toast(e.message, true); } };
+
+  async function loadCodes() { const r = await api("/buy-admin/overview"); products = r.products; codes = r.codes; cursor = r.cursor; drawProducts(); drawCodes(); }
+  async function loadAll() { try { await loadCodes(); } catch (e) { $("#b_codes").innerHTML = `<p class="err">${esc(e.message)}</p>`; } }
+  loadConn(); loadAll();
+}});
+</script></body></html>

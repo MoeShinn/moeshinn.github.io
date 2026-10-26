@@ -1,4 +1,5 @@
 User-agent: *
 Disallow: /admin/
+Disallow: /buy/
 
 Sitemap: https://shinjuvn.github.io/sitemap.xml

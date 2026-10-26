@@ -389,7 +389,7 @@ function put(rel, next) {
 const NON_PAGE = /\.(?:webp|png|jpe?g|gif|avif|svg|ico|mp4|webm|zip|exe|pdf|json|txt)(?:\?.*)?$/i;
 function patchSitemap(xml) {
   const prefixes = [`${SITE}/product/`, `${SITE}/album/`];
-  const dropPath = (loc) => NON_PAGE.test(loc) || ["/assets/", "/s/", "/admin/", "/image/"].some((d) => loc.startsWith(SITE + d));
+  const dropPath = (loc) => NON_PAGE.test(loc) || ["/assets/", "/s/", "/admin/", "/buy/", "/image/"].some((d) => loc.startsWith(SITE + d));
   let out = xml.replace(/[ \t]*<url><loc>([^<]*)<\/loc>(?:<lastmod>[^<]*<\/lastmod>)?<\/url>\r?\n?/g, (m, loc) => (dropPath(loc) || (prefixes.some((p) => loc.startsWith(p)) && /\/$/.test(loc)) ? "" : m));
   if (!downloads.length) out = out.replace(new RegExp(`[ \\t]*<url><loc>${escRe(SITE)}/download/</loc>(?:<lastmod>[^<]*</lastmod>)?</url>\\r?\\n?`), "");
   else if (!out.includes(`<loc>${SITE}/download/</loc>`)) out = out.replace(/<\/urlset>/, () => `  <url><loc>${SITE}/download/</loc></url>\n</urlset>`);
