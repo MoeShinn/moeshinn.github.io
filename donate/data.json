@@ -35,14 +35,14 @@
     "css": ".alert{gap:12px;padding:16px;max-width:900px}\n.h1{font-size:44px;font-weight:700;text-shadow:0 2px 6px #000}\n.mes{font-size:30px;text-shadow:0 2px 6px #000;word-break:break-word}"
   },
   "tts": {
-    "on": true,
+    "on": false,
     "voice": "banmai",
     "speed": "0",
     "delay": 2,
     "min": 10000,
     "maxChars": 100,
-    "text": "{DISPLAY NAME} đã tặng bạn 1 ly cà phê giá {AMOUNT} đồng.",
-    "textMsg": "{DISPLAY NAME} đã tặng bạn 1 ly cà phê giá {AMOUNT} đồng. Lời nhắn gửi từ {DISPLAY NAME}: {MESSENGER}"
+    "text": "{DISPLAY NAME} đã tặng bạn 1 ly kem giá {AMOUNT} đồng.",
+    "textMsg": "{DISPLAY NAME} đã tặng bạn 1 ly kem giá {AMOUNT} đồng. {MESSENGER}"
   },
   "seo": {
     "description": "Ủng hộ Shinju Ch. qua chuyển khoản ngân hàng, quét mã QR, không phí phụ thu. Donate hiện alert ngay trên stream.",
