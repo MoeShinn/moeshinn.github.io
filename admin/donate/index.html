@@ -48,7 +48,7 @@ Admin.boot({ id: "donate", title: "Donate", async render(main) {
     <div class="cols">${S("Giọng", "tts.voice", VOICES)}${S("Tốc độ", "tts.speed", [["-2", "-2"], ["-1", "-1"], ["0", "0"], ["1", "1"], ["2", "2"]])}${T("Delay sau âm thanh (giây)", "tts.delay", "number", 'step="0.1" min="0"')}${T("Đọc từ mức (đ)", "tts.min", "number", 'step="1000"')}${T("Đọc tối đa (ký tự)", "tts.maxChars", "number")}</div>
     ${A("Câu đọc khi không có lời nhắn", "tts.text")}${A("Câu đọc khi có lời nhắn", "tts.textMsg", 3)}<p class="row"><button class="ghost" id="vp">Nghe thử giọng</button></p></div>
   <div class="card"><b>Xem trước & Test donate ảo</b><div class="cols">${`<label>Tên<input id="tn" value="Khách Test"></label><label>Số tiền<input id="ta" type="number" value="50000"></label><label>Tin nhắn<input id="tm" value="Chúc kênh ngày càng phát triển!"></label>`}</div>
-    <p class="row"><button id="tg">Gửi alert thử</button><label class="row"><input type="checkbox" id="tt">Đọc TTS thật (tốn lượt API)</label></p><div class="pv" id="pv"><iframe id="fr" src="/donate/overlay/?preview=1"></iframe></div></div>
+    <p class="row"><button class="ghost" id="tg">Xem thử trong khung</button><button id="to">Gửi alert thử lên OBS</button><button class="ghost" id="cpt">Copy link overlay (test, không cần stream)</button><label class="row"><input type="checkbox" id="tt">Đọc TTS thật (tốn lượt API)</label></p><div class="pv" id="pv"><iframe id="fr" src="/donate/overlay/?preview=1"></iframe></div></div>
   <p class="row"><button id="save">Lưu lên GitHub</button></p>`;
   const fr = $("#fr"), pv = $("#pv"), fit = () => (fr.style.transform = `scale(${pv.clientWidth / 1920})`); fit(); addEventListener("resize", fit);
   const pcfg = () => { const c = structuredClone(cfg); for (const k of ["image", "sound"]) if (blobs[c.alert[k]]) c.alert[k] = blobs[c.alert[k]]; return c; };
@@ -65,9 +65,12 @@ Admin.boot({ id: "donate", title: "Donate", async render(main) {
   $("#cp").onclick = () => { keep(); navigator.clipboard.writeText(`${location.origin}/donate/overlay/?t=${encodeURIComponent($("#ot").value)}`).then(() => Admin.toast("Đã copy link overlay")); };
   $("#push").onclick = async () => { try { await cf("/admin/settings", { min: cfg.min, nameMax: cfg.nameMax, msgMax: cfg.msgMax, template: cfg.template, ai: cfg.ai, bank: cfg.bank, tts: cfg.tts }); Admin.toast("Cloudflare đã nhận setting mới"); } catch (e) { Admin.toast(e.message, true); } };
   $("#vp").onclick = async () => { try { const d = await cf("/admin/tts", { voice: cfg.tts.voice, speed: cfg.tts.speed, text: "Xin chào, đây là giọng đọc thử cho donate." }); play(d.url); } catch (e) { Admin.toast(e.message, true); } };
-  $("#tg").onclick = async () => { const al = { name: $("#tn").value, amount: +$("#ta").value, msg: $("#tm").value, audio: "" };
+  const mk = async () => { const al = { name: $("#tn").value, amount: +$("#ta").value, msg: $("#tm").value, audio: "" };
     if ($("#tt").checked) try { const t = cfg.tts, f = (s) => s.replace(/\{DISPLAY NAME\}/g, al.name).replace(/\{AMOUNT\}/g, al.amount).replace(/\{MESSENGER\}/g, al.msg.slice(0, t.maxChars)); al.audio = (await cf("/admin/tts", { voice: t.voice, speed: t.speed, text: f(al.msg ? t.textMsg : t.text) })).url; } catch (e) { Admin.toast(e.message, true); }
-    fr.contentWindow.postMessage({ cfg: pcfg(), alert: al }, "*"); };
+    return al; };
+  $("#tg").onclick = async () => fr.contentWindow.postMessage({ cfg: pcfg(), alert: await mk() }, "*");
+  $("#to").onclick = async () => { try { await cf("/admin/test", await mk()); Admin.toast("Đã gửi, OBS nhận trong ≤5 giây (nhớ Lưu lên GitHub nếu vừa sửa giao diện)"); } catch (e) { Admin.toast(e.message, true); } };
+  $("#cpt").onclick = () => { keep(); navigator.clipboard.writeText(`${location.origin}/donate/overlay/?t=${encodeURIComponent($("#ot").value)}&always=1`).then(() => Admin.toast("Đã copy link test")); };
   $("#save").onclick = async () => { try { await Admin.commitFiles("Admin: cập nhật donate", [...files, { path: PATH, content: JSON.stringify(cfg, null, 2) + "\n" }]); files.length = 0; Admin.toast("Đã lưu. Web cập nhật sau ~1 phút."); } catch (e) { Admin.toast(e.message, true); } };
   const KM = { k_sp: "SEPAY_KEY", k_fp: "FPT_KEY" }, dirty = {};
   ["k_sp", "k_fp"].forEach((id) => ($("#" + id).oninput = () => (dirty[id] = 1)));

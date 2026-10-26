@@ -52,13 +52,13 @@
   async function main() {
     cfg0 = await (await fetch("/donate/data.json", { cache: "no-cache" })).json(); apply(cfg0);
     if (PREVIEW) return parent.postMessage({ ready: 1 }, "*");
-    const API = cfg0.api; let cursor = null, timer = 0, streaming = !window.obsstudio, visible = true; const t0 = Date.now(), inObs = !!window.obsstudio;
+    const API = cfg0.api; const always = Q.has("always"); let cursor = null, tt = 0, timer = 0, streaming = !window.obsstudio || always, visible = true; const t0 = Date.now(), inObs = !!window.obsstudio;
     const active = () => streaming && visible && (inObs || (document.visibilityState === "visible" && Date.now() - t0 < 6 * 3600e3));
     async function tick() {
       timer = 0; if (!active()) { cursor = null; return; }
       try {
-        const r = await (await fetch(`${API}/api/alerts?t=${encodeURIComponent(TOKEN)}&after=${cursor ?? "latest"}`)).json();
-        if (r.items) { cursor = r.last; queue.push(...r.items); pump(); }
+        const r = await (await fetch(`${API}/api/alerts?t=${encodeURIComponent(TOKEN)}&after=${cursor ?? "latest"}&tt=${tt}`)).json();
+        if (r.items) { cursor = r.last; tt = r.tt || tt; if (r.test) queue.push(r.test); queue.push(...r.items); pump(); }
       } catch {}
       timer = setTimeout(tick, 5000);
     }
@@ -66,7 +66,7 @@
     if (inObs) {
       obsstudio.getStatus && obsstudio.getStatus((s) => { streaming = !!s.streaming; kick(); });
       addEventListener("obsStreamingStarted", () => { streaming = true; cursor = null; kick(); });
-      addEventListener("obsStreamingStopped", () => { streaming = false; });
+      addEventListener("obsStreamingStopped", () => { streaming = always; });
       addEventListener("obsSourceVisibleChanged", (e) => { visible = e.detail.visible; if (!visible) cursor = null; kick(); });
     }
     document.addEventListener("visibilitychange", () => { if (document.visibilityState !== "visible") cursor = null; kick(); });
