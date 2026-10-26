@@ -127,10 +127,7 @@ Admin.boot({ id: "setting", title: "Cài đặt", async render(main) {
     <label>category-id<input id="gc_cid" value="${esc(S.giscus.categoryId)}"></label></div>
   <details class="card"><summary>Nâng cao</summary>
     <p class="hint">Đổi favicon, tên site hay mô tả mặc định chỉ cập nhật 5 trang chính. Các trang bài viết / download đã đăng trước đó vẫn giữ bản cũ. Bấm nút dưới sau khi <b>đã Lưu</b> để làm mới tất cả trang đó trong một commit (bài đăng mới luôn dùng cài đặt mới nhất).</p>
-    <button type="button" class="ghost" id="rb">Làm mới trang bài viết và download</button> <span class="hint" id="rbs"></span>
-    <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
-    <p class="hint"><b>Sitemap.</b> Bấm nút dưới để quét toàn bộ repo và thêm vào <code>sitemap.xml</code> mọi trang công khai (viết gọn dạng <code>/post/…/</code>, không kèm <code>index.html</code>) cùng ảnh png, jpg, webp… chưa có trong sitemap. URL đã có sẽ được giữ nguyên, không đổi <code>lastmod</code>. File .js, .css, .json, .md, trang <code>/admin/</code> và link rút gọn <code>/s/</code> không được thêm. Worker cũng tự quét mỗi ngày lúc 00:30 (giờ Việt Nam). Muốn loại thêm thư mục hoặc tắt quét tự động: sửa <code>sitemap</code> trong <code>site-settings.json</code> (<code>exclude</code>, <code>auto</code>).</p>
-    <button type="button" class="ghost" id="sm">Quét và cập nhật sitemap</button> <span class="hint" id="sms"></span></details>
+    <button type="button" class="ghost" id="rb">Làm mới trang bài viết và download</button> <span class="hint" id="rbs"></span></details>
   <p class="hint">Lưu ý: nền động và SEO có hiệu lực sau khi lưu (khoảng 1 phút). Các mục thông báo, bảo trì và bình luận đã được lưu vào <code>site-settings.json</code>, nhưng web công khai sẽ đọc chúng ở các giai đoạn sau.</p>
   <button id="save">Lưu thay đổi</button>`;
   $("#av_file").onchange = (e) => { const f = e.target.files[0]; if (f) $("#av_prev").src = URL.createObjectURL(f); };
@@ -155,14 +152,6 @@ Admin.boot({ id: "setting", title: "Cài đặt", async render(main) {
       const [posts, saved] = await Promise.all([Admin.readJson("post/data/posts.json", []), Admin.readJson("site-settings.json", {})]);
       const r = await Rebuild.all(Admin, { posts, seo: AdminSeo.merge(saved.seo), render: { parseFrontmatter, renderPostBody }, onProgress: (i, n) => (st.textContent = `Đang xử lý ${i}/${n}…`) });
       st.textContent = ""; Admin.toast(`Đã làm mới ${r.posts} bài và ${r.downloads} mục download.`);
-    } catch (e) { st.textContent = ""; Admin.toast(e.message, true); }
-    b.disabled = false;
-  };
-  $("#sm").onclick = async () => {
-    const b = $("#sm"), st = $("#sms"); b.disabled = true; st.textContent = "Đang quét repo…";
-    try {
-      const r = await Admin.api("/sitemap/scan", {});
-      st.textContent = ""; Admin.toast(r.skipped ? "Đã bỏ qua: " + r.skipped : r.added ? `Đã thêm ${r.added} URL mới vào sitemap (tổng ${r.total} URL). Web cập nhật sau ~1 phút.` : `Sitemap đã đầy đủ (${r.total} URL), không có URL mới.`);
     } catch (e) { st.textContent = ""; Admin.toast(e.message, true); }
     b.disabled = false;
   };
