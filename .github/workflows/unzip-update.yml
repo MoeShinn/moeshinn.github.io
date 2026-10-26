@@ -114,7 +114,7 @@ jobs:
           node-version: 20
 
       # Dựng lại HTML tĩnh / sitemap / llms.txt theo file vừa cập nhật.
-      # Nếu prerender lỗi thì vẫn commit phần giải nén (cron của workflow Prerender sẽ chạy lại sau ≤ 5 phút).
+      # Nếu prerender lỗi thì vẫn commit phần giải nén (không còn cron tự chạy lại: nếu lỗi, vào tab Actions bấm Run workflow ở Prerender, hoặc commit lại một file .json/.html bất kỳ).
       - name: Prerender
         continue-on-error: true
         run: node tools/prerender.js

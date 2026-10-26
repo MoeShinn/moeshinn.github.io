@@ -28,9 +28,7 @@ on:
       - "!moods.json"
       - "!manifest.webmanifest"
       - "!download/link-data.json"
-  schedule:
-    - cron: "*/5 * * * *"   # dự phòng: 5 phút một lần (xóa mục này nếu không cần dự phòng)
-  workflow_dispatch:         # có nút chạy tay trong tab Actions
+  workflow_dispatch:         # có nút chạy tay trong tab Actions (không còn cron định kỳ; chạy khi push có đụng file ở mục paths ở trên)
 
 concurrency:
   group: prerender
