@@ -1,10 +1,11 @@
-<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><title>Donate overlay</title>
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><title>Donate overlay</title>
 <style>html,body{margin:0;height:100%;background:transparent!important;overflow:hidden;font-family:"Baloo 2","Segoe UI",sans-serif;color:#fff}
 #stage{position:fixed;inset:0;display:flex;padding:24px;box-sizing:border-box}
 .alert{display:flex;align-items:center;text-align:center;animation:in .4s ease-out}.alert.v{flex-direction:column}.alert.h{flex-direction:row;text-align:left}
 .alert img{object-fit:contain;flex:none}.alert .t{display:flex;flex-direction:column;gap:6px;min-width:0}.alert.h .t{flex:1}
 @keyframes in{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:none}}.alert.out{opacity:0;transition:opacity .5s}</style>
 <style id="usercss"></style></head><body><div id="stage"></div>
+<script src="/donate/js/tts.js"></script>
 <script>
 (() => {
   const Q = new URLSearchParams(location.search), TOKEN = Q.get("t") || "", PREVIEW = Q.has("preview"), $ = (s) => document.querySelector(s);
@@ -34,14 +35,15 @@
     $("#stage").replaceChildren(el);
     const t0 = Date.now(), max = (+a.duration || 15) * 1000; let end = (+a.minShow || 6) * 1000;
     if (a.sound) { const s = new Audio(a.sound); s.volume = Math.min(1, (+a.volume || 80) / 100); s.play().catch(() => {}); }
-    if (t.on && al.audio) {
-      await sleep((+t.delay || 0) * 1000);
-      const v = new Audio(al.audio); v.volume = 1;
-      for (let k = 0; k < 15; k++) { // file FPT cần vài giây để sẵn sàng
-        const ok = await new Promise((r) => { v.onended = () => r("end"); v.onplaying = () => r("play"); v.onerror = () => r("err"); v.src = al.audio + (k ? "?r=" + k : ""); v.play().catch(() => r("err")); });
-        if (ok === "err") { await sleep(1500); continue; }
-        if (ok === "play") { await new Promise((r) => (v.onended = r)); end = Math.max(end, Date.now() - t0 + 1000); }
-        break;
+    const T = window.ShinjuTTS, tc = T.cfg(t);
+    // Giọng đọc: Google TTS → tự chuyển speechSynthesis nếu Google lỗi/bị chặn. al.audio === "mute" = alert thử không đọc.
+    if (tc.on && al.audio !== "mute" && Number(al.amount) >= (+tc.min || 0)) {
+      await sleep((+tc.delay || 0) * 1000);
+      const left = max - (Date.now() - t0);
+      if (left > 500) {
+        const spoken = T.build(tc, al);
+        await Promise.race([T.speak(spoken, tc), sleep(left)]); T.cancel(); // quá thời gian tối đa thì cắt
+        end = Math.max(end, Date.now() - t0 + 1000);
       }
     }
     await sleep(Math.max(0, Math.min(max, end) - (Date.now() - t0)));

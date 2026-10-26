@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex,nofollow"><title>Donate</title>
+<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><title>Donate</title>
 <link rel="stylesheet" href="/admin/css/admin.css">
 <style>.pv{position:relative;height:300px;border:1px solid var(--line);border-radius:10px;background:repeating-conic-gradient(#1b2a44 0 25%,#13203a 0 50%) 0 0/24px 24px;overflow:hidden}
 .pv iframe{position:absolute;left:0;top:0;width:1920px;height:1080px;border:0;transform-origin:0 0;background:transparent}
 .warn{color:#ffb454;font-size:13px}.k{font-family:monospace}</style></head>
 <body><div id="app"></div><div id="toast"></div>
 <script src="/admin/js/core.js"></script>
+<script src="/donate/js/tts.js"></script>
 <script>
 Admin.boot({ id: "donate", title: "Donate", async render(main) {
   const { esc, $ } = Admin, PATH = "donate/data.json", LS = localStorage;
   let cfg; try { cfg = await Admin.readJson(PATH, {}); } catch (e) { main.innerHTML = `<h2>Donate</h2><p class="err">${esc(e.message)}</p>`; return; }
-  const D = { title: "Ủng Hộ Shinju Ch.", intro: "", api: "", min: 10000, nameMax: 24, msgMax: 120, presets: [10000, 20000, 50000, 100000], bank: {}, template: "DONATE {ORDER CODE}", ai: true, alert: { layout: "v", posX: "center", posY: "top", duration: 15, minShow: 6, volume: 80, imgW: 200, imgH: 200 }, tts: { on: true, voice: "banmai", speed: "0", delay: 2, min: 10000, maxChars: 100 }, seo: {} };
+  const D = { title: "Ủng Hộ Shinju Ch.", intro: "", api: "", min: 10000, nameMax: 24, msgMax: 120, presets: [10000, 20000, 50000, 100000], bank: {}, template: "DONATE {ORDER CODE}", ai: true, alert: { layout: "v", posX: "center", posY: "top", duration: 15, minShow: 6, volume: 80, imgW: 200, imgH: 200 }, tts: structuredClone(ShinjuTTS.DEF), seo: {} };
   const merge = (a, b) => { for (const k in b) a[k] = b[k] && typeof b[k] === "object" && !Array.isArray(b[k]) ? merge(a[k] || {}, b[k]) : b[k]; return a; };
   cfg = merge(structuredClone(D), cfg);
+  delete cfg.tts.voice; delete cfg.tts.speed; // bỏ cấu hình FPT.AI cũ, mọi thứ nằm trong một file donate/data.json
   const files = [], blobs = {}; // file chờ commit; blob để xem trước
   const get = (p) => p.split(".").reduce((o, k) => o?.[k], cfg);
   const set = (p, v) => { const ks = p.split("."), l = ks.pop(); ks.reduce((o, k) => (o[k] ??= {}), cfg)[l] = v; };
@@ -21,19 +23,16 @@ Admin.boot({ id: "donate", title: "Donate", async render(main) {
   const A = (l, p, r = 2) => `<label>${l}<textarea data-p="${p}" rows="${r}" spellcheck="false">${esc(get(p) ?? "")}</textarea></label>`;
   const S = (l, p, o) => `<label>${l}<select data-p="${p}">${o.map(([v, n]) => `<option value="${v}" ${String(get(p)) === v ? "selected" : ""}>${n}</option>`).join("")}</select></label>`;
   const C = (l, p) => `<label class="row"><input type="checkbox" data-p="${p}" ${get(p) ? "checked" : ""}>${l}</label>`;
-  const VOICES = [["banmai", "Ban Mai (nữ Bắc)"], ["thuminh", "Thu Minh (nữ Bắc)"], ["leminh", "Lê Minh (nam Bắc)"], ["myan", "Mỹ An (nữ Trung)"], ["giahuy", "Gia Huy (nam Trung)"], ["ngoclam", "Ngọc Lam (nữ Trung)"], ["lannhi", "Lan Nhi (nữ Nam)"], ["linhsan", "Linh San (nữ Nam)"]];
   main.innerHTML = `<h2>Donate</h2>
   <div class="card"><b>Kết nối Cloudflare</b><div class="cols"><label>Địa chỉ Worker<input data-p="api" value="${esc(cfg.api)}" placeholder="https://shinju-donate.xxx.workers.dev"></label>
     <label>Admin key (chỉ lưu trên máy này)<input id="ak" type="password" value="${esc(LS.dn_ak || "")}"></label>
     <label>Overlay token (chỉ lưu trên máy này)<input id="ot" type="password" value="${esc(LS.dn_ot || "")}"></label></div>
-    <p class="row"><button class="ghost" id="cp">Copy link overlay donate</button><button class="ghost" id="push">Cập nhật setting lên Cloudflare</button></p>
-    <p class="hint">Cloudflare chỉ dùng bản setting ở nút trên (không quét định kỳ). Phần hiển thị alert nằm ở GitHub nên lưu GitHub là đổi ngay.</p></div>
+    <p class="row"><button class="ghost" id="cp">Copy link overlay donate</button></p>
+    <p class="hint">Toàn bộ setting nằm trong MỘT file <span class="k">donate/data.json</span> trên GitHub. Worker Cloudflare tự đọc file này (trễ tối đa vài phút do cache), không cần đẩy setting riêng nữa.</p></div>
   <div class="card"><b>API key (lưu trên Cloudflare, không đưa vào repo)</b>
     <label>SePay API Key — tự đặt một chuỗi bí mật, rồi dán đúng chuỗi đó vào SePay: my.sepay.vn → Tích hợp Webhooks → chọn kiểu xác thực "API Key" (tên menu có thể khác)
       <span class="row"><input id="k_sp" type="password" placeholder="Đang ẩn — bấm Hiện để lấy từ Cloudflare" style="flex:1"><button class="ghost" data-eye="k_sp">Hiện</button></span></label>
-    <label>TTS API Key — FPT.AI: console.fpt.ai → Text to Speech → API key
-      <span class="row"><input id="k_fp" type="password" placeholder="Đang ẩn — bấm Hiện để lấy từ Cloudflare" style="flex:1"><button class="ghost" data-eye="k_fp">Hiện</button></span></label>
-    <p class="row"><button class="ghost" id="ksave">Lưu key lên Cloudflare</button></p><p class="hint">Chỉ gửi ô bạn đã nhập mới. Key không nằm trong data.json hay GitHub; Hiện mới gọi Cloudflare, Ẩn thì xóa khỏi màn hình.</p></div>
+    <p class="row"><button class="ghost" id="ksave">Lưu key lên Cloudflare</button></p><p class="hint">Giọng đọc dùng Google TTS/giọng trình duyệt nên không cần key. Key không nằm trong data.json hay GitHub; Hiện mới gọi Cloudflare, Ẩn thì xóa khỏi màn hình.</p></div>
   <div class="card"><b>Trang donate</b><div class="cols">${T("Tiêu đề", "title")}${T("Giới thiệu", "intro")}${T("Số tiền tối thiểu (đ)", "min", "number", 'step="1000"')}${T("Tên tối đa (ký tự)", "nameMax", "number")}${T("Lời nhắn tối đa (ký tự)", "msgMax", "number")}</div>
     <div class="cols">${T("Mã ngân hàng (vietqr.io: mbbank, vcb, 970422…)", "bank.id")}${T("Tên ngân hàng", "bank.name")}${T("Số tài khoản", "bank.acc")}${T("Chủ tài khoản", "bank.holder")}</div>
     ${T("Nội dung chuyển khoản (giữ {ORDER CODE})", "template")}${C("Dùng AI kiểm duyệt lời nhắn khi bấm donate", "ai")}
@@ -44,11 +43,13 @@ Admin.boot({ id: "donate", title: "Donate", async render(main) {
     <div class="cols"><label>Âm thanh: link<input data-p="alert.sound" value="${esc(cfg.alert.sound || "")}"></label><label>…hoặc tải lên<input type="file" id="fs" accept="audio/*"></label>${T("Âm lượng (0-100)", "alert.volume", "number")}</div>
     <div class="cols">${S("Bố cục", "alert.layout", [["v", "Dọc: ảnh / H1 / Mes"], ["h", "Ngang: ảnh | H1 + Mes"]])}${S("Căn ngang", "alert.posX", [["left", "Trái"], ["center", "Giữa"], ["right", "Phải"]])}${S("Căn dọc", "alert.posY", [["top", "Trên"], ["middle", "Giữa"], ["bottom", "Dưới"]])}${T("Hiện tối đa (giây)", "alert.duration", "number", 'step="1" min="1"')}${T("Hiện tối thiểu (giây)", "alert.minShow", "number", 'step="1" min="1"')}</div>
     ${A("CSS (theo màn FHD 1920×1080; class .alert .h1 .mes img)", "alert.css", 6)}</div>
-  <div class="card"><b>Thoại TTS (FPT.AI)</b>${C("Bật đọc lời nhắn", "tts.on")}
-    <div class="cols">${S("Giọng", "tts.voice", VOICES)}${S("Tốc độ", "tts.speed", [["-2", "-2"], ["-1", "-1"], ["0", "0"], ["1", "1"], ["2", "2"]])}${T("Delay sau âm thanh (giây)", "tts.delay", "number", 'step="0.1" min="0"')}${T("Đọc từ mức (đ)", "tts.min", "number", 'step="1000"')}${T("Đọc tối đa (ký tự)", "tts.maxChars", "number")}</div>
-    ${A("Câu đọc khi không có lời nhắn", "tts.text")}${A("Câu đọc khi có lời nhắn", "tts.textMsg", 3)}<p class="row"><button class="ghost" id="vp">Nghe thử giọng</button></p></div>
+  <div class="card"><b>Giọng đọc (Google TTS → dự phòng giọng trình duyệt)</b>${C("Bật đọc lời nhắn", "tts.on")}
+    <div class="cols">${S("Nguồn giọng", "tts.engine", [["auto", "Google TTS, lỗi thì dùng giọng trình duyệt"], ["browser", "Chỉ dùng giọng trình duyệt"]])}<label>Giọng trình duyệt dự phòng (theo máy đang mở admin)<select data-p="tts.voiceURI" id="vsel"><option value="">Tự chọn giọng tiếng Việt</option></select></label>${T("Tốc độ (0.5 – 2)", "tts.rate", "number", 'step="0.1" min="0.5" max="2"')}${T("Cao độ (0 – 2, chỉ giọng trình duyệt)", "tts.pitch", "number", 'step="0.1" min="0" max="2"')}${T("Âm lượng giọng (0-100)", "tts.volume", "number")}${T("Delay sau âm thanh (giây)", "tts.delay", "number", 'step="0.1" min="0"')}${T("Đọc từ mức (đ)", "tts.min", "number", 'step="1000"')}${T("Đọc tối đa (ký tự lời nhắn)", "tts.maxChars", "number")}</div>
+    ${A("Câu đọc khi không có lời nhắn ({DISPLAY NAME} {AMOUNT})", "tts.text")}${A("Câu đọc khi có lời nhắn (thêm {MESSENGER})", "tts.textMsg", 3)}
+    <p class="hint">Tự đổi số tiền thành chữ ("50000" → "năm mươi nghìn"), hiểu 50k / 1tr5 / viết tắt (ko, dc, ae, mn…), bỏ emoji, link, kéo dài chữ (quáááá). Giọng dự phòng phụ thuộc máy chạy OBS: cần cài giọng tiếng Việt cho Windows (Settings → Time &amp; language → Speech).</p>
+    <p class="row"><button class="ghost" id="vp">Nghe thử giọng</button></p><p class="hint">Câu sẽ đọc: <span id="spk" class="k"></span></p></div>
   <div class="card"><b>Xem trước & Test donate ảo</b><div class="cols">${`<label>Tên<input id="tn" value="Khách Test"></label><label>Số tiền<input id="ta" type="number" value="50000"></label><label>Tin nhắn<input id="tm" value="Chúc kênh ngày càng phát triển!"></label>`}</div>
-    <p class="row"><button class="ghost" id="tg">Xem thử trong khung</button><button id="to">Gửi alert thử lên OBS</button><button class="ghost" id="cpt">Copy link overlay (test, không cần stream)</button><label class="row"><input type="checkbox" id="tt">Đọc TTS thật (tốn lượt API)</label></p><div class="pv" id="pv"><iframe id="fr" src="/donate/overlay/?preview=1"></iframe></div></div>
+    <p class="row"><button class="ghost" id="tg">Xem thử trong khung</button><button id="to">Gửi alert thử lên OBS</button><button class="ghost" id="cpt">Copy link overlay (test, không cần stream)</button><label class="row"><input type="checkbox" id="tt" checked>Đọc giọng khi test</label></p><div class="pv" id="pv"><iframe id="fr" src="/donate/overlay/?preview=1"></iframe></div></div>
   <p class="row"><button id="save">Lưu lên GitHub</button></p>`;
   const fr = $("#fr"), pv = $("#pv"), fit = () => (fr.style.transform = `scale(${pv.clientWidth / 1920})`); fit(); addEventListener("resize", fit);
   const pcfg = () => { const c = structuredClone(cfg); for (const k of ["image", "sound"]) if (blobs[c.alert[k]]) c.alert[k] = blobs[c.alert[k]]; return c; };
@@ -61,20 +62,18 @@ Admin.boot({ id: "donate", title: "Donate", async render(main) {
   pick("#fi", "image"); pick("#fs", "sound");
   const keep = () => { LS.dn_ak = $("#ak").value; LS.dn_ot = $("#ot").value; };
   const cf = async (path, body) => { keep(); const r = await fetch(cfg.api + path, { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + $("#ak").value }, body: JSON.stringify(body) }); const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || "Lỗi " + r.status); return d; };
-  const play = async (d) => { if (d.error || !d.url) return Admin.toast(d.error || "Không nhận được link âm thanh", true); Admin.toast("Đang tạo giọng, chờ vài giây…"); const a = new Audio();
-    for (let k = 0; k < 15; k++) { a.src = d.url + (k ? "?r=" + k : ""); try { await a.play(); return; } catch { await new Promise((r) => setTimeout(r, 1500)); } } Admin.toast("FPT tạo file quá lâu hoặc link lỗi, thử lại sau", true); };
   $("#cp").onclick = () => { keep(); navigator.clipboard.writeText(`${location.origin}/donate/overlay/?t=${encodeURIComponent($("#ot").value)}`).then(() => Admin.toast("Đã copy link overlay")); };
-  $("#push").onclick = async () => { try { await cf("/admin/settings", { min: cfg.min, nameMax: cfg.nameMax, msgMax: cfg.msgMax, template: cfg.template, ai: cfg.ai, bank: cfg.bank, tts: cfg.tts }); Admin.toast("Cloudflare đã nhận setting mới"); } catch (e) { Admin.toast(e.message, true); } };
-  $("#vp").onclick = async () => { try { const d = await cf("/admin/tts", { voice: cfg.tts.voice, speed: cfg.tts.speed, text: "Xin chào, đây là giọng đọc thử cho donate." }); play(d); } catch (e) { Admin.toast(e.message, true); } };
-  const mk = async () => { const al = { name: $("#tn").value, amount: +$("#ta").value, msg: $("#tm").value, audio: "" };
-    if ($("#tt").checked) try { const t = cfg.tts, f = (s) => s.replace(/\{DISPLAY NAME\}/g, al.name).replace(/\{AMOUNT\}/g, al.amount).replace(/\{MESSENGER\}/g, al.msg.slice(0, t.maxChars)); const d = await cf("/admin/tts", { voice: t.voice, speed: t.speed, text: f(al.msg ? t.textMsg : t.text) }); if (d.error) Admin.toast(d.error, true); al.audio = d.url || ""; } catch (e) { Admin.toast(e.message, true); }
-    return al; };
+  const spoken = () => { try { $("#spk").textContent = ShinjuTTS.build(cfg.tts, { name: $("#tn").value, amount: +$("#ta").value, msg: $("#tm").value }); } catch {} };
+  $("#vp").onclick = async () => { Admin.toast("Đang đọc thử…"); const used = await ShinjuTTS.speak(ShinjuTTS.build(cfg.tts, { name: $("#tn").value, amount: +$("#ta").value, msg: $("#tm").value }), cfg.tts); Admin.toast(used === "none" ? "Không phát được giọng nào (kiểm tra loa/trình duyệt)" : used.includes("browser") ? "Google TTS không dùng được, đã chuyển sang giọng trình duyệt" : "Đã đọc bằng Google TTS", used === "none"); };
+  ShinjuTTS.voices().then((vs) => { const sel = $("#vsel"); sel.innerHTML = '<option value="">Tự chọn giọng tiếng Việt</option>' + vs.map((v) => `<option value="${esc(v.voiceURI)}">${esc(v.name)} (${esc(v.lang)})</option>`).join(""); sel.value = cfg.tts.voiceURI || ""; });
+  const mk = async () => ({ name: $("#tn").value, amount: +$("#ta").value, msg: $("#tm").value, audio: $("#tt").checked ? "" : "mute" });
   $("#tg").onclick = async () => fr.contentWindow.postMessage({ cfg: pcfg(), alert: await mk() }, "*");
+  main.addEventListener("input", spoken); spoken();
   $("#to").onclick = async () => { try { await cf("/admin/test", await mk()); Admin.toast("Đã gửi, OBS nhận trong ≤5 giây (nhớ Lưu lên GitHub nếu vừa sửa giao diện)"); } catch (e) { Admin.toast(e.message, true); } };
   $("#cpt").onclick = () => { keep(); navigator.clipboard.writeText(`${location.origin}/donate/overlay/?t=${encodeURIComponent($("#ot").value)}&always=1`).then(() => Admin.toast("Đã copy link test")); };
   $("#save").onclick = async () => { try { await Admin.commitFiles("Admin: cập nhật donate", [...files, { path: PATH, content: JSON.stringify(cfg, null, 2) + "\n" }]); files.length = 0; Admin.toast("Đã lưu. Web cập nhật sau ~1 phút."); } catch (e) { Admin.toast(e.message, true); } };
-  const KM = { k_sp: "SEPAY_KEY", k_fp: "FPT_KEY" }, dirty = {};
-  ["k_sp", "k_fp"].forEach((id) => ($("#" + id).oninput = () => (dirty[id] = 1)));
+  const KM = { k_sp: "SEPAY_KEY" }, dirty = {};
+  ["k_sp"].forEach((id) => ($("#" + id).oninput = () => (dirty[id] = 1)));
   main.querySelectorAll("[data-eye]").forEach((b) => (b.onclick = async () => { const i = $("#" + b.dataset.eye);
     if (i.type === "text") { i.type = "password"; if (!dirty[i.id]) i.value = ""; b.textContent = "Hiện"; return; }
     if (!dirty[i.id]) try { i.value = (await cf("/admin/secrets", { get: 1 }))[KM[i.id]] || ""; } catch (e) { return Admin.toast(e.message, true); }
