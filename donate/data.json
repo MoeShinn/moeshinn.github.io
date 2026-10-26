@@ -42,7 +42,7 @@
     "min": 10000,
     "maxChars": 100,
     "text": "{DISPLAY NAME} đã tặng bạn 1 ly cà phê giá {AMOUNT} đồng.",
-    "textMsg": "{DISPLAY NAME} đã tặng bạn 1 ly cà phê giá {AMOUNT} đồng. Lời nhắn gửi từ {DISPLAY NAME}: {MESSENGER}"
+    "textMsg": "{DISPLAY NAME} đã tặng bạn 1 ly cà phê giá {AMOUNT} đồng. {MESSENGER}"
   },
   "seo": {
     "description": "Ủng hộ Shinju Ch. qua chuyển khoản ngân hàng, quét mã QR, không phí phụ thu. Donate hiện alert ngay trên stream.",
