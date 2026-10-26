@@ -4,7 +4,17 @@
 <link rel="stylesheet" href="/admin/css/admin.css">
 <style>.pv{position:relative;height:300px;border:1px solid var(--line);border-radius:10px;background:repeating-conic-gradient(#1b2a44 0 25%,#13203a 0 50%) 0 0/24px 24px;overflow:hidden}
 .pv iframe{position:absolute;left:0;top:0;width:1920px;height:1080px;border:0;transform-origin:0 0;background:transparent}
-.warn{color:#ffb454;font-size:13px}.k{font-family:monospace}</style></head>
+.warn{color:#ffb454;font-size:13px}.k{font-family:monospace}
+/* trạng thái nút: bấm / đang xử lý / xong / lỗi */
+button{transition:filter .15s,transform .05s,background .2s}
+button:not(:disabled):hover{filter:brightness(1.15)}button:not(:disabled):active{transform:translateY(1px) scale(.98)}
+button.ghost:not(:disabled):hover{background:rgba(255,255,255,.07)}
+button.busy:disabled,button.done:disabled,button.fail:disabled{opacity:1}
+button.busy{cursor:progress;background:#2b4f86;color:#fff}button.busy.ghost{background:rgba(255,255,255,.1);border-color:#5b8fd9}
+button.busy::before{content:"";display:inline-block;width:.85em;height:.85em;margin-right:.5em;vertical-align:-.1em;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:bsp .7s linear infinite}
+@keyframes bsp{to{transform:rotate(360deg)}}
+button.done{cursor:default;background:#1f8a4c!important;border-color:#1f8a4c!important;color:#fff!important}
+button.fail{cursor:default;background:#b3382c!important;border-color:#b3382c!important;color:#fff!important}</style></head>
 <body><div id="app"></div><div id="toast"></div>
 <script src="/admin/js/core.js"></script>
 <script src="/donate/js/tts.js"></script>
@@ -62,23 +72,40 @@ Admin.boot({ id: "donate", title: "Donate", async render(main) {
   pick("#fi", "image"); pick("#fs", "sound");
   const keep = () => { LS.dn_ak = $("#ak").value; LS.dn_ot = $("#ot").value; };
   const cf = async (path, body) => { keep(); const r = await fetch(cfg.api + path, { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + $("#ak").value }, body: JSON.stringify(body) }); const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || "Lỗi " + r.status); return d; };
-  $("#cp").onclick = () => { keep(); navigator.clipboard.writeText(`${location.origin}/donate/overlay/?t=${encodeURIComponent($("#ot").value)}`).then(() => Admin.toast("Đã copy link overlay")); };
+  // Nút: bấm xong là khoá ngay + đổi chữ/màu (đang xử lý → xong/lỗi), mở lại sau ~1,5 giây. fn ném lỗi = báo lỗi, trả "skip" = không hiện "xong".
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const lock = (b, label) => { b.dataset.txt ??= b.textContent; b.disabled = true; b.classList.remove("done", "fail"); b.classList.add("busy"); b.textContent = label; };
+  const unlock = (b, after) => { b.classList.remove("busy", "done", "fail"); b.textContent = after ?? b.dataset.txt; b.disabled = false; };
+  const act = (b, fn, o = {}) => (b.onclick = async () => {
+    if (b.disabled) return;
+    lock(b, o.busy || "Đang xử lý…"); let st = "done", r;
+    try { r = await fn(); if (r === "skip") st = "skip"; } catch (e) { st = "fail"; Admin.toast(e.message || String(e), true); }
+    if (st === "skip") return unlock(b);
+    b.classList.remove("busy"); b.classList.add(st); b.textContent = st === "done" ? (o.done || "Đã xong ✓") : "Lỗi ✗";
+    await sleep(st === "done" ? (o.hold ?? 1500) : 2000); unlock(b);
+  });
+  const link = (extra) => `${location.origin}/donate/overlay/?t=${encodeURIComponent($("#ot").value)}${extra}`;
+  const copy = (t) => { keep(); return navigator.clipboard.writeText(t).then(() => Admin.toast("Đã copy link"), () => { throw new Error("Trình duyệt chặn copy, hãy thử lại"); }); };
+  act($("#cp"), () => copy(link("")), { busy: "Đang copy…", done: "Đã copy ✓" });
   const spoken = () => { try { $("#spk").textContent = ShinjuTTS.build(cfg.tts, { name: $("#tn").value, amount: +$("#ta").value, msg: $("#tm").value }); } catch {} };
-  $("#vp").onclick = async () => { Admin.toast("Đang đọc thử…"); const used = await ShinjuTTS.speak(ShinjuTTS.build(cfg.tts, { name: $("#tn").value, amount: +$("#ta").value, msg: $("#tm").value }), cfg.tts); Admin.toast(used === "none" ? "Không phát được giọng nào (kiểm tra loa/trình duyệt)" : used.includes("browser") ? "Google TTS không dùng được, đã chuyển sang giọng trình duyệt" : "Đã đọc bằng Google TTS", used === "none"); };
+  act($("#vp"), async () => { Admin.toast("Đang đọc thử…"); const used = await ShinjuTTS.speak(ShinjuTTS.build(cfg.tts, { name: $("#tn").value, amount: +$("#ta").value, msg: $("#tm").value }), cfg.tts);
+    if (used === "none") throw new Error("Không phát được giọng nào (kiểm tra loa/trình duyệt)");
+    Admin.toast(used.includes("browser") ? "Google TTS không dùng được, đã chuyển sang giọng trình duyệt" : "Đã đọc bằng Google TTS"); }, { busy: "Đang đọc…", done: "Đã đọc xong ✓", hold: 800 });
   ShinjuTTS.voices().then((vs) => { const sel = $("#vsel"); sel.innerHTML = '<option value="">Tự chọn giọng tiếng Việt</option>' + vs.map((v) => `<option value="${esc(v.voiceURI)}">${esc(v.name)} (${esc(v.lang)})</option>`).join(""); sel.value = cfg.tts.voiceURI || ""; });
   const mk = async () => ({ name: $("#tn").value, amount: +$("#ta").value, msg: $("#tm").value, audio: $("#tt").checked ? "" : "mute" });
-  $("#tg").onclick = async () => fr.contentWindow.postMessage({ cfg: pcfg(), alert: await mk() }, "*");
+  act($("#tg"), async () => { fr.contentWindow.postMessage({ cfg: pcfg(), alert: await mk() }, "*"); await sleep(Math.min(8, +cfg.alert.minShow || 6) * 1000); }, { busy: "Đang phát thử…", done: "Đã phát ✓", hold: 600 });
   main.addEventListener("input", spoken); spoken();
-  $("#to").onclick = async () => { try { await cf("/admin/test", await mk()); Admin.toast("Đã gửi, OBS nhận trong ≤5 giây (nhớ Lưu lên GitHub nếu vừa sửa giao diện)"); } catch (e) { Admin.toast(e.message, true); } };
-  $("#cpt").onclick = () => { keep(); navigator.clipboard.writeText(`${location.origin}/donate/overlay/?t=${encodeURIComponent($("#ot").value)}&always=1`).then(() => Admin.toast("Đã copy link test")); };
-  $("#save").onclick = async () => { try { await Admin.commitFiles("Admin: cập nhật donate", [...files, { path: PATH, content: JSON.stringify(cfg, null, 2) + "\n" }]); files.length = 0; Admin.toast("Đã lưu. Web cập nhật sau ~1 phút."); } catch (e) { Admin.toast(e.message, true); } };
+  act($("#to"), async () => { await cf("/admin/test", await mk()); Admin.toast("Đã gửi, OBS nhận trong ≤5 giây (nhớ Lưu lên GitHub nếu vừa sửa giao diện)"); }, { busy: "Đang gửi…", done: "Đã gửi ✓", hold: 4000 });
+  act($("#cpt"), () => copy(link("&always=1")), { busy: "Đang copy…", done: "Đã copy ✓" });
+  act($("#save"), async () => { await Admin.commitFiles("Admin: cập nhật donate", [...files, { path: PATH, content: JSON.stringify(cfg, null, 2) + "\n" }]); files.length = 0; Admin.toast("Đã lưu. Web cập nhật sau ~1 phút."); }, { busy: "Đang lưu lên GitHub…", done: "Đã lưu ✓", hold: 2500 });
   const KM = { k_sp: "SEPAY_KEY" }, dirty = {};
   ["k_sp"].forEach((id) => ($("#" + id).oninput = () => (dirty[id] = 1)));
-  main.querySelectorAll("[data-eye]").forEach((b) => (b.onclick = async () => { const i = $("#" + b.dataset.eye);
+  main.querySelectorAll("[data-eye]").forEach((b) => (b.onclick = async () => { const i = $("#" + b.dataset.eye); if (b.disabled) return;
     if (i.type === "text") { i.type = "password"; if (!dirty[i.id]) i.value = ""; b.textContent = "Hiện"; return; }
-    if (!dirty[i.id]) try { i.value = (await cf("/admin/secrets", { get: 1 }))[KM[i.id]] || ""; } catch (e) { return Admin.toast(e.message, true); }
-    i.type = "text"; b.textContent = "Ẩn"; }));
-  $("#ksave").onclick = async () => { const set = {}; for (const id in dirty) set[KM[id]] = $("#" + id).value; try { await cf("/admin/secrets", { set }); for (const id in dirty) delete dirty[id]; Admin.toast("Đã lưu key lên Cloudflare"); } catch (e) { Admin.toast(e.message, true); } };
+    if (!dirty[i.id]) { lock(b, "Đang lấy…"); try { i.value = (await cf("/admin/secrets", { get: 1 }))[KM[i.id]] || ""; } catch (e) { unlock(b, "Hiện"); return Admin.toast(e.message, true); } }
+    i.type = "text"; unlock(b, "Ẩn"); b.dataset.txt = "Ẩn"; }));
+  act($("#ksave"), async () => { const set = {}; for (const id in dirty) set[KM[id]] = $("#" + id).value; if (!Object.keys(set).length) { Admin.toast("Chưa nhập key mới nào để lưu"); return "skip"; }
+    await cf("/admin/secrets", { set }); for (const id in dirty) delete dirty[id]; Admin.toast("Đã lưu key lên Cloudflare"); }, { busy: "Đang lưu key…", done: "Đã lưu key ✓", hold: 2000 });
   lint();
 } });
 </script></body></html>
