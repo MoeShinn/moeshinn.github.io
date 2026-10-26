@@ -2,9 +2,9 @@
   "title": "Ủng Hộ Shinju Ch.",
   "intro": "Mỗi ly cà phê là động lực để mình làm nội dung đều hơn. Cảm ơn bạn rất nhiều!",
   "api": "https://shinju-donate.git-api.workers.dev",
-  "min": 10000,
+  "min": 8000,
   "nameMax": 24,
-  "msgMax": 120,
+  "msgMax": 100,
   "presets": [
     10000,
     20000,
@@ -35,15 +35,15 @@
     "css": ".alert{gap:12px;padding:16px;max-width:900px}\n.h1{font-size:44px;font-weight:700;text-shadow:0 2px 6px #000}\n.mes{font-size:30px;text-shadow:0 2px 6px #000;word-break:break-word}"
   },
   "tts": {
-    "on": false,
+    "on": true,
     "engine": "auto",
     "rate": 1,
     "pitch": 1,
     "volume": 100,
     "voiceURI": "",
     "delay": 2,
-    "min": 10000,
-    "maxChars": 120,
+    "min": 8000,
+    "maxChars": 100,
     "text": "{DISPLAY NAME} đã tặng bạn 1 ly kem giá {AMOUNT} đồng.",
     "textMsg": "{DISPLAY NAME} đã tặng bạn 1 ly kem giá {AMOUNT} đồng. {MESSENGER}"
   },
