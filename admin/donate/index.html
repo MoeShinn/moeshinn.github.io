@@ -1,85 +1,77 @@
-<!DOCTYPE html>
-<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex,nofollow"><title>Donate</title>
-<link rel="stylesheet" href="/admin/css/admin.css">
-<style>.pv{position:relative;height:300px;border:1px solid var(--line);border-radius:10px;background:repeating-conic-gradient(#1b2a44 0 25%,#13203a 0 50%) 0 0/24px 24px;overflow:hidden}
-.pv iframe{position:absolute;left:0;top:0;width:1920px;height:1080px;border:0;transform-origin:0 0;background:transparent}
-.warn{color:#ffb454;font-size:13px}.k{font-family:monospace}</style></head>
-<body><div id="app"></div><div id="toast"></div>
-<script src="/admin/js/core.js"></script>
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><title>Donate overlay</title>
+<style>html,body{margin:0;height:100%;background:transparent!important;overflow:hidden;font-family:"Baloo 2","Segoe UI",sans-serif;color:#fff}
+#stage{position:fixed;inset:0;display:flex;padding:24px;box-sizing:border-box}
+.alert{display:flex;align-items:center;text-align:center;animation:in .4s ease-out}.alert.v{flex-direction:column}.alert.h{flex-direction:row;text-align:left}
+.alert img{object-fit:contain;flex:none}.alert .t{display:flex;flex-direction:column;gap:6px;min-width:0}.alert.h .t{flex:1}
+@keyframes in{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:none}}.alert.out{opacity:0;transition:opacity .5s}</style>
+<style id="usercss"></style></head><body><div id="stage"></div>
 <script>
-Admin.boot({ id: "donate", title: "Donate", async render(main) {
-  const { esc, $ } = Admin, PATH = "donate/data.json", LS = localStorage;
-  let cfg; try { cfg = await Admin.readJson(PATH, {}); } catch (e) { main.innerHTML = `<h2>Donate</h2><p class="err">${esc(e.message)}</p>`; return; }
-  const D = { title: "Ủng Hộ Shinju Ch.", intro: "", api: "", min: 10000, nameMax: 24, msgMax: 120, presets: [10000, 20000, 50000, 100000], bank: {}, template: "DONATE {ORDER CODE}", ai: true, alert: { layout: "v", posX: "center", posY: "top", duration: 15, minShow: 6, volume: 80, imgW: 200, imgH: 200 }, tts: { on: true, voice: "banmai", speed: "0", delay: 2, min: 10000, maxChars: 100 }, seo: {} };
-  const merge = (a, b) => { for (const k in b) a[k] = b[k] && typeof b[k] === "object" && !Array.isArray(b[k]) ? merge(a[k] || {}, b[k]) : b[k]; return a; };
-  cfg = merge(structuredClone(D), cfg);
-  const files = [], blobs = {}; // file chờ commit; blob để xem trước
-  const get = (p) => p.split(".").reduce((o, k) => o?.[k], cfg);
-  const set = (p, v) => { const ks = p.split("."), l = ks.pop(); ks.reduce((o, k) => (o[k] ??= {}), cfg)[l] = v; };
-  const T = (l, p, t = "text", x = "") => `<label>${l}<input data-p="${p}" type="${t}" ${x} value="${esc(get(p) ?? "")}"></label>`;
-  const A = (l, p, r = 2) => `<label>${l}<textarea data-p="${p}" rows="${r}" spellcheck="false">${esc(get(p) ?? "")}</textarea></label>`;
-  const S = (l, p, o) => `<label>${l}<select data-p="${p}">${o.map(([v, n]) => `<option value="${v}" ${String(get(p)) === v ? "selected" : ""}>${n}</option>`).join("")}</select></label>`;
-  const C = (l, p) => `<label class="row"><input type="checkbox" data-p="${p}" ${get(p) ? "checked" : ""}>${l}</label>`;
-  const VOICES = [["banmai", "Ban Mai (nữ Bắc)"], ["thuminh", "Thu Minh (nữ Bắc)"], ["leminh", "Lê Minh (nam Bắc)"], ["myan", "Mỹ An (nữ Trung)"], ["giahuy", "Gia Huy (nam Trung)"], ["ngoclam", "Ngọc Lam (nữ Trung)"], ["lannhi", "Lan Nhi (nữ Nam)"], ["linhsan", "Linh San (nữ Nam)"]];
-  main.innerHTML = `<h2>Donate</h2>
-  <div class="card"><b>Kết nối Cloudflare</b><div class="cols"><label>Địa chỉ Worker<input data-p="api" value="${esc(cfg.api)}" placeholder="https://shinju-donate.xxx.workers.dev"></label>
-    <label>Admin key (chỉ lưu trên máy này)<input id="ak" type="password" value="${esc(LS.dn_ak || "")}"></label>
-    <label>Overlay token (chỉ lưu trên máy này)<input id="ot" type="password" value="${esc(LS.dn_ot || "")}"></label></div>
-    <p class="row"><button class="ghost" id="cp">Copy link overlay donate</button><button class="ghost" id="push">Cập nhật setting lên Cloudflare</button></p>
-    <p class="hint">Cloudflare chỉ dùng bản setting ở nút trên (không quét định kỳ). Phần hiển thị alert nằm ở GitHub nên lưu GitHub là đổi ngay.</p></div>
-  <div class="card"><b>API key (lưu trên Cloudflare, không đưa vào repo)</b>
-    <label>SePay API Key — tự đặt một chuỗi bí mật, rồi dán đúng chuỗi đó vào SePay: my.sepay.vn → Tích hợp Webhooks → chọn kiểu xác thực "API Key" (tên menu có thể khác)
-      <span class="row"><input id="k_sp" type="password" placeholder="Đang ẩn — bấm Hiện để lấy từ Cloudflare" style="flex:1"><button class="ghost" data-eye="k_sp">Hiện</button></span></label>
-    <label>TTS API Key — FPT.AI: console.fpt.ai → Text to Speech → API key
-      <span class="row"><input id="k_fp" type="password" placeholder="Đang ẩn — bấm Hiện để lấy từ Cloudflare" style="flex:1"><button class="ghost" data-eye="k_fp">Hiện</button></span></label>
-    <p class="row"><button class="ghost" id="ksave">Lưu key lên Cloudflare</button></p><p class="hint">Chỉ gửi ô bạn đã nhập mới. Key không nằm trong data.json hay GitHub; Hiện mới gọi Cloudflare, Ẩn thì xóa khỏi màn hình.</p></div>
-  <div class="card"><b>Trang donate</b><div class="cols">${T("Tiêu đề", "title")}${T("Giới thiệu", "intro")}${T("Số tiền tối thiểu (đ)", "min", "number", 'step="1000"')}${T("Tên tối đa (ký tự)", "nameMax", "number")}${T("Lời nhắn tối đa (ký tự)", "msgMax", "number")}</div>
-    <div class="cols">${T("Mã ngân hàng (vietqr.io: mbbank, vcb, 970422…)", "bank.id")}${T("Tên ngân hàng", "bank.name")}${T("Số tài khoản", "bank.acc")}${T("Chủ tài khoản", "bank.holder")}</div>
-    ${T("Nội dung chuyển khoản (giữ {ORDER CODE})", "template")}${C("Dùng AI kiểm duyệt lời nhắn khi bấm donate", "ai")}
-    <div class="cols">${A("SEO mô tả", "seo.description")}${A("SEO từ khóa", "seo.keywords")}</div></div>
-  <div class="card"><b>Alert (nền luôn trong suốt)</b>
-    <div class="cols"><label>Ảnh/GIF: link<input data-p="alert.image" value="${esc(cfg.alert.image || "")}"></label><label>…hoặc tải lên<input type="file" id="fi" accept="image/*"></label>${T("Rộng (px)", "alert.imgW", "number")}${T("Cao (px)", "alert.imgH", "number")}</div>
-    ${A("H1 ({DISPLAY NAME} {AMOUNT}; mã § màu/đậm/nghiêng)", "alert.h1")}<div class="warn" id="lint"></div>${A("Mes ({MESSENGER})", "alert.mes")}
-    <div class="cols"><label>Âm thanh: link<input data-p="alert.sound" value="${esc(cfg.alert.sound || "")}"></label><label>…hoặc tải lên<input type="file" id="fs" accept="audio/*"></label>${T("Âm lượng (0-100)", "alert.volume", "number")}</div>
-    <div class="cols">${S("Bố cục", "alert.layout", [["v", "Dọc: ảnh / H1 / Mes"], ["h", "Ngang: ảnh | H1 + Mes"]])}${S("Căn ngang", "alert.posX", [["left", "Trái"], ["center", "Giữa"], ["right", "Phải"]])}${S("Căn dọc", "alert.posY", [["top", "Trên"], ["middle", "Giữa"], ["bottom", "Dưới"]])}${T("Hiện tối đa (giây)", "alert.duration", "number", 'step="1" min="1"')}${T("Hiện tối thiểu (giây)", "alert.minShow", "number", 'step="1" min="1"')}</div>
-    ${A("CSS (theo màn FHD 1920×1080; class .alert .h1 .mes img)", "alert.css", 6)}</div>
-  <div class="card"><b>Thoại TTS (FPT.AI)</b>${C("Bật đọc lời nhắn", "tts.on")}
-    <div class="cols">${S("Giọng", "tts.voice", VOICES)}${S("Tốc độ", "tts.speed", [["-2", "-2"], ["-1", "-1"], ["0", "0"], ["1", "1"], ["2", "2"]])}${T("Delay sau âm thanh (giây)", "tts.delay", "number", 'step="0.1" min="0"')}${T("Đọc từ mức (đ)", "tts.min", "number", 'step="1000"')}${T("Đọc tối đa (ký tự)", "tts.maxChars", "number")}</div>
-    ${A("Câu đọc khi không có lời nhắn", "tts.text")}${A("Câu đọc khi có lời nhắn", "tts.textMsg", 3)}<p class="row"><button class="ghost" id="vp">Nghe thử giọng</button></p></div>
-  <div class="card"><b>Xem trước & Test donate ảo</b><div class="cols">${`<label>Tên<input id="tn" value="Khách Test"></label><label>Số tiền<input id="ta" type="number" value="50000"></label><label>Tin nhắn<input id="tm" value="Chúc kênh ngày càng phát triển!"></label>`}</div>
-    <p class="row"><button class="ghost" id="tg">Xem thử trong khung</button><button id="to">Gửi alert thử lên OBS</button><button class="ghost" id="cpt">Copy link overlay (test, không cần stream)</button><label class="row"><input type="checkbox" id="tt">Đọc TTS thật (tốn lượt API)</label></p><div class="pv" id="pv"><iframe id="fr" src="/donate/overlay/?preview=1"></iframe></div></div>
-  <p class="row"><button id="save">Lưu lên GitHub</button></p>`;
-  const fr = $("#fr"), pv = $("#pv"), fit = () => (fr.style.transform = `scale(${pv.clientWidth / 1920})`); fit(); addEventListener("resize", fit);
-  const pcfg = () => { const c = structuredClone(cfg); for (const k of ["image", "sound"]) if (blobs[c.alert[k]]) c.alert[k] = blobs[c.alert[k]]; return c; };
-  const push = () => fr.contentWindow.postMessage({ cfg: pcfg() }, "*");
-  addEventListener("message", (e) => e.data?.ready && push());
-  const lint = () => { const bad = [...String(cfg.alert.h1 + cfg.alert.mes).matchAll(/§(.?)/g)].filter((m) => !/[0-9a-fk-or]/i.test(m[1])).map((m) => m[0]); $("#lint").innerHTML = bad.length ? `Mã § không hợp lệ: ${esc(bad.join(" "))} <button class="ghost" id="fx">Tự sửa</button>` : ""; if (bad.length) $("#fx").onclick = () => { for (const k of ["h1", "mes"]) cfg.alert[k] = cfg.alert[k].replace(/§(?![0-9a-fk-or])./gi, ""); document.querySelectorAll("[data-p^='alert.h1'],[data-p='alert.mes']").forEach((i) => (i.value = get(i.dataset.p))); lint(); push(); }; };
-  main.oninput = (e) => { const i = e.target, p = i.dataset.p; if (!p) return; set(p, i.type === "checkbox" ? i.checked : i.type === "number" ? (i.value === "" ? "" : +i.value) : i.value); lint(); push(); };
-  const pick = (id, key, dir) => ($(id).onchange = (e) => { const f = e.target.files[0]; if (!f) return; const n = Date.now().toString(36) + "-" + f.name.replace(/[^\w.-]/g, "_"), r = new FileReader();
-    r.onload = () => { files.push({ path: "donate/media/" + n, content: r.result.split(",")[1], encoding: "base64" }); const u = "/donate/media/" + n; blobs[u] = URL.createObjectURL(f); cfg.alert[key] = u; main.querySelector(`[data-p="alert.${key}"]`).value = u; push(); }; r.readAsDataURL(f); });
-  pick("#fi", "image"); pick("#fs", "sound");
-  const keep = () => { LS.dn_ak = $("#ak").value; LS.dn_ot = $("#ot").value; };
-  const cf = async (path, body) => { keep(); const r = await fetch(cfg.api + path, { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + $("#ak").value }, body: JSON.stringify(body) }); const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || "Lỗi " + r.status); return d; };
-  const play = async (d) => { if (d.error || !d.url) return Admin.toast(d.error || "Không nhận được link âm thanh", true); Admin.toast("Đang tạo giọng, chờ vài giây…"); const a = new Audio();
-    for (let k = 0; k < 15; k++) { a.src = d.url + (k ? "?r=" + k : ""); try { await a.play(); return; } catch { await new Promise((r) => setTimeout(r, 1500)); } } Admin.toast("FPT tạo file quá lâu hoặc link lỗi, thử lại sau", true); };
-  $("#cp").onclick = () => { keep(); navigator.clipboard.writeText(`${location.origin}/donate/overlay/?t=${encodeURIComponent($("#ot").value)}`).then(() => Admin.toast("Đã copy link overlay")); };
-  $("#push").onclick = async () => { try { await cf("/admin/settings", { min: cfg.min, nameMax: cfg.nameMax, msgMax: cfg.msgMax, template: cfg.template, ai: cfg.ai, bank: cfg.bank, tts: cfg.tts }); Admin.toast("Cloudflare đã nhận setting mới"); } catch (e) { Admin.toast(e.message, true); } };
-  $("#vp").onclick = async () => { try { const d = await cf("/admin/tts", { voice: cfg.tts.voice, speed: cfg.tts.speed, text: "Xin chào, đây là giọng đọc thử cho donate." }); play(d); } catch (e) { Admin.toast(e.message, true); } };
-  const mk = async () => { const al = { name: $("#tn").value, amount: +$("#ta").value, msg: $("#tm").value, audio: "" };
-    if ($("#tt").checked) try { const t = cfg.tts, f = (s) => s.replace(/\{DISPLAY NAME\}/g, al.name).replace(/\{AMOUNT\}/g, al.amount).replace(/\{MESSENGER\}/g, al.msg.slice(0, t.maxChars)); const d = await cf("/admin/tts", { voice: t.voice, speed: t.speed, text: f(al.msg ? t.textMsg : t.text) }); if (d.error) Admin.toast(d.error, true); al.audio = d.url || ""; } catch (e) { Admin.toast(e.message, true); }
-    return al; };
-  $("#tg").onclick = async () => fr.contentWindow.postMessage({ cfg: pcfg(), alert: await mk() }, "*");
-  $("#to").onclick = async () => { try { await cf("/admin/test", await mk()); Admin.toast("Đã gửi, OBS nhận trong ≤5 giây (nhớ Lưu lên GitHub nếu vừa sửa giao diện)"); } catch (e) { Admin.toast(e.message, true); } };
-  $("#cpt").onclick = () => { keep(); navigator.clipboard.writeText(`${location.origin}/donate/overlay/?t=${encodeURIComponent($("#ot").value)}&always=1`).then(() => Admin.toast("Đã copy link test")); };
-  $("#save").onclick = async () => { try { await Admin.commitFiles("Admin: cập nhật donate", [...files, { path: PATH, content: JSON.stringify(cfg, null, 2) + "\n" }]); files.length = 0; Admin.toast("Đã lưu. Web cập nhật sau ~1 phút."); } catch (e) { Admin.toast(e.message, true); } };
-  const KM = { k_sp: "SEPAY_KEY", k_fp: "FPT_KEY" }, dirty = {};
-  ["k_sp", "k_fp"].forEach((id) => ($("#" + id).oninput = () => (dirty[id] = 1)));
-  main.querySelectorAll("[data-eye]").forEach((b) => (b.onclick = async () => { const i = $("#" + b.dataset.eye);
-    if (i.type === "text") { i.type = "password"; if (!dirty[i.id]) i.value = ""; b.textContent = "Hiện"; return; }
-    if (!dirty[i.id]) try { i.value = (await cf("/admin/secrets", { get: 1 }))[KM[i.id]] || ""; } catch (e) { return Admin.toast(e.message, true); }
-    i.type = "text"; b.textContent = "Ẩn"; }));
-  $("#ksave").onclick = async () => { const set = {}; for (const id in dirty) set[KM[id]] = $("#" + id).value; try { await cf("/admin/secrets", { set }); for (const id in dirty) delete dirty[id]; Admin.toast("Đã lưu key lên Cloudflare"); } catch (e) { Admin.toast(e.message, true); } };
-  lint();
-} });
+(() => {
+  const Q = new URLSearchParams(location.search), TOKEN = Q.get("t") || "", PREVIEW = Q.has("preview"), $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const COL = { 0: "#000", 1: "#00a", 2: "#0a0", 3: "#0aa", 4: "#a00", 5: "#a0a", 6: "#fa0", 7: "#aaa", 8: "#555", 9: "#55f", a: "#5f5", b: "#5ff", c: "#f55", d: "#f5f", e: "#ff5", f: "#fff" };
+  // Mã § kiểu Minecraft: 0-f màu, l đậm, o nghiêng, n gạch chân, m gạch ngang, r reset. Giá trị người donate bị thay SAU khi tách mã nên không thể chèn §.
+  function mc(tpl, vars) {
+    const parts = String(tpl || "").split(/§([0-9a-fk-or])/i); let st = {}, h = "";
+    for (let i = 0; i < parts.length; i++) {
+      if (i % 2) { const c = parts[i].toLowerCase(); if (COL[c]) st = { ...st, c: COL[c] }; else if (c === "r") st = {}; else if ("lonm".includes(c)) st = { ...st, [c]: 1 }; continue; }
+      const t = esc(parts[i]).replace(/\{(DISPLAY NAME|AMOUNT|MESSENGER)\}/g, (_, k) => esc(vars[k])); if (!t) continue;
+      const css = (st.c ? `color:${st.c};` : "") + (st.l ? "font-weight:700;" : "") + (st.o ? "font-style:italic;" : "") + ((st.n || st.m) ? `text-decoration:${[st.n && "underline", st.m && "line-through"].filter(Boolean).join(" ")};` : "");
+      h += css ? `<span style="${css}">${t}</span>` : t;
+    }
+    return h.replace(/\n/g, "<br>");
+  }
+  let cfg, queue = [], busy = false;
+  const apply = (c) => { cfg = c; $("#usercss").textContent = c.alert.css || ""; const s = $("#stage").style, a = c.alert;
+    s.justifyContent = { left: "flex-start", center: "center", right: "flex-end" }[a.posX]; s.alignItems = { top: "flex-start", middle: "center", bottom: "flex-end" }[a.posY]; };
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  async function show(al) {
+    const a = cfg.alert, t = cfg.tts, vars = { "DISPLAY NAME": al.name, AMOUNT: Number(al.amount).toLocaleString("vi-VN"), MESSENGER: al.msg || "" };
+    const el = document.createElement("div"); el.className = "alert " + (a.layout === "h" ? "h" : "v");
+    const img = a.image ? `<img src="${esc(a.image)}" style="width:${+a.imgW || 200}px;${a.layout === "h" ? "" : `height:${+a.imgH || 200}px`}" alt="">` : "";
+    el.innerHTML = img + `<div class="t"><div class="h1">${mc(a.h1, vars)}</div>${al.msg ? `<div class="mes">${mc(a.mes, vars)}</div>` : ""}</div>`;
+    if (a.layout === "h") { const i = el.querySelector("img"); if (i) i.style.alignSelf = "stretch"; }
+    $("#stage").replaceChildren(el);
+    const t0 = Date.now(), max = (+a.duration || 15) * 1000; let end = (+a.minShow || 6) * 1000;
+    if (a.sound) { const s = new Audio(a.sound); s.volume = Math.min(1, (+a.volume || 80) / 100); s.play().catch(() => {}); }
+    if (t.on && al.audio) {
+      await sleep((+t.delay || 0) * 1000);
+      const v = new Audio(al.audio); v.volume = 1;
+      for (let k = 0; k < 15; k++) { // file FPT cần vài giây để sẵn sàng
+        const ok = await new Promise((r) => { v.onended = () => r("end"); v.onplaying = () => r("play"); v.onerror = () => r("err"); v.src = al.audio + (k ? "?r=" + k : ""); v.play().catch(() => r("err")); });
+        if (ok === "err") { await sleep(1500); continue; }
+        if (ok === "play") { await new Promise((r) => (v.onended = r)); end = Math.max(end, Date.now() - t0 + 1000); }
+        break;
+      }
+    }
+    await sleep(Math.max(0, Math.min(max, end) - (Date.now() - t0)));
+    el.classList.add("out"); await sleep(500); el.remove();
+  }
+  async function pump() { if (busy) return; busy = true; while (queue.length) { try { await show(queue.shift()); } catch {} } busy = false; }
+  window.addEventListener("message", (e) => { if (!PREVIEW || !e.data) return; if (e.data.cfg) apply(e.data.cfg); if (e.data.alert) { queue.push(e.data.alert); pump(); } });
+  async function main() {
+    cfg0 = await (await fetch("/donate/data.json", { cache: "no-cache" })).json(); apply(cfg0);
+    if (PREVIEW) return parent.postMessage({ ready: 1 }, "*");
+    const API = cfg0.api; const always = Q.has("always"); let cursor = null, tt = 0, timer = 0, streaming = !window.obsstudio || always, visible = true; const t0 = Date.now(), inObs = !!window.obsstudio;
+    const active = () => visible && (inObs || (document.visibilityState === "visible" && Date.now() - t0 < 6 * 3600e3)); // trong OBS luôn quét; chưa stream thì chỉ phát alert test
+    async function tick() {
+      timer = 0; if (!active()) return;
+      try {
+        const r = await (await fetch(`${API}/api/alerts?t=${encodeURIComponent(TOKEN)}&after=${cursor ?? "latest"}&tt=${tt}`)).json();
+        if (r.items) { cursor = r.last; tt = r.tt || tt; if (r.test) queue.push(r.test); queue.push(...r.items.filter((x) => streaming || x.test)); pump(); }
+      } catch {}
+      timer = setTimeout(tick, 5000);
+    }
+    const kick = () => { if (!timer && active()) tick(); };
+    if (inObs) {
+      obsstudio.getStatus && obsstudio.getStatus((s) => { streaming = !!s.streaming; kick(); });
+      addEventListener("obsStreamingStarted", () => { streaming = true; kick(); });
+      addEventListener("obsStreamingStopped", () => { streaming = always; });
+      addEventListener("obsSourceVisibleChanged", (e) => { visible = e.detail.visible; kick(); });
+    }
+    document.addEventListener("visibilitychange", () => { kick(); });
+    kick();
+  }
+  let cfg0; main();
+})();
 </script></body></html>
