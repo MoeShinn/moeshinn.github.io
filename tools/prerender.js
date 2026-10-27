@@ -286,7 +286,7 @@ const OVERLAY = /[ \t]*<!--\s*Shared loading screen[^>]*-->\s*|[ \t]*<div id="si
 
 // Trang KHÔNG dùng màn hình chờ: mỗi lần dựng sẽ tự gỡ <link css/loading.css> + <script js/loading.js> nếu có ai chép đè bản cũ
 // (admin lưu, Unzip update, mẫu cũ…). Muốn thêm trang khác thì thêm đường dẫn vào đây (vd "donate/terms/index.html").
-const NO_LOADING = new Set(["donate/index.html"]);
+const NO_LOADING = new Set(["donate/index.html", "donate/terms/index.html", "donate/privacy/index.html", "/channel/index.html", "/index.html", "/post/index.html"]);
 const LOADING_TAGS = /[ \t]*<link\b[^>]*\/css\/loading\.css[^>]*>[ \t]*\r?\n?|[ \t]*<script\b[^>]*\/js\/loading\.js[^>]*><\/script>[ \t]*\r?\n?/g;
 
 function transform(rel, html) {
