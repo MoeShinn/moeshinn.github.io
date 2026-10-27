@@ -2,7 +2,7 @@
    Không chứa bí mật nào. File nằm trong repo private; Worker kiểm tra mã rồi truyền file về, trang này chỉ gọi API.
    Nếu đổi địa chỉ Worker, sửa API ở đây VÀ trong /admin/js/core.js. */
 (() => {
-  const API = "https://shinju-admin-api.git-api.workers.dev";
+  const API = "https://admin-api.git-api.workers.dev";
   const $ = (s) => document.querySelector(s);
   const el = { form: $("#f-code"), code: $("#code"), check: $("#btn-check"), err: $("#err"), res: $("#s-result"),
     name: $("#r-name"), chips: $("#r-chips"), file: $("#r-file"), dl: $("#btn-dl"), msg: $("#r-msg"), ttl: $("#r-ttl"), other: $("#btn-other") };

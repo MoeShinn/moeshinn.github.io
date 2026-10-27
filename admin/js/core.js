@@ -1,6 +1,6 @@
 /* Admin core: phiên đăng nhập, gọi admin-api, khung giao diện. Không chứa bí mật nào. */
 (() => {
-  const API = "https://shinju-admin-api.git-api.workers.dev";
+  const API = "https://admin-api.git-api.workers.dev";
   const KEY = "shinju_admin_session";
   const BYPASS = "shinju_bypass_until"; // localStorage: trình duyệt này đang đăng nhập admin → trang công khai bỏ qua màn hình bảo trì (hết hạn cùng phiên)
   const NAV = [
@@ -12,6 +12,7 @@
     ["channel", "Kênh", "/admin/channel/"],
     ["profile", "Hồ sơ Vtuber", "/admin/profile/"],
     ["donate", "Donate", "/admin/donate/"],
+    ["donate-stats", "Số liệu donate", "/admin/donate/stats/"],
     ["links", "Link rút gọn", "/admin/links/"],
     ["images", "Kho ảnh", "/admin/images/"],
     ["linkpool", "Kho liên kết", "/admin/linkpool/"],

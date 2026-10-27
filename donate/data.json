@@ -4,7 +4,7 @@
   "banner": "/image/vssnllkt.webp",
   "avatar": "/assets/avatar/avatar-336.webp",
   "googleClientId": "786995296674-k9dn13kikai2hpo2811l8huu62853sh1.apps.googleusercontent.com",
-  "api": "https://shinju-donate.git-api.workers.dev",
+  "api": "https://donate-api.git-api.workers.dev",
   "min": 8000,
   "nameMax": 24,
   "msgMax": 100,

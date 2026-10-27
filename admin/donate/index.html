@@ -5,6 +5,7 @@
 <style>.pv{position:relative;height:300px;border:1px solid var(--line);border-radius:10px;background:repeating-conic-gradient(#1b2a44 0 25%,#13203a 0 50%) 0 0/24px 24px;overflow:hidden}
 .pv iframe{position:absolute;left:0;top:0;width:1920px;height:1080px;border:0;transform-origin:0 0;background:transparent}
 .warn{color:#ffb454;font-size:13px}.k{font-family:monospace}
+a.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
 .imgf{display:flex;flex-direction:column;gap:6px}.imgf .pvi{display:block;border:1px solid var(--line);background:#0b1424}.imgf .pvi[hidden]{display:none}
 #bn_pv{width:100%;max-width:520px;height:120px;object-fit:cover;border-radius:10px}#av_pv{width:72px;height:72px;object-fit:cover;border-radius:50%}
 /* trạng thái nút: bấm / đang xử lý / xong / lỗi */
@@ -38,10 +39,10 @@ Admin.boot({ id: "donate", title: "Donate", async render(main) {
   const S = (l, p, o) => `<label>${l}<select data-p="${p}">${o.map(([v, n]) => `<option value="${v}" ${String(get(p)) === v ? "selected" : ""}>${n}</option>`).join("")}</select></label>`;
   const C = (l, p) => `<label class="row"><input type="checkbox" data-p="${p}" ${get(p) ? "checked" : ""}>${l}</label>`;
   main.innerHTML = `<h2>Donate</h2>
-  <div class="card"><b>Kết nối Cloudflare</b><div class="cols"><label>Địa chỉ Worker<input data-p="api" value="${esc(cfg.api)}" placeholder="https://shinju-donate.xxx.workers.dev"></label>
+  <div class="card"><b>Kết nối Cloudflare</b><div class="cols"><label>Địa chỉ Worker<input data-p="api" value="${esc(cfg.api)}" placeholder="https://donate-api.xxx.workers.dev"></label>
     <label>Admin key (chỉ lưu trên máy này)<input id="ak" type="password" value="${esc(LS.dn_ak || "")}"></label>
     <label>Overlay token (chỉ lưu trên máy này)<input id="ot" type="password" value="${esc(LS.dn_ot || "")}"></label></div>
-    <p class="row"><button class="ghost" id="cp">Copy link overlay donate</button></p>
+    <p class="row"><button class="ghost" id="cp">Copy link overlay donate</button><a class="btn ghost" href="/admin/donate/stats/">Xem số liệu &amp; lịch sử donate →</a></p>
     <p class="hint">Toàn bộ setting nằm trong MỘT file <span class="k">donate/data.json</span> trên GitHub. Worker Cloudflare tự đọc file này (trễ tối đa vài phút do cache), không cần đẩy setting riêng nữa.</p></div>
   <div class="card"><b>API key (lưu trên Cloudflare, không đưa vào repo)</b>
     <label>SePay API Key — tự đặt một chuỗi bí mật, rồi dán đúng chuỗi đó vào SePay: my.sepay.vn → Tích hợp Webhooks → chọn kiểu xác thực "API Key" (tên menu có thể khác)

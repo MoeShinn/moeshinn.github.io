@@ -50,7 +50,6 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--green-1);outline-of
 .dn-vf svg{display:block}
 
 /* ---------- Top 10 + lịch sử ---------- */
-.dn-sum{margin:0;opacity:.85;font-size:14px}
 .dn-empty{margin:0;opacity:.7;font-size:14px;line-height:1.5}
 .dn-rank,.dn-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
 .dn-rank li{display:grid;grid-template-columns:28px 38px minmax(0,1fr) auto;align-items:center;gap:10px}

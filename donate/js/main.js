@@ -166,7 +166,6 @@
   const nameCell = (x) => { const n = el("div", "dn-nm"); n.appendChild(el("span", "", String(x.name || "Ẩn danh"))); if (x.verified) n.appendChild(badge()); return n; };
   try {
     const r = await fetch(cfg.api + "/api/stats"); if (!r.ok) throw 0; const s = await r.json();
-    $("[data-sum]").textContent = `${s.count} lượt · tổng ${fm(s.total)} · tháng này ${fm(s.month)}`;
     const top = Array.isArray(s.top) ? s.top : [], recent = (Array.isArray(s.recent) ? s.recent : []).slice(0, 10); // lịch sử chỉ hiện 10 donate gần nhất
     if (!top.length) emptyTop("Chưa có ai trong bảng xếp hạng. Đăng nhập bằng YouTube rồi donate để tên bạn xuất hiện ở đây!");
     else { topEl.replaceChildren(); top.forEach((x, i) => { const li = el("li"); li.append(el("span", "dn-pos", String(i + 1)), avatar(x.avatar, "Avatar " + x.name), nameCell({ ...x, verified: true }), el("span", "dn-amt", fm(x.amount ?? x.s))); topEl.appendChild(li); }); }
