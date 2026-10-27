@@ -27,7 +27,7 @@ button.fail{cursor:default;background:#b3382c!important;border-color:#b3382c!imp
 Admin.boot({ id: "donate", title: "Donate", async render(main) {
   const { esc, $ } = Admin, PATH = "donate/data.json", LS = localStorage;
   let cfg; try { cfg = await Admin.readJson(PATH, {}); } catch (e) { main.innerHTML = `<h2>Donate</h2><p class="err">${esc(e.message)}</p>`; return; }
-  const D = { title: "Ủng Hộ Shinju Ch.", intro: "", banner: "", avatar: "/assets/avatar/avatar-336.webp", googleClientId: "", api: "", min: 10000, nameMax: 24, msgMax: 120, presets: [10000, 20000, 50000, 100000], bank: {}, template: "DONATE {ORDER CODE}", ai: true, alert: { layout: "v", posX: "center", posY: "top", duration: 15, minShow: 6, volume: 80, imgW: 200, imgH: 200 }, tts: structuredClone(ShinjuTTS.DEF), seo: {} };
+  const D = { title: "Ủng Hộ Moe Shinn", intro: "", banner: "", avatar: "/assets/avatar/avatar-336.webp", googleClientId: "", api: "", min: 10000, nameMax: 24, msgMax: 120, presets: [10000, 20000, 50000, 100000], bank: {}, template: "DONATE {ORDER CODE}", ai: true, alert: { layout: "v", posX: "center", posY: "top", duration: 15, minShow: 6, volume: 80, imgW: 200, imgH: 200 }, tts: structuredClone(ShinjuTTS.DEF), seo: {} };
   const merge = (a, b) => { for (const k in b) a[k] = b[k] && typeof b[k] === "object" && !Array.isArray(b[k]) ? merge(a[k] || {}, b[k]) : b[k]; return a; };
   cfg = merge(structuredClone(D), cfg);
   delete cfg.tts.voice; delete cfg.tts.speed; // bỏ cấu hình FPT.AI cũ, mọi thứ nằm trong một file donate/data.json

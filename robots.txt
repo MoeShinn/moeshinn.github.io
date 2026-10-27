@@ -3,4 +3,4 @@ Disallow: /admin/
 Disallow: /buy/
 Disallow: /worker/
 
-Sitemap: https://shinjuvn.github.io/sitemap.xml
+Sitemap: https://moeshinn.github.io/sitemap.xml

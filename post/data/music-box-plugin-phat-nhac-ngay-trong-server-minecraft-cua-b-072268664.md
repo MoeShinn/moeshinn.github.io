@@ -2,11 +2,11 @@
 title: "Music Box – Plugin phát nhạc cho server Minecraft"
 photo: "photo/hoang-hon-voxel-ben-hop-nhac-ky-dieu-mvairvij.webp"
 date: "16/10/2026"
-keywords: "music box, plugin music box, plugin phát nhạc minecraft, plugin nhạc minecraft, phát nhạc từ link, simple voice chat, plugin voicechat, plugin paper, plugin purpur, plugin leaf, minecraft 1.21, nhạc mp3 minecraft, plugin Việt Nam, Shinju Ch"
+keywords: "music box, plugin music box, plugin phát nhạc minecraft, plugin nhạc minecraft, phát nhạc từ link, simple voice chat, plugin voicechat, plugin paper, plugin purpur, plugin leaf, minecraft 1.21, nhạc mp3 minecraft, plugin Việt Nam, Moe Shinn"
 description: "Giới thiệu Music Box: plugin cho phép người chơi lưu playlist và phát nhạc từ link trong game qua Simple Voice Chat. Xem tính năng, lệnh và cách cài trên Paper, Purpur, Leaf 1.21+."
 ---
 §l§dMusic Box§r là plugin §lphát nhạc cá nhân§r dành cho server Minecraft chạy Core Paper như §bPaper§r, §bPurpur§r, §bLeaf§r. Người chơi chỉ cần dán link file nhạc trực tiếp, đặt cho nó một ID ngắn rồi phát bất cứ lúc nào bằng một câu lệnh. Âm thanh được truyền qua §aSimple Voice Chat§r nên nghe như đang bật loa ngay trong game, người ở gần còn nghe được nếu họ cho phép.
-§7Tác giả: §f§lShinju Ch. [VNer]§r
+§7Tác giả: §f§lMoe Shinn [VNer]§r
 
 §c§lLƯỚT XUỐNG DƯỚI CÙNG BẤM NÚT §e[LINK TẢI PLUGIN] §c§lRỒI HẲN ĐỌC NHA! :3§r
 
@@ -28,7 +28,7 @@ Tải Simple Voice Chat tại: <a href="https://modrinth.com/plugin/simple-voice
 <h2>Cài đặt</h2>
 <ul><li>§eBước 1:§r Cài Simple Voice Chat lên server và kiểm tra voice chat hoạt động.</li><li>§eBước 2:§r Bỏ file §fMusicBox.jar§r vào thư mục §fplugins§r.</li><li>§eBước 3:§r Khởi động lại server (không nên dùng /reload).</li><li>§eBước 4:§r Plugin tự tạo thư mục §fplugins/MusicBox§r gồm config.yml, dữ liệu người chơi và thư mục cache.</li><li>§eBước 5:§r Chỉnh config nếu cần rồi dùng §e/musicbox reload§r để áp dụng.</li></ul>
 
-👉 [Tải Music Box tại đây](https://github.com/ShinjuVN/Plugin-Paper-API/releases/tag/Plugin-MusicBox)
+👉 [Tải Music Box tại đây](https://github.com/MoeShinn/Plugin-Paper-API/releases/tag/Plugin-MusicBox)
 
 <hr>
 
@@ -73,6 +73,6 @@ Các mục thường chỉnh trong §fconfig.yml§r:
 
 ![Các phiên bản server plugin MusicBox hỗ trợ](/post/photo/screenshot-2026-10-16-123747-mvajdrk0.webp)
 
-<a class="button-5s" data-seconds="30" href="https://shinjuvn.github.io/download/music-box-1-21-11/" target="_blank" rel="noopener noreferrer">Link tải plugin</a>
+<a class="button-5s" data-seconds="30" href="https://moeshinn.github.io/download/music-box-1-21-11/" target="_blank" rel="noopener noreferrer">Link tải plugin</a>
 
 §7Nếu gặp lỗi hoặc muốn đề xuất tính năng, hãy để lại bình luận bên dưới bài viết hoặc liên hệ trực tiếp qua các [liên hệ](../../channel) §7của tui nha. §cCảm ơn bạn đã sử dụng §d§lMusic Box§r§7!§r

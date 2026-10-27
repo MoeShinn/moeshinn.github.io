@@ -6,7 +6,7 @@
   "linkButtons": [
     {
       "id": "link1",
-      "label": "Đăng kí kênh của Shinju Ch. #(10s)",
+      "label": "Đăng kí kênh của Moe Shinn #(10s)",
       "seconds": 10,
       "categories": [
         "Youtube Channel"
@@ -17,14 +17,14 @@
       "label": "Xem qua trang bài đăng của tui :3 #(20s)",
       "seconds": 20,
       "type": "custom",
-      "url": "https://shinjuvn.github.io/post"
+      "url": "https://moeshinn.github.io/post"
     }
   ],
   "downloads": [
     {
       "id": "primary",
       "label": "Tải Xuống",
-      "url": "https://github.com/ShinjuVN/Plugin-Paper-API/releases/download/Plugin-MusicBox/MusicBox.jar"
+      "url": "https://github.com/MoeShinn/Plugin-Paper-API/releases/download/Plugin-MusicBox/MusicBox.jar"
     }
   ],
   "short": "S2gYpX",

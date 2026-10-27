@@ -1,4 +1,4 @@
-/* Service worker của Shinju Ch. — đổi VERSION khi muốn xóa sạch cache cũ trên máy mọi người.
+/* Service worker của Moe Shinn — đổi VERSION khi muốn xóa sạch cache cũ trên máy mọi người.
    - Trang HTML, JS, CSS, JSON, MD: ưu tiên MẠNG (luôn mới), mất mạng hoặc mạng chậm > 3,5 giây thì dùng bản đã lưu.
    - Ảnh, font: dùng bản đã lưu ngay, rồi cập nhật ngầm cho lần sau.
    - Trang /profile: lưu sẵn trang + dữ liệu lúc cài đặt (xem WARM), và nhận tin nhắn {type:"warm-images", urls:[…]} từ profile/js/main.js để lưu sẵn ảnh của hồ sơ (ảnh model, fan name, nền…) → mở lại khi mất mạng vẫn thấy ảnh.

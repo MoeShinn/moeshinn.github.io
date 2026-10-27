@@ -27,15 +27,15 @@
 // /counter-api-cf.
 // IMPORTANT: fill these in with your real values after following
 // /counter-api-cf/README.md.
-const COUNTERS_REPO_OWNER = "ShinjuVN"; // GitHub username/org
+const COUNTERS_REPO_OWNER = "MoeShinn"; // GitHub username/org
 const COUNTERS_REPO_NAME = "api-counters"; // the SEPARATE repo that only holds counter .json files
 const COUNTERS_BRANCH = "main";
 const COUNTERS_RAW_BASE = `https://raw.githubusercontent.com/${COUNTERS_REPO_OWNER}/${COUNTERS_REPO_NAME}/${COUNTERS_BRANCH}`;
 const COUNTER_API_BASE = "https://n238.git-api.workers.dev"; // your deployed Cloudflare Worker URL
 const COUNTER_TYPE = "view"; // matches a key in the Worker's COUNTER_TYPES env var
 
-const LAST_SEARCH_KEY = "shinjuvn_blog_last_search";
-const CAME_FROM_HOME_KEY = "shinjuvn_blog_from_home";
+const LAST_SEARCH_KEY = "moeshinn_blog_last_search";
+const CAME_FROM_HOME_KEY = "moeshinn_blog_from_home";
 
 // localStorage/sessionStorage có thể ném lỗi (trình duyệt nhúng của Zalo/Messenger, chế độ riêng tư, bị chặn cookie…).
 // Mọi truy cập đi qua đây: lỗi thì coi như "không có gì", trang vẫn chạy bình thường.
@@ -94,7 +94,7 @@ function counterReadUrl(id, bucketMs = COUNTER_READ_BUCKET_MS) {
 // sessionStorage, và gọi tối đa vài request cùng lúc — để không bắn hàng chục request tới raw.githubusercontent.com mỗi lần mở
 // trang (dễ chạm giới hạn tốc độ). Trang từng bài vẫn đọc ô 1 phút để số hiện ra mới nhất.
 const LIST_VIEWS_BUCKET_MS = 5 * 60 * 1000;
-const LIST_VIEWS_CACHE_KEY = "shinjuvn_blog_list_views";
+const LIST_VIEWS_CACHE_KEY = "moeshinn_blog_list_views";
 const LIST_VIEWS_CONCURRENCY = 4;
 function readListViewsCache() {
     try {
@@ -616,7 +616,7 @@ async function renderPostPage(id) {
     });
 
     setTimeout(() => {
-        const storageKey = `shinjuvn_blog_viewed_${id}`;
+        const storageKey = `moeshinn_blog_viewed_${id}`;
         const lastViewedAt = Number(safeStore.get(storageKey) || 0);
         if (Date.now() - lastViewedAt < VIEW_COOLDOWN_MS) return; // counted recently — skip
 
@@ -802,7 +802,7 @@ function plainExcerpt(markdown, max) {
 }
 
 function applySeoMeta(meta, body, id) {
-    const siteName = "Shinju Ch.";
+    const siteName = "Moe Shinn";
     const title = meta.title ? `${meta.title} — ${siteName}` : `${siteName} — Blog`;
     document.title = title;
 

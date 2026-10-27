@@ -1,5 +1,5 @@
 {
-  "title": "Ủng Hộ Shinju Ch.",
+  "title": "Ủng Hộ Moe Shinn",
   "intro": "Mỗi lần bạn donate là động lực để mình phát triển kênh. Cảm ơn bạn rất nhiều!",
   "banner": "/image/vssnllkt.webp",
   "avatar": "/assets/avatar/avatar-336.webp",
@@ -51,7 +51,7 @@
     "textMsg": "{DISPLAY NAME} đã tặng bạn 1 ly kem giá {AMOUNT} đồng. {MESSENGER}"
   },
   "seo": {
-    "description": "Ủng hộ Shinju Ch. qua chuyển khoản ngân hàng, quét mã QR, không phí phụ thu. Donate hiện alert ngay trên stream.",
-    "keywords": "donate, ủng hộ, ủng hộ streamer, donate qua QR, donate VTuber, Shinju Ch., ShinjuVNer, chuyển khoản, cà phê"
+    "description": "Ủng hộ Moe Shinn qua chuyển khoản ngân hàng, quét mã QR, không phí phụ thu. Donate hiện alert ngay trên stream.",
+    "keywords": "donate, ủng hộ, ủng hộ streamer, donate qua QR, donate VTuber, Moe Shinn, MoeShinn, chuyển khoản, cà phê"
   }
 }

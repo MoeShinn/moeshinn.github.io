@@ -29,7 +29,7 @@
       const album = AG.find(idx, id);
       if (!album) { location.replace("/404.html"); return; }
       html = AG.bodyAlbum({ idx, album });
-      document.title = `${album.name} — ${AG.HUB} — ${(document.title.split(" — ").pop()) || "Shinju Ch."}`;
+      document.title = `${album.name} — ${AG.HUB} — ${(document.title.split(" — ").pop()) || "Moe Shinn"}`;
     }
     const tmp = document.createElement("div"); tmp.innerHTML = html; // so sánh theo DOM (không phải chuỗi) để biết bản tĩnh đã đúng chưa
     if (tmp.innerHTML !== app.innerHTML.replace(/<!--[\s\S]*?-->/g, "")) app.innerHTML = html; // đúng rồi thì không dựng lại (khỏi nháy ảnh)

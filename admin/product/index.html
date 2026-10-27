@@ -286,7 +286,7 @@ Admin.boot({ id: "product", title: "Sản phẩm", async render(main) {
     $("#e_ai").onclick = async () => {
       const b = $("#e_ai"); b.disabled = true;
       try {
-        const r = await Admin.api("/ai/seo", { title: $("#e_title").value, body: `${cat ? "Danh mục" : "Sản phẩm số"} trên website Shinju Ch. ${$("#e_desc").value} ${$("#e_body") ? $("#e_body").value : ""} ${$("#e_kw").value}`.slice(0, 6000) });
+        const r = await Admin.api("/ai/seo", { title: $("#e_title").value, body: `${cat ? "Danh mục" : "Sản phẩm số"} trên website Moe Shinn ${$("#e_desc").value} ${$("#e_body") ? $("#e_body").value : ""} ${$("#e_kw").value}`.slice(0, 6000) });
         if (r.description) $("#e_desc").value = r.description; if (r.keywords) $("#e_kw").value = [].concat(r.keywords).join(", ");
         Admin.toast("AI đã điền gợi ý, xem lại rồi lưu.");
       } catch (err) { Admin.toast(err.message, true); } b.disabled = false;

@@ -93,7 +93,7 @@
 
   function showLogin(root, done) {
     try { localStorage.removeItem(BYPASS); } catch {} // chưa/không còn đăng nhập → khách thường
-    root.innerHTML = `<div class="login"><form id="lf"><h1>Quản trị · Shinju</h1>
+    root.innerHTML = `<div class="login"><form id="lf"><h1>Quản trị · Moe Shinn</h1>
       <label>Mật khẩu<input id="pw" type="password" autocomplete="current-password" autofocus required></label>
       <div class="err" id="le"></div><button>Đăng nhập</button></form></div>`;
     $("#lf").onsubmit = async (e) => {
@@ -113,7 +113,7 @@
     try { localStorage.setItem(BYPASS, String(session().exp * 1000)); } catch {}
     const nav = NAV.map(([k, label, url, soon]) =>
       soon ? `<span class="soon">${label}<small>sắp có</small></span>` : `<a href="${url}" class="${k === id ? "on" : ""}">${label}</a>`).join("");
-    root.innerHTML = `<div class="layout"><nav class="side"><div class="brand">Shinju Admin</div><div class="navlist" id="navlist">${nav}</div>
+    root.innerHTML = `<div class="layout"><nav class="side"><div class="brand">Moe Shinn Admin</div><div class="navlist" id="navlist">${nav}</div>
       <div class="foot"><span id="left"></span><button class="ghost" id="out">Đăng xuất</button></div></nav><main id="main"></main></div>`;
     const tick = () => { const s = session(); if (!s) return location.reload(); $("#left").textContent = "Phiên còn " + Math.max(1, Math.round((s.exp * 1000 - Date.now()) / 60000)) + " phút"; };
     tick(); setInterval(tick, 30000);

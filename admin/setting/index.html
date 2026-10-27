@@ -46,7 +46,7 @@ const toPng = (file, size) => new Promise((res, rej) => {
 const themeOpts = (sel, withDef) => (withDef ? `<option value="" ${!sel ? "selected" : ""}>(Dùng nền mặc định của web)</option>` : "") + ShinjuTheme.list.map(([k, l]) => `<option value="${k}" ${sel === k ? "selected" : ""}>${l}</option>`).join("");
 const mergeTg = (t = {}) => ({ login: true, loginFail: true, ...t, views: { enabled: false, thresholds: [100, 500, 1000], ...t.views }, downloads: { enabled: false, thresholds: [50, 100, 500], ...t.downloads } });
 const DEF = {
-  giscus: { enabled: true, repo: "ShinjuVN/giscus-data", repoId: "", category: "Bình luận", categoryId: "", mapping: "pathname" },
+  giscus: { enabled: true, repo: "MoeShinn/giscus-data", repoId: "", category: "Bình luận", categoryId: "", mapping: "pathname" },
   announcement: { enabled: false, text: "", url: "", expires: "" },
   maintenance: { enabled: false, message: "Trang web đang được cập nhật, vui lòng quay lại sau." },
   theme: { default: "none", intensity: 0.7, wash: 0.6, dim: 0, forceMotion: false, pages: { home: "", post: "", product: "", download: "", channel: "", donate: "" } },

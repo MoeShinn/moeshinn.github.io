@@ -11,7 +11,7 @@
 Admin.boot({ id: "stats", title: "Số liệu", async render(main) {
   const { esc, $ } = Admin;
   // Bộ đếm lưu thành file trong repo api-counters: view-<id>.json {views}, download-<id>.json {downloads}
-  const RAW = "https://raw.githubusercontent.com/ShinjuVN/api-counters/main", COUNTER_API = "https://n238.git-api.workers.dev", BK = "shinju_stats_baseline";
+  const RAW = "https://raw.githubusercontent.com/MoeShinn/api-counters/main", COUNTER_API = "https://n238.git-api.workers.dev", BK = "shinju_stats_baseline";
   const fmt = (n) => (n == null ? "?" : n.toLocaleString("vi-VN"));
   async function load() {
     main.innerHTML = `<h2>Số liệu</h2><p class="hint">Đang tải số liệu…</p>`;

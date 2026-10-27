@@ -49,13 +49,13 @@
       theme: { ...THEME },
       background: { mode: "pattern", image: "", color: THEME.primary, fit: "cover", fixed: true, dim: 0 },
       hero: {
-        avatar: "/assets/avatar/avatar-336.webp", name: "Shinju Ch.", tagline: "PNGtuber (Ezy Tuber) Việt Nam",
-        intro: "Xin chào, mình là **Shinn Moeji**, người đứng sau kênh **Shinju Ch. [VNer]**. Mình là một PNGtuber Việt Nam dùng **Ezy Tuber** (ảnh tĩnh gắn khớp để chuyển động, kiểu PNGTuber+), làm nội dung game, trò chuyện, reaction và livestream trên **YouTube**.",
+        avatar: "/assets/avatar/avatar-336.webp", name: "Moe Shinn", tagline: "PNGtuber (Ezy Tuber) Việt Nam",
+        intro: "Xin chào, mình là **Shinn Moeji**, người đứng sau kênh **Moe Shinn [VNer]**. Mình là một PNGtuber Việt Nam dùng **Ezy Tuber** (ảnh tĩnh gắn khớp để chuyển động, kiểu PNGTuber+), làm nội dung game, trò chuyện, reaction và livestream trên **YouTube**.",
       },
       sections: [
         { id: "lore", type: "text", enabled: true, nav: "Lore", title: "Lore", body: "", image: "" },
         { id: "info", type: "info", enabled: true, nav: "Thông tin", title: "Thông tin cơ bản", image: "", rows: [
-          { label: "Tên", value: "Shinn Moeji" }, { label: "Tên kênh", value: "Shinju Ch. [VNer]" },
+          { label: "Tên", value: "Shinn Moeji" }, { label: "Tên kênh", value: "Moe Shinn [VNer]" },
           { label: "Thể loại", value: "PNGtuber, dùng Ezy Tuber (ảnh tĩnh gắn khớp chuyển động, kiểu PNGTuber+)" }, { label: "Quốc gia", value: "Việt Nam" },
           { label: "Nền tảng", value: "YouTube" }, { label: "Nội dung", value: "Game, trò chuyện, reaction, livestream" } ] },
         { id: "fan", type: "fan", enabled: true, nav: "Fan name", title: "Fan name", body: "", oshiLabel: "Oshi mark", oshi: "", images: [] },

@@ -12,7 +12,7 @@
     }
   ],
   "price": "Miễn phí",
-  "body": "<h2>Giới thiệu Ezy Tuber</h2>\n§l§bEzy Tuber§r là phần mềm §lchạy model Vtuber và PNGTuber§r theo thời gian thực, được làm §l§dhoàn toàn bằng tiếng Việt§r. Chỉ cần model của bạn, mở app lên là nhân vật có thể phản hồi giọng nói và biểu cảm của bạn để livestream, quay video hay trò chuyện cùng bạn bè.\n\n<h2>Điểm nổi bật</h2>\n<ul><li>§l§aTiếng Việt§r: giao diện và hướng dẫn đều bằng tiếng Việt, dễ dùng ngay từ lần đầu.</li><li>§l§bGiao diện trực quan§r: bố cục rõ ràng, bấm là hiểu, không cần học cách dùng phức tạp.</li><li>§l§dRig dễ dàng hơn§r: thiết lập layer và chuyển động nhanh gọn, ít bước, ít rối hơn.</li><li>§l§eChạy thời gian thực§r: nhân vật phản hồi theo giọng nói và chuột của bạn.</li></ul>\n\n<hr>\n\n§7Liên hệ & hỗ trợ: [Liên hệ](https://shinjuvn.github.io/channel/)§r",
+  "body": "<h2>Giới thiệu Ezy Tuber</h2>\n§l§bEzy Tuber§r là phần mềm §lchạy model Vtuber và PNGTuber§r theo thời gian thực, được làm §l§dhoàn toàn bằng tiếng Việt§r. Chỉ cần model của bạn, mở app lên là nhân vật có thể phản hồi giọng nói và biểu cảm của bạn để livestream, quay video hay trò chuyện cùng bạn bè.\n\n<h2>Điểm nổi bật</h2>\n<ul><li>§l§aTiếng Việt§r: giao diện và hướng dẫn đều bằng tiếng Việt, dễ dùng ngay từ lần đầu.</li><li>§l§bGiao diện trực quan§r: bố cục rõ ràng, bấm là hiểu, không cần học cách dùng phức tạp.</li><li>§l§dRig dễ dàng hơn§r: thiết lập layer và chuyển động nhanh gọn, ít bước, ít rối hơn.</li><li>§l§eChạy thời gian thực§r: nhân vật phản hồi theo giọng nói và chuột của bạn.</li></ul>\n\n<hr>\n\n§7Liên hệ & hỗ trợ: [Liên hệ](https://moeshinn.github.io/channel/)§r",
   "gallery": [
     "/image/nm548qoa.webp",
     "/image/km6lw3ph.webp",
@@ -22,7 +22,7 @@
   "buttons": [
     {
       "label": "Tải xuống",
-      "url": "https://github.com/ShinjuVN/Ezy-Software-and-Model/releases/download/Software/EzyTuber.exe",
+      "url": "https://github.com/MoeShinn/Ezy-Software-and-Model/releases/download/Software/EzyTuber.exe",
       "style": "blue"
     }
   ]

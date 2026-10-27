@@ -9,17 +9,17 @@
     {
       "id": "primary",
       "label": "[Picture Lite] Setup.exe - Nén Ảnh",
-      "url": "https://github.com/ShinjuVN/Picture-Lite/releases/download/Picture-Lite-Install/Picture-Lite-Installer.exe"
+      "url": "https://github.com/MoeShinn/Picture-Lite/releases/download/Picture-Lite-Install/Picture-Lite-Installer.exe"
     },
     {
       "id": "dl3",
       "label": "[Extractor] Setup.exe - SOURCE -> TXT",
-      "url": "https://github.com/ShinjuVN/Source-Tree-Extractor/releases/download/Source-Tree-Extractor-Install/Setup-STE.exe"
+      "url": "https://github.com/MoeShinn/Source-Tree-Extractor/releases/download/Source-Tree-Extractor-Install/Setup-STE.exe"
     },
     {
       "id": "dl2",
       "label": "[Picture Lite] Portable.exe (bản v1.0.0-beta1)",
-      "url": "https://github.com/ShinjuVN/Picture-Lite/releases/download/Picture-Lite-Install/PictureLite-Portable-v1.0.0-beta1.exe"
+      "url": "https://github.com/MoeShinn/Picture-Lite/releases/download/Picture-Lite-Install/PictureLite-Portable-v1.0.0-beta1.exe"
     }
   ],
   "short": "rVpEXbwfmu",

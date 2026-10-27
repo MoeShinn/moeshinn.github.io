@@ -23,7 +23,7 @@ Bạn có thể làm tương tự với §bFabric Launcher§r, §bPrism Launcher
 <hr>
 
 <h2>2. Chuẩn bị trước khi cài</h2>
-<ul><li>Một launcher đã cài sẵn: §lLegacy Launcher§r (bài này), Fabric Launcher hoặc Prism Launcher</li><li>File §emrpack-to-zip.zip§r (bản modpack đã đổi từ .mrpack sang .zip)</li><li>Tải §lFabric API§r đúng phiên bản Minecraft: <a href="https://modrinth.com/mod/fabric-api/versions">[Modrinth]</a> hoặc <a href="https://www.curseforge.com/minecraft/mc-mods/fabric-api">[CurseForge]</a></li><li>Link tải Optimized ZIP: <a href="https://github.com/ShinjuVN/Optimized-Fabric-Pack/releases" target="_blank">tại đây</a></li><li>Đã cài §lJava§r phù hợp: Minecraft 1.20.5 trở lên dùng §aJava 21§r, 1.18 đến 1.20.4 dùng §aJava 17§r. Có thể bỏ qua nếu Launcher chạy bằng java có sẵn trong mã nguồn.</li></ul>
+<ul><li>Một launcher đã cài sẵn: §lLegacy Launcher§r (bài này), Fabric Launcher hoặc Prism Launcher</li><li>File §emrpack-to-zip.zip§r (bản modpack đã đổi từ .mrpack sang .zip)</li><li>Tải §lFabric API§r đúng phiên bản Minecraft: <a href="https://modrinth.com/mod/fabric-api/versions">[Modrinth]</a> hoặc <a href="https://www.curseforge.com/minecraft/mc-mods/fabric-api">[CurseForge]</a></li><li>Link tải Optimized ZIP: <a href="https://github.com/MoeShinn/Optimized-Fabric-Pack/releases" target="_blank">tại đây</a></li><li>Đã cài §lJava§r phù hợp: Minecraft 1.20.5 trở lên dùng §aJava 21§r, 1.18 đến 1.20.4 dùng §aJava 17§r. Có thể bỏ qua nếu Launcher chạy bằng java có sẵn trong mã nguồn.</li></ul>
 §cQuan trọng:§r phiên bản Minecraft, phiên bản Fabric API và phiên bản Optimized Fabric phải §lKHỚP NHAU§r. Lệch phiên bản là game sẽ crash hoặc không mở được.
 
 <hr>

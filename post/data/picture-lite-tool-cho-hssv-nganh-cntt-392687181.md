@@ -11,7 +11,7 @@ Thế nhưng dùng đồ free thì cũng có cái khó riêng. Github Pages tuy 
 
 Vì gặp đúng vấn đề đó nên mình đã tự tay viết ra một công cụ nén ảnh nhỏ gọn để tối ưu lại web của mình, đặt tên là: §9Picture Lite§r
 
-Đây là một tool nén ảnh mã nguồn mở do chính mình (§bShinju Ch.§r) phát triển, với mục tiêu ban đầu là tự dùng, sau là muốn chia sẻ cho anh em HSSV tụi mình cùng giảm dung lượng ảnh mà vẫn giữ được chất lượng nét căng. Picture Lite cân tốt các định dạng phổ biến như PNG, JPEG, lẫn WebP, kèm theo nhiều tùy chỉnh nén linh hoạt tùy theo nhu cầu của dự án.
+Đây là một tool nén ảnh mã nguồn mở do chính mình (§bMoe Shinn§r) phát triển, với mục tiêu ban đầu là tự dùng, sau là muốn chia sẻ cho anh em HSSV tụi mình cùng giảm dung lượng ảnh mà vẫn giữ được chất lượng nét căng. Picture Lite cân tốt các định dạng phổ biến như PNG, JPEG, lẫn WebP, kèm theo nhiều tùy chỉnh nén linh hoạt tùy theo nhu cầu của dự án.
 
 Tùy vào sở thích thì bạn có thể tải bản cài đặt qua file setup, hoặc tiện nhất là xài bản PictureLite-§oPortable§r.exe chạy trực tiếp luôn, không cần cài đặt rườm rà. <hr>
 
@@ -21,7 +21,7 @@ Tiết kiệm được siêu nhiều thời gian, nhất là mấy dự án đ�
 
 Tải xuống Picture Lite tại đây nè :3
 
-<a class="button-5s" data-seconds="10" href="https://shinjuvn.github.io/download/1271266172/" target="_blank" rel="noopener noreferrer">Mở link download</a>
+<a class="button-5s" data-seconds="10" href="https://moeshinn.github.io/download/1271266172/" target="_blank" rel="noopener noreferrer">Mở link download</a>
 
 Anh em cứ tải về xài thử rồi tối ưu lại mớ ảnh trên website cho mượt mà nha!
 §n§l§6Bình luận để tui cải tiến thêm nha!!!§r

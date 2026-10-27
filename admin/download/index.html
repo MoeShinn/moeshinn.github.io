@@ -12,7 +12,7 @@ Admin.boot({ id: "download", title: "Download", async render(main) {
   const { esc, $ } = Admin;
   main.innerHTML = `<h2>Download</h2><p class="hint">Đang tải…</p>`;
   let S, tree, pool, items = [];
-  const REPO_API = "https://api.github.com/repos/ShinjuVN/shinjuvn.github.io";
+  const REPO_API = "https://api.github.com/repos/MoeShinn/moeshinn.github.io";
   async function firstCommitDate(path) {
     const key = "shinju_dl_created:" + path;
     try { const c = localStorage.getItem(key); if (c) return c; } catch (e) { /* bỏ qua */ }

@@ -1,16 +1,16 @@
 ---
-title: "Shinju Ch. debut: Kênh Vtuber/PNGtuber Việt Nam"
+title: "Moe Shinn debut: Kênh Vtuber/PNGtuber Việt Nam"
 photo: "photo/shinju-ch-ra-mat-neon-mvee385m.webp"
 date: "19/10/2026"
-keywords: "Shinju Ch, VNer, Vtuber, PNGtuber, VtuberDebut, LivestreamVN"
+keywords: "Moe Shinn, VNer, Vtuber, PNGtuber, VtuberDebut, LivestreamVN"
 description: "Kênh YouTube Vtuber/PNGtuber Việt Nam gaming, reaction & stream 20h hằng ngày"
 ---
 <hr>
 
-§l§bShinju Ch. [VNer]§r chính thức §l§eđi vào hoạt động§r với video đầu tiên vào §n§c00:00 ngày 19/10/2026§r!
+§l§bMoe Shinn [VNer]§r chính thức §l§eđi vào hoạt động§r với video đầu tiên vào §n§c00:00 ngày 19/10/2026§r!
 
-<h2>Shinju Ch. [VNer] là ai?</h2>
-§lShinju Ch. [VNer]§r là kênh YouTube của một §l§dPNGtuber/Vtuber Việt Nam§r mới debut, mang đến nội dung §agame§r, §btrò chuyện§r, §creaction§r và §elivestream§r vui nhộn, gần gũi dành cho cộng đồng người xem Việt.
+<h2>Moe Shinn [VNer] là ai?</h2>
+§lMoe Shinn [VNer]§r là kênh YouTube của một §l§dPNGtuber/Vtuber Việt Nam§r mới debut, mang đến nội dung §agame§r, §btrò chuyện§r, §creaction§r và §elivestream§r vui nhộn, gần gũi dành cho cộng đồng người xem Việt.
 
 <hr>
 
@@ -31,11 +31,11 @@ description: "Kênh YouTube Vtuber/PNGtuber Việt Nam gaming, reaction & stream
 
 <a class="btn" href="https://youtube.com/shorts/wUzWvpvYZ8k?si=23794EFnBLr7jUgY" target="_blank" rel="noopener noreferrer">Xem video ik nè</a>
 
-![Shinju Ch. VNer - Vtuber PNGtuber Việt Nam debut kênh YouTube game reaction stream 20h](/post/photo/avatar-mve2v3bk.webp)
+![Moe Shinn. VNer - Vtuber PNGtuber Việt Nam debut kênh YouTube game reaction stream 20h](/post/photo/avatar-mve2v3bk.webp)
 
-<h3>Theo dõi Shinju Ch. [VNer]</h3>
+<h3>Theo dõi Moe Shinn [VNer]</h3>
 <ul>
-<li>§l§cYouTube§r: <a href="https://www.youtube.com/channel/UCoZR9unQFHLfqoOQ22lPcGA" target="_blank">Shinju Ch. [VNer]</a></li>
+<li>§l§cYouTube§r: <a href="https://www.youtube.com/channel/UCoZR9unQFHLfqoOQ22lPcGA" target="_blank">Moe Shinn [VNer]</a></li>
 </ul>
 
 <hr>

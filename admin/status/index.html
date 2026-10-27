@@ -15,7 +15,7 @@
 Admin.boot({ id: "status", title: "Trạng thái", async render(main) {
   const { esc, $ } = Admin;
   main.innerHTML = `<h2>Trạng thái</h2><p class="hint">Đang tải…</p>`;
-  let st, M, name = "Shinju Ch.";
+  let st, M, name = "Moe Shinn";
   try {
     [st, M] = await Promise.all([Admin.readJson("status.json", {}), fetch("/moods.json", { cache: "no-cache" }).then((r) => r.json())]);
     try { name = (await Admin.readJson("data.json")).profile?.name || name; } catch (e) { /* dùng tên mặc định */ }

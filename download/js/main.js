@@ -29,7 +29,7 @@ const SITE_404 = "/404.html";
 // the small Cloudflare Worker. See /counter-api-cf/README.md.
 // IMPORTANT: fill these in with your real values after following that
 // README — these are just placeholders.
-const COUNTERS_REPO_OWNER = "ShinjuVN";
+const COUNTERS_REPO_OWNER = "MoeShinn";
 const COUNTERS_REPO_NAME = "api-counters";
 const COUNTERS_BRANCH = "main";
 const COUNTERS_RAW_BASE = `https://raw.githubusercontent.com/${COUNTERS_REPO_OWNER}/${COUNTERS_REPO_NAME}/${COUNTERS_BRANCH}`;

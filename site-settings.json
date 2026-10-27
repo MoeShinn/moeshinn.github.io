@@ -1,7 +1,7 @@
 {
   "giscus": {
     "enabled": true,
-    "repo": "ShinjuVN/giscus-data",
+    "repo": "MoeShinn/giscus-data",
     "repoId": "R_kgDOVAMWOQ",
     "category": "Announcements",
     "categoryId": "DIC_kwDOVAMWOc4DHS7p",
@@ -9,7 +9,7 @@
   },
   "announcement": {
     "enabled": true,
-    "text": "Shinju Ch. đã ra mắt trên Youtube ✨",
+    "text": "Moe Shinn. đã ra mắt trên Youtube ✨",
     "url": "https://www.youtube.com/channel/UCoZR9unQFHLfqoOQ22lPcGA",
     "expires": "2026-10-23"
   },
@@ -34,9 +34,9 @@
     }
   },
   "seo": {
-    "siteUrl": "https://shinjuvn.github.io",
-    "siteName": "Shinju Ch.",
-    "ogImage": "https://shinjuvn.github.io/assets/avatar/avatar.webp",
+    "siteUrl": "https://moeshinn.github.io",
+    "siteName": "Moe Shinn",
+    "ogImage": "https://moeshinn.github.io/assets/avatar/avatar.webp",
     "shortLength": 6,
     "favicon": {
       "icon": "/assets/favicon/favicon-32.png?v=mvdx4gck",
@@ -50,39 +50,39 @@
     },
     "pages": {
       "home": {
-        "title": "Shinju Ch.",
-        "description": "Trang cá nhân của Shinju Ch. Mạng xã hội, ủng hộ và các bài đăng mới.",
-        "keywords": "Shinju Ch., ShinjuVNer, Shinju, mạng xã hội, blog"
+        "title": "Moe Shinn",
+        "description": "Trang cá nhân của Moe Shinn. Mạng xã hội, ủng hộ và các bài đăng mới.",
+        "keywords": "Moe Shinn, MoeShinn, mạng xã hội, blog"
       },
       "post": {
-        "title": "Bài viết & hướng dẫn Minecraft, OBS, Vtuber — Shinju Ch.",
-        "description": "Bài viết, hướng dẫn và thông báo của Shinju Ch.: tối ưu Minecraft, cài OBS cho máy yếu, plugin Music Box, công cụ nén ảnh và tin Vtuber/PNGtuber.",
-        "keywords": "bài viết, hướng dẫn, Minecraft, OBS, Vtuber, PNGtuber, plugin, Shinju Ch."
+        "title": "Bài viết & hướng dẫn Minecraft, OBS, Vtuber — Moe Shinn",
+        "description": "Bài viết, hướng dẫn và thông báo của Moe Shinn: tối ưu Minecraft, cài OBS cho máy yếu, plugin Music Box, công cụ nén ảnh và tin Vtuber/PNGtuber.",
+        "keywords": "bài viết, hướng dẫn, Minecraft, OBS, Vtuber, PNGtuber, plugin, Moe Shinn"
       },
       "product": {
-        "title": "Sản phẩm — Shinju Ch.",
-        "description": "Sản phẩm số của Shinju Ch. [VNer]: phần mềm và model PNGTuber/Vtuber (Ezy Tuber), kèm chính sách sử dụng rõ ràng.",
-        "keywords": "sản phẩm số, phần mềm, model Ezy Tuber, PNGTuber, Vtuber, Shinju Ch."
+        "title": "Sản phẩm — Moe Shinn",
+        "description": "Sản phẩm số của Moe Shinn [VNer]: phần mềm và model PNGTuber/Vtuber (Ezy Tuber), kèm chính sách sử dụng rõ ràng.",
+        "keywords": "sản phẩm số, phần mềm, model Ezy Tuber, PNGTuber, Vtuber, Moe Shinn"
       },
       "download": {
-        "title": "Tải xuống — Shinju Ch.",
-        "description": "Tải xuống các tệp và tài nguyên do Shinju Ch. chia sẻ",
-        "keywords": "tải xuống, download, Shinju Ch."
+        "title": "Tải xuống — Moe Shinn",
+        "description": "Tải xuống các tệp và tài nguyên do Moe Shinn chia sẻ",
+        "keywords": "tải xuống, download, Moe Shinn"
       },
       "channel": {
-        "title": "Shinju Ch. Channel",
-        "description": "Trang mạng xã hội cá nhân Shinju Ch.",
-        "keywords": "Shinju Ch., ShinjuVNer, YouTube, mạng xã hội"
+        "title": "Moe Shinn Channel",
+        "description": "Trang mạng xã hội cá nhân Moe Shinn",
+        "keywords": "Moe Shinn, MoeShinn, YouTube, mạng xã hội"
       },
       "profile": {
-        "title": "Hồ sơ Vtuber Shinju Ch. — Model, fan name, thông tin",
-        "description": "Hồ sơ PNGtuber Việt Nam Shinju Ch. [VNer] (Shinn Moeji, Ezy Tuber): thông tin cơ bản, lore, fan name, các model và kênh mạng xã hội chính thức.",
-        "keywords": "Shinju Ch., ShinjuVNer, hồ sơ Vtuber, Shinn Moeji, Ezy Tuber, PNGTuber+, Vtuber Việt Nam, PNGtuber, model Vtuber, fan name, lore"
+        "title": "Hồ sơ Vtuber Moe Shinn — Model, fan name, thông tin",
+        "description": "Hồ sơ PNGtuber Việt Nam Moe Shinn [VNer] (Shinn Moeji, Ezy Tuber): thông tin cơ bản, lore, fan name, các model và kênh mạng xã hội chính thức.",
+        "keywords": "Moe Shinn, MoeShinn, hồ sơ Vtuber, Shinn Moeji, Ezy Tuber, PNGTuber+, Vtuber Việt Nam, PNGtuber, model Vtuber, fan name, lore"
       },
       "donate": {
-        "title": "Ủng Hộ — Shinju Ch.",
-        "description": "Ủng hộ Shinju Ch. để duy trì và phát triển nội dung.",
-        "keywords": "ủng hộ, đóng góp, Shinju Ch."
+        "title": "Ủng Hộ — Moe Shinn",
+        "description": "Ủng hộ Moe Shinn. để duy trì và phát triển nội dung.",
+        "keywords": "ủng hộ, đóng góp, Moe Shinn"
       }
     }
   },

@@ -16,7 +16,7 @@
   const SITE_404 = "/404.html";
 
   // Bộ đếm tự host: ĐỌC thẳng từ raw.githubusercontent.com, chỉ +1 mới qua Worker (giống post/js/main.js).
-  const COUNTERS_RAW_BASE = "https://raw.githubusercontent.com/ShinjuVN/api-counters/main";
+  const COUNTERS_RAW_BASE = "https://raw.githubusercontent.com/MoeShinn/api-counters/main";
   const COUNTER_API_BASE = "https://n238.git-api.workers.dev";
   const COUNTER_TYPE = "product"; // phải có trong COUNTER_TYPES của Worker
   const BUCKET_MS = 60 * 1000;
@@ -106,7 +106,7 @@
     const el = document.querySelector("[data-views-wrap]");
     const show = (v) => { if (el && v > 0) { el.textContent = `👁 ${formatCount(v)} lượt xem`; el.hidden = false; } };
     getViews(id).then(show);
-    const key = `shinjuvn_product_viewed_${id}`;
+    const key = `moeshinn_product_viewed_${id}`;
     let seen = 0;
     const timer = setInterval(() => { // chỉ cộng giây khi tab đang hiện
       if (document.hidden) return;
@@ -398,7 +398,7 @@
     const details = await loadDetails(nodes, id), d = details[id] || {};
     const bodyHtml = !PG.isCat(node) && d.body && typeof renderPostBody === "function" ? renderPostBody(d.body) : "";
     app.innerHTML = PG.bodyNode({ node, nodes, details, bodyHtml, hub });
-    setTitle(`${node.title} — ${(document.title.split(" — ")[1]) || "Shinju Ch."}`);
+    setTitle(`${node.title} — ${(document.title.split(" — ")[1]) || "Moe Shinn"}`);
     if (PG.isTool(node, d)) await mountTool(d.tool);
     if (window.SiteLoading) window.SiteLoading.ready();
     document.querySelectorAll("[data-gallery]").forEach(initGallery);

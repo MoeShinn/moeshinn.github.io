@@ -159,7 +159,7 @@
         // Trạng thái tự tạo: lời trống thì KHÔNG tự thêm câu nào, chỉ hiện icon trong khung trắng.
         if (!text && mood && mood.custom) text = (mood.text || "").trim();
         else if (!text && mood) { // cảm xúc có sẵn mà không có lời → "Tên đang cảm thấy …"
-            let name = "Shinju Ch.";
+            let name = "Moe Shinn";
             try { const d = await window.siteJSON("/data.json"); name = (d.profile && d.profile.name) || name; } catch (e) { /* dùng tên mặc định */ }
             text = `${name} ${mood.phrase}`;
         }
