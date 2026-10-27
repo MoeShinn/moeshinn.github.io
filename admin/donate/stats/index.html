@@ -102,7 +102,7 @@ Admin.boot({ id: "donate-stats", title: "Số liệu donate", async render(main)
     <div><div class="ds-nm"><b>${esc(x.name || "Ẩn danh")}</b>${x.verified ? BADGE : ""}${x.handle ? `<span class="ds-handle">${esc(x.handle)}</span>` : ""}</div>
       ${x.msg ? `<p class="ds-msg">${esc(x.msg)}</p>` : ""}
       <div class="ds-meta">${x.noCode ? '<span class="ds-chip off" title="Chuyển khoản không kèm mã đơn">Không có mã đơn</span>' : `<button type="button" class="ds-chip" data-copy="${esc(x.code)}" title="Bấm để copy mã đơn">${esc(x.code)}</button>`}
-        ${x.msgHidden ? '<span class="ds-tag" title="Tin nhắn chưa qua kiểm duyệt nên không hiện trên stream">Tin nhắn bị ẩn</span>' : ""}<span>${fdt(x.paid)}</span></div></div>
+        ${x.msgHidden ? '<span class="ds-tag" title="Tin nhắn chưa qua kiểm duyệt nên không hiện trên stream">Tin nhắn bị ẩn</span>' : ""}${x.msgChecking ? '<span class="ds-tag" title="AI đang kiểm duyệt, alert sẽ phát ngay khi kiểm duyệt xong">Đang kiểm duyệt</span>' : ""}<span>${fdt(x.paid)}</span></div></div>
     <div class="ds-amt">${fm(x.amount)}</div></li>`;
 
   // local = true: thẻ gọn — máy chủ luôn trả donate mới nhất, việc sắp xếp theo số tiền làm ngay trên máy.
