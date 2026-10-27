@@ -23,8 +23,8 @@
   "template": "DONATE {ORDER CODE}",
   "ai": true,
   "alert": {
-    "layout": "v",
-    "posX": "center",
+    "layout": "h",
+    "posX": "left",
     "posY": "top",
     "duration": 15,
     "minShow": 10,
