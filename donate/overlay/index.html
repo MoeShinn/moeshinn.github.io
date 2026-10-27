@@ -76,7 +76,7 @@
     }
     const kick = () => { if (!timer && active()) tick(); };
     if (inObs) {
-      obsstudio.getStatus && obsstudio.getStatus((s) => { streaming = !!s.streaming; kick(); });
+      obsstudio.getStatus && obsstudio.getStatus((s) => { streaming = !!s.streaming || always; kick(); }); // có ?always thì luôn phát, không để trạng thái stream ghi đè
       addEventListener("obsStreamingStarted", () => { streaming = true; kick(); });
       addEventListener("obsStreamingStopped", () => { streaming = always; });
       addEventListener("obsSourceVisibleChanged", (e) => { visible = e.detail.visible; kick(); });
