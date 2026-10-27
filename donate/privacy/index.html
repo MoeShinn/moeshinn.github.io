@@ -43,7 +43,7 @@
     <div class="dn-wrap dn-doc-wrap">
       <h1 class="page-title">Chính sách bảo mật</h1>
       <article class="dn-card dn-doc">
-        <p class="dn-upd">Cập nhật lần cuối: 27/10/2026</p>
+        <p class="dn-upd">Cập nhật lần cuối: 28/10/2026</p>
         <p>Trang <a href="/donate/">Donate</a> của Moe Shinn (“chúng tôi”, “mình”) cho phép bạn ủng hộ kênh và, nếu muốn, đăng nhập bằng tài khoản YouTube để tên kênh và avatar hiện trong lịch sử/bảng xếp hạng ủng hộ. Trang này giải thích mình thu thập dữ liệu nào, dùng để làm gì và bạn kiểm soát nó ra sao.</p>
 
         <h2>1. Dữ liệu mình thu thập</h2>
@@ -67,12 +67,13 @@
         <ul>
           <li><b>Cloudflare</b> (Workers, cơ sở dữ liệu D1 và bộ nhớ KV): lưu thông tin kênh (ID, tên, @handle, đường dẫn avatar) và các bản ghi donate. KV còn giữ bộ đếm chống spam theo địa chỉ IP trong tối đa khoảng 2 phút rồi tự xoá.</li>
           <li><b>Trình duyệt của bạn (<code>localStorage</code>)</b>: thẻ phiên và thông tin hiển thị (tên, @handle, avatar) để bạn không phải đăng nhập lại; cùng tên khách bạn đã nhập lần trước. Bấm “Đăng xuất” hoặc xoá dữ liệu trang web là các mục này mất.</li>
-          <li>Tên và lời nhắn có thể được gửi qua bộ kiểm duyệt tự động (Cloudflare Workers AI) để lọc nội dung không phù hợp.</li>
+          <li>Kiểm duyệt tự động: tên hiển thị và lời nhắn (chỉ phần chữ, không kèm ID kênh, số tiền hay địa chỉ IP) có thể được gửi tới <b>Google Gemini API</b> (gói miễn phí) để lọc nội dung không phù hợp; nếu dịch vụ này lỗi, mình dùng Cloudflare Workers AI làm dự phòng. Với người đã đăng nhập YouTube, tên được kiểm tra là tên kênh hoặc @handle. Theo điều khoản của Google, nội dung gửi qua gói miễn phí có thể được Google dùng để cải thiện sản phẩm của họ.</li>
+          <li>Giọng đọc alert: khi stream, tên, số tiền và lời nhắn đã qua kiểm duyệt có thể được gửi tới dịch vụ chuyển văn bản thành giọng nói của Google (translate.google.com) từ trình duyệt của người phát stream để tạo âm thanh; nếu dịch vụ này lỗi, trình duyệt dùng giọng đọc có sẵn trong máy.</li>
           <li>Mã QR được tạo bởi dịch vụ VietQR (img.vietqr.io) từ số tiền và nội dung chuyển khoản; việc chuyển tiền do ngân hàng của bạn và dịch vụ SePay xử lý theo chính sách riêng của họ.</li>
         </ul>
 
         <h2>5. Chia sẻ dữ liệu</h2>
-        <p>Mình <b>không bán, không cho thuê và không chia sẻ</b> dữ liệu của bạn cho bên thứ ba vì mục đích riêng của họ. Dữ liệu chỉ đi qua các nhà cung cấp hạ tầng nêu ở mục 4 để trang hoạt động. Phần bạn tự chọn để hiển thị (tên/@handle, avatar, số tiền, lời nhắn đã qua kiểm duyệt) là thông tin công khai trên trang Donate.</p>
+        <p>Mình <b>không bán, không cho thuê và không chia sẻ</b> dữ liệu của bạn cho bên thứ ba vì mục đích riêng của họ. Dữ liệu chỉ đi qua các nhà cung cấp nêu ở mục 4 để trang hoạt động; riêng nội dung gửi tới các dịch vụ của Google (kiểm duyệt, giọng đọc) thì Google xử lý theo điều khoản của chính Google. Phần bạn tự chọn để hiển thị (tên/@handle, avatar, số tiền, lời nhắn đã qua kiểm duyệt) là thông tin công khai trên trang Donate.</p>
 
         <h2>6. Tuân thủ chính sách dữ liệu của Google</h2>
         <p>Việc sử dụng và chuyển giao thông tin nhận được từ các Google API sang bất kỳ ứng dụng nào khác của Moe Shinn sẽ tuân thủ <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer">Chính sách dữ liệu người dùng của Google API Services</a> (Google API Services User Data Policy), bao gồm các yêu cầu về <b>Giới hạn sử dụng</b> (Limited Use requirements): dữ liệu chỉ dùng để cung cấp tính năng hiển thị tên kênh mà bạn thấy trên trang này, không chuyển cho bên khác ngoài mục đích đó, không dùng để quảng cáo và không cho người đọc thủ công trừ khi cần để bảo mật hoặc theo yêu cầu pháp luật.</p>
