@@ -47,7 +47,7 @@ Admin.boot({ id: "download", title: "Download", async render(main) {
       <td style="text-align:right;white-space:nowrap"><a href="/download/${encodeURIComponent(id)}/" target="_blank">Mở</a>${d.short ? ` · <a href="#" data-copy="${site}/s/${esc(d.short)}/">Chép link</a>` : ""} · <a href="#edit/${encodeURIComponent(id)}">Sửa</a> · <a href="#" data-del="${esc(id)}" style="color:#ff8b8f">Xóa</a></td></tr>`).join("");
     main.innerHTML = `<h2>Download</h2><p><a class="btn" href="#new">＋ Mục tải mới</a></p>
       <div class="card"><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">${rows || '<tr><td class="hint">Chưa có mục tải nào.</td></tr>'}</table></div></div>`;
-    main.querySelectorAll("[data-copy]").forEach((el) => (el.onclick = (e) => { e.preventDefault(); navigator.clipboard.writeText(el.dataset.copy).then(() => Admin.toast("Đã chép: " + el.dataset.copy)); }));
+    main.querySelectorAll("[data-copy]").forEach((el) => (el.onclick = (e) => { e.preventDefault(); Admin.copy(el.dataset.copy, el, { toast: "Đã chép: " + el.dataset.copy }); }));
     main.querySelectorAll("[data-del]").forEach((el) => (el.onclick = async (e) => {
       e.preventDefault(); const it = items.find((x) => x.id === el.dataset.del); if (!confirm(`Xóa mục tải “${it.d.title || it.id}”? Trang và link rút gọn sẽ bị xóa.`)) return;
       try { await Rebuild.deleteDownload(Admin, { id: it.id, data: it.d, seo, message: "Admin: xóa mục tải " + it.id }); Admin.toast("Đã xóa. Web cập nhật sau ~1 phút."); setTimeout(() => location.reload(), 1200); }

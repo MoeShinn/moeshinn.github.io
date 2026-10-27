@@ -29,10 +29,7 @@ Admin.boot({ id: "buy", title: "Bán hàng", async render(main) {
   const pretty = (c) => String(c).match(/.{1,5}/g).join("-");
   const STATE = { active: "Chưa dùng hết", downloading: "Đang tải", used: "Hết lượt", expired: "Hết hạn", revoked: "Đã thu hồi" };
   const stateOf = (c) => (c.s === "revoked" ? "revoked" : c.e && c.e < Date.now() ? "expired" : c.u >= c.m ? "used" : c.l > Date.now() ? "downloading" : "active");
-  const copy = async (text, ok = "Đã sao chép") => {
-    try { await navigator.clipboard.writeText(text); } catch { const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select(); document.execCommand("copy"); t.remove(); }
-    toast(ok);
-  };
+  const copy = (text, ok = "Đã sao chép", el) => Admin.copy(text, el, { toast: ok }); // el: nút vừa bấm → đổi thành "Đã Copy ✓" 1,5 giây
   const message = (prodName, code, max, exp) =>
     `Cảm ơn bạn đã mua ${prodName}! 🎉\nMã tải: ${pretty(code)}\nVào ${LINK} và dán mã để tải file.\nMã dùng được ${max} lần${exp ? `, hết hạn ${fmtDate(exp)}` : ""}. Vui lòng không chia sẻ mã cho người khác.`;
 
@@ -140,7 +137,9 @@ Admin.boot({ id: "buy", title: "Bán hàng", async render(main) {
 
   // ---------- tạo mã ----------
   $("#c_go").onclick = async () => {
-    const btn = $("#c_go"); $("#c_err").textContent = ""; btn.disabled = true;
+    const btn = $("#c_go"); if (btn.disabled) return;
+    const label = btn.textContent; let failed = false;
+    $("#c_err").textContent = ""; btn.disabled = true; btn.classList.add("busy"); btn.textContent = "Đang tạo mã…";
     try {
       const r = await api("/buy-admin/codes/create", { product: $("#c_prod").value, count: +$("#c_n").value, max: +$("#c_max").value, days: +$("#c_days").value, note: $("#c_note").value });
       $("#c_out").innerHTML = `<p class="hint">Đã tạo ${r.codes.length} mã cho <b>${esc(r.product.name)}</b>. Mã chỉ hiện đầy đủ ở đây và trong danh sách bên dưới.</p>` +
@@ -148,11 +147,15 @@ Admin.boot({ id: "buy", title: "Bán hàng", async render(main) {
         (r.codes.length > 1 ? `<button class="ghost" data-all="1">Sao chép tất cả mã</button>` : "");
       $("#c_out").onclick = (e) => {
         const b = e.target.closest("button"); if (!b) return;
-        if (b.dataset.cp) copy(b.dataset.cp); else if (b.dataset.cm) copy(message(r.product.name, b.dataset.cm, r.max, r.exp), "Đã sao chép tin nhắn"); else if (b.dataset.all) copy(r.codes.join("\n"), "Đã sao chép tất cả mã");
+        if (b.dataset.cp) copy(b.dataset.cp, undefined, b); else if (b.dataset.cm) copy(message(r.product.name, b.dataset.cm, r.max, r.exp), "Đã sao chép tin nhắn", b); else if (b.dataset.all) copy(r.codes.join("\n"), "Đã sao chép tất cả mã", b);
       };
       toast("Đã tạo mã"); await loadCodes();
-    } catch (e) { $("#c_err").textContent = e.message; }
-    btn.disabled = false;
+    } catch (e) { failed = true; $("#c_err").textContent = e.message; toast(e.message, true); }
+    finally {
+      btn.classList.remove("busy"); btn.textContent = label;
+      // Lỗi: giữ khoá thêm ~1500 ms (chống bấm dồn) rồi mới mở lại; thành công: mở lại ngay. Dùng finally + setTimeout nên nút không bao giờ kẹt khoá.
+      if (failed) setTimeout(() => (btn.disabled = false), 1500); else btn.disabled = false;
+    }
   };
 
   // ---------- danh sách mã ----------
@@ -170,8 +173,8 @@ Admin.boot({ id: "buy", title: "Bán hàng", async render(main) {
     const b = e.target.closest("button[data-a]"); if (!b) return;
     const code = b.closest("tr").dataset.code, c = codes.find((x) => x.code === code), a = b.dataset.a, body = { code, action: a };
     try {
-      if (a === "copy") return copy(pretty(code));
-      if (a === "msg") { const p = products.find((x) => x.id === c.p); return copy(message(p ? p.name : "sản phẩm", code, c.m, c.e), "Đã sao chép tin nhắn"); }
+      if (a === "copy") return copy(pretty(code), undefined, b);
+      if (a === "msg") { const p = products.find((x) => x.id === c.p); return copy(message(p ? p.name : "sản phẩm", code, c.m, c.e), "Đã sao chép tin nhắn", b); }
       if (a === "delete" && !confirm(`Xoá hẳn mã ${pretty(code)}?\nKhách còn giữ mã này sẽ không tải được nữa.`)) return;
       if (a === "revoke" && !confirm(`Thu hồi mã ${pretty(code)}? Khách sẽ không tải được nữa (có thể khôi phục).`)) return;
       if (a === "expiry") { const d = prompt("Hạn mới: số ngày kể từ hôm nay (0 = không hết hạn)", "30"); if (d === null) return; body.days = +d; }

@@ -49,7 +49,7 @@ Admin.boot({ id: "links", title: "Link rút gọn", async render(main) {
     <div class="card"><h3>Link tự đặt (${links.length})</h3>${links.length ? `<table style="width:100%;border-collapse:collapse">${links.map((l, i) => `<tr style="border-top:1px solid var(--line)"><td style="padding:8px 0"><b>/s/${esc(l.id)}</b><br><small class="hint">→ ${esc(l.url)}</small></td>
       <td style="text-align:right;white-space:nowrap"><a href="#" data-copy="${esc(full(l.id))}">Chép</a> · <a href="#" data-edit="${i}">Sửa</a> · <a href="#" data-del="${i}" style="color:#ff8b8f">Xóa</a></td></tr>`).join("")}</table>` : '<p class="hint">Chưa có link tự đặt.</p>'}</div>
     <details class="card"><summary>Link tự động của bài viết và mục tải (${auto.length}) — chỉ xem</summary>${auto.map(([c, to, name]) => `<p style="margin:6px 0"><a href="#" data-copy="${esc(full(c))}">/s/${esc(c)}</a> <small class="hint">→ ${esc(to)} · ${esc(name)}</small></p>`).join("") || '<p class="hint">Chưa có.</p>'}</details>`;
-    main.querySelectorAll("[data-copy]").forEach((el) => (el.onclick = (e) => { e.preventDefault(); navigator.clipboard.writeText(el.dataset.copy).then(() => Admin.toast("Đã chép: " + el.dataset.copy)); }));
+    main.querySelectorAll("[data-copy]").forEach((el) => (el.onclick = (e) => { e.preventDefault(); Admin.copy(el.dataset.copy, el, { toast: "Đã chép: " + el.dataset.copy }); }));
     main.querySelectorAll("[data-edit]").forEach((el) => (el.onclick = (e) => { e.preventDefault(); editing = links[+el.dataset.edit]; draw(); scrollTo(0, 0); }));
     main.querySelectorAll("[data-del]").forEach((el) => (el.onclick = async (e) => {
       e.preventDefault(); const l = links[+el.dataset.del]; if (!confirm(`Xóa link /s/${l.id}?`)) return;

@@ -1,6 +1,9 @@
 {
   "title": "Ủng Hộ Shinju Ch.",
   "intro": "Mỗi lần bạn donate là động lực để mình phát triển kênh. Cảm ơn bạn rất nhiều!",
+  "banner": "",
+  "avatar": "/assets/avatar/avatar-336.webp",
+  "googleClientId": "786995296674-k9dn13kikai2hpo2811l8huu62853sh1.apps.googleusercontent.com",
   "api": "https://shinju-donate.git-api.workers.dev",
   "min": 8000,
   "nameMax": 24,

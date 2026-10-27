@@ -28,6 +28,7 @@
   <link rel="manifest" href="/manifest.webmanifest" />
   <meta name="theme-color" content="#050b16" />
   <script src="/js/pwa.js" defer></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
@@ -44,30 +45,73 @@
   </header>
   <script src="/js/site-chrome.js"></script>
 
-  <main class="page">
-    <h1 class="page-title" data-title>Ủng Hộ Shinju Ch.</h1>
-    <p class="dn-intro" data-intro></p>
-    <section class="dn-card" data-form-card>
-      <label>Tên hiển thị<input data-name maxlength="24" placeholder="Tên của bạn" autocomplete="nickname"></label>
-      <label>Số tiền (đ)<input data-amount inputmode="numeric" placeholder="20000"></label>
-      <div class="dn-presets" data-presets></div>
-      <label>Lời nhắn <small data-count></small><textarea data-msg rows="3" placeholder="Lời nhắn hiện trên stream (không bắt buộc)"></textarea></label>
-      <p class="dn-err" data-err hidden></p>
-      <button type="button" class="dn-go" data-go>Tạo mã QR donate</button>
-    </section>
-    <section class="dn-card" data-qr-card hidden>
-      <img data-qr alt="Mã QR chuyển khoản donate" width="260" height="260">
+  <main class="page dn-page">
+    <div class="dn-wrap">
+      <div class="dn-hero">
+        <div class="dn-banner"><img data-banner alt="" hidden decoding="async" referrerpolicy="no-referrer"></div>
+        <img class="dn-avatar" data-avatar src="/assets/avatar/avatar-336.webp" srcset="/assets/avatar/avatar-168.webp 1x, /assets/avatar/avatar-336.webp 2x" width="112" height="112" alt="Shinju Ch." decoding="async" />
+      </div>
+      <h1 class="page-title" data-title>Ủng Hộ Shinju Ch.</h1>
+      <p class="dn-intro" data-intro></p>
+
+      <div class="dn-grid">
+        <div class="dn-col">
+          <section class="dn-card" data-form-card aria-label="Form donate">
+            <div class="dn-login" data-login>
+              <div data-login-out>
+                <button type="button" class="dn-yt" data-yt-login>
+                  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path fill="#ff0033" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1c.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8z"/><path fill="#fff" d="M9.6 15.6V8.4l6.2 3.6z"/></svg>
+                  <span data-yt-login-t>Đăng nhập bằng YouTube</span>
+                </button>
+                <p class="dn-hint">Chỉ dùng để lấy tên kênh, @ và avatar. Nếu Google báo chưa xác minh, chọn Nâng cao → Tiếp tục.</p>
+              </div>
+              <div class="dn-me" data-login-in hidden>
+                <img class="dn-me-av" data-me-av alt="" width="44" height="44" referrerpolicy="no-referrer" />
+                <div class="dn-me-t"><b data-me-name></b><span data-me-handle></span></div>
+                <button type="button" class="dn-lo" data-yt-logout>Đăng xuất</button>
+              </div>
+              <p class="dn-err" data-login-err role="alert" hidden></p>
+            </div>
+            <label>Tên hiển thị<input data-name maxlength="24" placeholder="Tên của bạn" autocomplete="nickname"></label>
+            <p class="dn-hint" data-name-hint hidden>Tên lấy từ kênh YouTube của bạn nên không sửa được.</p>
+            <label>Số tiền (đ)<input data-amount inputmode="numeric" placeholder="20000"></label>
+            <div class="dn-presets" data-presets></div>
+            <label>Lời nhắn <small data-count></small><textarea data-msg rows="3" placeholder="Lời nhắn hiện trên stream (không bắt buộc)"></textarea></label>
+            <p class="dn-err" data-err role="alert" hidden></p>
+            <button type="button" class="dn-go" data-go>Tạo mã QR donate</button>
+          </section>
+        </div>
+
+        <div class="dn-col">
+          <section class="dn-card" data-top-card aria-labelledby="dn-top-h">
+            <h2 id="dn-top-h">Top 10 ủng hộ</h2>
+            <ol class="dn-rank" data-top></ol>
+          </section>
+          <section class="dn-card" data-stats aria-labelledby="dn-his-h" hidden>
+            <h2 id="dn-his-h">Lịch sử donate</h2><p class="dn-sum" data-sum></p><ul class="dn-list" data-list></ul>
+          </section>
+        </div>
+      </div>
+
+      <div class="dn-foot">
+        <nav class="dn-legal" aria-label="Pháp lý"><a href="/donate/privacy/">Chính sách bảo mật</a><span aria-hidden="true">·</span><a href="/donate/terms/">Điều khoản sử dụng</a></nav>
+        <footer class="site-footer" data-global-footer>© 2026 Shinju Ch. (@ShinjuVNer). All rights reserved.</footer>
+      </div>
+    </div>
+  </main>
+
+  <div class="dn-modal" data-modal hidden>
+    <div class="dn-modal-box" role="dialog" aria-modal="true" aria-labelledby="dn-m-title" tabindex="-1">
+      <button type="button" class="dn-x" data-modal-close aria-label="Đóng">×</button>
+      <h2 id="dn-m-title">Quét mã để donate</h2>
+      <p class="dn-m-who" data-m-who></p>
+      <div class="dn-m-qrbox"><img data-qr alt="Mã QR chuyển khoản donate" width="260" height="260"><p class="dn-err" data-qr-err hidden>Không tải được mã QR. Bạn vẫn có thể chuyển khoản theo thông tin bên dưới.</p></div>
       <dl class="dn-info" data-info></dl>
       <p class="dn-note" data-hidden-note hidden>Tin nhắn chưa kiểm duyệt được nên sẽ không hiện trên stream, tiền vẫn được ghi nhận.</p>
       <p class="dn-note">Nhớ giữ nguyên nội dung chuyển khoản để alert hiện đúng tên bạn nhé.</p>
-      <button type="button" class="dn-back" data-back>Quay lại</button>
-    </section>
-    <section class="dn-card" data-stats hidden>
-      <h2>Lịch sử donate</h2><p class="dn-sum" data-sum></p><ul class="dn-list" data-list></ul>
-    </section>
-
-    <footer class="site-footer" data-global-footer>© 2026 Shinju Ch. (@ShinjuVNer). All rights reserved.</footer>
-  </main>
+      <button type="button" class="dn-back" data-back>Đóng</button>
+    </div>
+  </div>
 
   <script src="/donate/js/main.js"></script>
 </body>

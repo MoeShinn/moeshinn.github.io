@@ -26,7 +26,7 @@ Admin.boot({ id: "post", title: "Bài đăng", async render(main) {
     main.innerHTML = `<h2>Bài đăng</h2><p><a class="btn" href="#new">＋ Bài mới</a></p>
       <div class="card"><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">${rows || '<tr><td class="hint">Chưa có bài nào. Bấm “Bài mới” để đăng bài đầu tiên.</td></tr>'}</table></div></div>
 `;
-    main.querySelectorAll("[data-copy]").forEach((el) => (el.onclick = (e) => { e.preventDefault(); navigator.clipboard.writeText(el.dataset.copy).then(() => Admin.toast("Đã chép: " + el.dataset.copy)); }));
+    main.querySelectorAll("[data-copy]").forEach((el) => (el.onclick = (e) => { e.preventDefault(); Admin.copy(el.dataset.copy, el, { toast: "Đã chép: " + el.dataset.copy }); }));
     main.querySelectorAll("[data-del]").forEach((el) => (el.onclick = async (e) => {
       e.preventDefault(); const p = posts[+el.dataset.del]; if (!confirm(`Xóa bài “${p.title}”? Trang và link rút gọn của bài sẽ bị xóa.`)) return;
       try { await Rebuild.deletePost(Admin, { posts: posts.filter((x) => x !== p), post: p, seo, message: "Admin: xóa bài " + p.id }); Admin.toast("Đã xóa. Web cập nhật sau ~1 phút."); setTimeout(() => location.reload(), 1200); }

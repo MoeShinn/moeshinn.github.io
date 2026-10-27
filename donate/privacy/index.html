@@ -4,37 +4,29 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Chính sách bảo mật — Shinju Ch.</title>
-  <meta name="description" content="Chính sách bảo mật của trang donate Shinju Ch.: dữ liệu thu thập khi donate và đăng nhập YouTube, cách sử dụng và cách xoá dữ liệu." />
-  <meta name="robots" content="index, follow" />
+  <meta name="description" content="Chính sách bảo mật trang Donate của Shinju Ch.: dữ liệu YouTube nào được đọc, dùng để làm gì, không lưu token Google, cách thu hồi quyền và yêu cầu xoá dữ liệu." />
+  <meta name="robots" content="index,follow" />
   <link rel="canonical" href="https://shinjuvn.github.io/donate/privacy/" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Shinju Ch." />
   <meta property="og:title" content="Chính sách bảo mật — Shinju Ch." />
-  <meta property="og:description" content="Chính sách bảo mật của trang donate Shinju Ch.: dữ liệu thu thập khi donate và đăng nhập YouTube, cách sử dụng và cách xoá dữ liệu." />
+  <meta property="og:description" content="Chính sách bảo mật trang Donate của Shinju Ch.: dữ liệu YouTube nào được đọc, dùng để làm gì, không lưu token Google, cách thu hồi quyền và yêu cầu xoá dữ liệu." />
   <meta property="og:url" content="https://shinjuvn.github.io/donate/privacy/" />
+  <meta property="og:image" content="https://shinjuvn.github.io/assets/avatar/avatar.webp" />
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32.png?v=mvdx4gck" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon/favicon-192.png?v=mvdx4gck" />
   <link rel="apple-touch-icon" href="/assets/favicon/favicon-180.png?v=mvdx4gck" />
   <link rel="stylesheet" href="/css/loading.css" />
   <link rel="stylesheet" href="/css/header.css" />
   <link rel="stylesheet" href="/donate/css/style.css" />
   <link rel="stylesheet" href="/donate/css/donate.css" />
-  <style>
-    .legal{width:100%;max-width:760px;background:var(--card-bg);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:28px 30px;backdrop-filter:blur(6px);line-height:1.7}
-    .legal h2{font-size:20px;margin:28px 0 8px;font-weight:800}
-    .legal h2:first-of-type{margin-top:6px}
-    .legal p,.legal li{margin:0 0 10px;opacity:.92}
-    .legal ul{margin:0 0 12px;padding-left:22px}
-    .legal a{color:var(--green-1)}
-    .legal .meta{font-size:14px;opacity:.7;margin-bottom:18px}
-    .legal-nav{display:flex;gap:16px;flex-wrap:wrap;margin-top:22px;font-size:15px}
-    @media (max-width:560px){.legal{padding:20px 16px}}
-  </style>
   <script src="/js/theme.js" defer></script>
   <link rel="manifest" href="/manifest.webmanifest" />
   <meta name="theme-color" content="#050b16" />
   <script src="/js/pwa.js" defer></script>
 </head>
 <body>
+  <!-- Cố ý KHÔNG nạp script màn hình chờ: trang pháp lý phải đọc được ngay (Google/bot không phải chờ màn hình chờ). loading.css giữ lại vì chứa font Baloo 2. -->
 
   <header class="site-header">
     <a href="/" class="site-header-logo" data-nav-home aria-label="Về trang chủ">
@@ -47,80 +39,65 @@
   </header>
   <script src="/js/site-chrome.js"></script>
 
-  <main class="page">
-    <h1 class="page-title">Chính sách bảo mật</h1>
-    <article class="legal">
-      <p class="meta">Cập nhật lần cuối: 27/10/2026</p>
+  <main class="page dn-page">
+    <div class="dn-wrap dn-doc-wrap">
+      <h1 class="page-title">Chính sách bảo mật</h1>
+      <article class="dn-card dn-doc">
+        <p class="dn-upd">Cập nhật lần cuối: 27/10/2026</p>
+        <p>Trang <a href="/donate/">Donate</a> của Shinju Ch. (“chúng tôi”, “mình”) cho phép bạn ủng hộ kênh và, nếu muốn, đăng nhập bằng tài khoản YouTube để tên kênh và avatar hiện trong lịch sử/bảng xếp hạng ủng hộ. Trang này giải thích mình thu thập dữ liệu nào, dùng để làm gì và bạn kiểm soát nó ra sao.</p>
 
-      <p>Trang donate <strong>shinjuvn.github.io/donate</strong> (sau đây gọi là “Trang”) do Shinju Ch. (@ShinjuVNer) vận hành. Chính sách này giải thích Trang thu thập, sử dụng và lưu trữ những dữ liệu nào, đặc biệt khi bạn chọn đăng nhập bằng YouTube.</p>
+        <h2>1. Dữ liệu mình thu thập</h2>
+        <p><b>Khi bạn đăng nhập bằng YouTube</b>, mình chỉ xin <b>một quyền chỉ-đọc</b> của Google: <code>https://www.googleapis.com/auth/youtube.readonly</code>. Từ quyền này mình chỉ đọc:</p>
+        <ul>
+          <li>ID kênh YouTube của bạn;</li>
+          <li>tên kênh;</li>
+          <li>tên người dùng dạng @handle (nếu kênh có);</li>
+          <li>ảnh đại diện (avatar) của kênh (chỉ lưu đường dẫn ảnh).</li>
+        </ul>
+        <p><b>Mình không đọc</b> video, bình luận, danh sách đăng ký, danh sách phát, email, tin nhắn hay bất kỳ dữ liệu nào khác trong tài khoản Google/YouTube của bạn, và không thể thay đổi hay đăng gì lên tài khoản của bạn vì quyền chỉ cho phép đọc.</p>
+        <p><b>Khi bạn donate</b> (dù đăng nhập hay không), hệ thống ghi: tên hiển thị, lời nhắn (nếu có), số tiền, thời gian, mã đơn và mã giao dịch ngân hàng do dịch vụ nhận tiền gửi về. Nếu bạn đăng nhập, khoản donate được gắn với ID kênh YouTube của bạn.</p>
 
-      <h2>1. Dữ liệu chúng tôi thu thập</h2>
-      <p><strong>Khi bạn donate (khách hoặc đăng nhập):</strong></p>
-      <ul>
-        <li>Tên hiển thị, lời nhắn, số tiền và mã đơn bạn tạo.</li>
-        <li>Thời gian tạo đơn và thời gian nhận tiền, mã giao dịch do ngân hàng/SePay gửi về để đối soát.</li>
-      </ul>
-      <p><strong>Khi bạn đăng nhập bằng YouTube:</strong> Trang chỉ xin quyền chỉ-đọc <code>youtube.readonly</code> của Google và chỉ đọc các thông tin công khai của kênh bạn chọn:</p>
-      <ul>
-        <li>ID kênh YouTube,</li>
-        <li>tên kênh,</li>
-        <li>tên người dùng (@handle),</li>
-        <li>ảnh đại diện (avatar) của kênh.</li>
-      </ul>
-      <p>Chúng tôi <strong>không</strong> đọc video, bình luận, danh sách đăng ký, danh sách phát, dữ liệu phân tích hay bất kỳ dữ liệu YouTube/Google nào khác, và không đăng, sửa hay xoá bất cứ thứ gì trên kênh của bạn. Chúng tôi cũng không có quyền truy cập email hay mật khẩu Google của bạn.</p>
+        <h2>2. Mục đích sử dụng</h2>
+        <p>Dữ liệu kênh YouTube chỉ dùng để <b>hiển thị tên/@handle, avatar và dấu xác minh trong lịch sử donate và Top 10</b>, hiện tên kênh trên alert/giọng đọc lúc stream, và chặn việc mạo danh kênh khác. Mình không dùng dữ liệu này để quảng cáo, lập hồ sơ, huấn luyện mô hình hay bất kỳ mục đích nào khác.</p>
 
-      <h2>2. Mã truy cập (token) Google</h2>
-      <p>Mã truy cập chỉ được dùng <strong>một lần</strong> lúc đăng nhập để lấy các thông tin ở mục 1, sau đó bị bỏ ngay. Chúng tôi không lưu mã truy cập, không xin hay lưu mã làm mới (refresh token), và không ghi nó vào nhật ký hay cơ sở dữ liệu.</p>
+        <h2>3. Mã truy cập (token) của Google không được lưu</h2>
+        <p>Sau khi bạn đồng ý, Google đưa trình duyệt của bạn một mã truy cập tạm thời. Mã này được gửi tới máy chủ của mình <b>một lần</b> để kiểm tra và lấy thông tin kênh, rồi <b>bị bỏ ngay</b>: không ghi vào cơ sở dữ liệu, bộ nhớ KV hay nhật ký. Mình chỉ phát cho trình duyệt của bạn một “thẻ phiên” do chính mình ký (không chứa mã của Google), hiệu lực 30 ngày, dùng để nhận ra bạn khi donate.</p>
 
-      <h2>3. Mục đích sử dụng</h2>
-      <ul>
-        <li>Hiển thị tên (hoặc @handle) và avatar của bạn trong lịch sử donate, bảng xếp hạng Top và alert trên stream, kèm dấu “đã xác minh” nếu bạn đăng nhập bằng YouTube.</li>
-        <li>Gộp các lần donate của cùng một kênh để tính Top và giữ lịch sử khi bạn đổi tên hay avatar.</li>
-        <li>Ghi nhận và đối soát khoản chuyển khoản của bạn.</li>
-        <li>Kiểm duyệt nội dung (xem mục 4) và chống lạm dụng.</li>
-      </ul>
-      <p>Chúng tôi không bán dữ liệu, không dùng cho quảng cáo và không dùng để lập hồ sơ cá nhân.</p>
+        <h2>4. Nơi lưu trữ</h2>
+        <ul>
+          <li><b>Cloudflare</b> (Workers, cơ sở dữ liệu D1 và bộ nhớ KV): lưu thông tin kênh (ID, tên, @handle, đường dẫn avatar) và các bản ghi donate. KV còn giữ bộ đếm chống spam theo địa chỉ IP trong tối đa khoảng 2 phút rồi tự xoá.</li>
+          <li><b>Trình duyệt của bạn (<code>localStorage</code>)</b>: thẻ phiên và thông tin hiển thị (tên, @handle, avatar) để bạn không phải đăng nhập lại; cùng tên khách bạn đã nhập lần trước. Bấm “Đăng xuất” hoặc xoá dữ liệu trang web là các mục này mất.</li>
+          <li>Tên và lời nhắn có thể được gửi qua bộ kiểm duyệt tự động (Cloudflare Workers AI) để lọc nội dung không phù hợp.</li>
+          <li>Mã QR được tạo bởi dịch vụ VietQR (img.vietqr.io) từ số tiền và nội dung chuyển khoản; việc chuyển tiền do ngân hàng của bạn và dịch vụ SePay xử lý theo chính sách riêng của họ.</li>
+        </ul>
 
-      <h2>4. Dịch vụ bên thứ ba</h2>
-      <ul>
-        <li><strong>Google/YouTube:</strong> xử lý việc đăng nhập và cung cấp thông tin kênh.</li>
-        <li><strong>Cloudflare:</strong> nơi chạy máy chủ của Trang và lưu dữ liệu (cơ sở dữ liệu D1 và KV). Tên và lời nhắn của bạn có thể được đưa qua mô hình AI của Cloudflare Workers AI chỉ để kiểm duyệt nội dung.</li>
-        <li><strong>SePay và ngân hàng:</strong> báo về giao dịch chuyển khoản. Chúng tôi không nhận số thẻ hay mật khẩu ngân hàng của bạn.</li>
-        <li><strong>GitHub Pages:</strong> lưu trữ giao diện của Trang.</li>
-      </ul>
-      <p>Chúng tôi không chia sẻ dữ liệu của bạn cho bên nào khác, trừ khi pháp luật yêu cầu.</p>
+        <h2>5. Chia sẻ dữ liệu</h2>
+        <p>Mình <b>không bán, không cho thuê và không chia sẻ</b> dữ liệu của bạn cho bên thứ ba vì mục đích riêng của họ. Dữ liệu chỉ đi qua các nhà cung cấp hạ tầng nêu ở mục 4 để trang hoạt động. Phần bạn tự chọn để hiển thị (tên/@handle, avatar, số tiền, lời nhắn đã qua kiểm duyệt) là thông tin công khai trên trang Donate.</p>
 
-      <h2>5. Dữ liệu lưu trong trình duyệt</h2>
-      <p>Nếu bạn đăng nhập, trình duyệt của bạn lưu một “thẻ phiên” và thông tin hiển thị (tên kênh, @handle, avatar) trong bộ nhớ cục bộ (<code>localStorage</code>) để bạn không phải đăng nhập lại mỗi lần. Thẻ này có hạn dùng và bạn có thể xoá nó bằng nút “Đăng xuất” hoặc bằng cách xoá dữ liệu trang trong trình duyệt.</p>
+        <h2>6. Tuân thủ chính sách dữ liệu của Google</h2>
+        <p>Việc sử dụng và chuyển giao thông tin nhận được từ các Google API sang bất kỳ ứng dụng nào khác của Shinju Ch. sẽ tuân thủ <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer">Chính sách dữ liệu người dùng của Google API Services</a> (Google API Services User Data Policy), bao gồm các yêu cầu về <b>Giới hạn sử dụng</b> (Limited Use requirements): dữ liệu chỉ dùng để cung cấp tính năng hiển thị tên kênh mà bạn thấy trên trang này, không chuyển cho bên khác ngoài mục đích đó, không dùng để quảng cáo và không cho người đọc thủ công trừ khi cần để bảo mật hoặc theo yêu cầu pháp luật.</p>
 
-      <h2>6. Thời gian lưu trữ</h2>
-      <p>Lịch sử donate được lưu để phục vụ bảng xếp hạng và đối soát, cho tới khi bạn yêu cầu xoá hoặc chủ kênh quyết định xoá. Các đơn tạo mã nhưng chưa thanh toán tự động bị xoá sau 24 giờ.</p>
+        <h2>7. Quyền của bạn</h2>
+        <ul>
+          <li><b>Thu hồi quyền:</b> bạn có thể gỡ quyền truy cập đã cấp bất cứ lúc nào tại <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener noreferrer">myaccount.google.com/permissions</a> (tìm ứng dụng của Shinju Ch. và chọn “Xoá quyền truy cập”).</li>
+          <li><b>Đăng xuất:</b> nút “Đăng xuất” trên trang Donate xoá thẻ phiên khỏi trình duyệt.</li>
+          <li><b>Yêu cầu xoá dữ liệu:</b> gửi email tới <a href="mailto:vtubershinju@gmail.com">vtubershinju@gmail.com</a> kèm tên kênh hoặc @handle của bạn. Mình sẽ xoá thông tin kênh đã lưu và gỡ liên kết giữa kênh với các khoản donate (các bản ghi giao dịch có thể được giữ ở dạng ẩn danh để đối soát). Mình cố gắng phản hồi trong vòng vài ngày làm việc.</li>
+        </ul>
 
-      <h2>7. Quyền của bạn</h2>
-      <ul>
-        <li><strong>Thu hồi quyền truy cập:</strong> bạn có thể gỡ quyền của Trang bất cứ lúc nào tại <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">myaccount.google.com/permissions</a>.</li>
-        <li><strong>Yêu cầu xoá hoặc chỉnh sửa dữ liệu:</strong> gửi email tới <a href="mailto:vtubershinju@gmail.com">vtubershinju@gmail.com</a> kèm tên kênh/@handle của bạn. Chúng tôi sẽ xử lý trong thời gian hợp lý.</li>
-      </ul>
+        <h2>8. Trẻ em</h2>
+        <p>Trang không dành cho trẻ dưới 13 tuổi và mình không cố ý thu thập dữ liệu của trẻ em.</p>
 
-      <h2>8. Tuân thủ chính sách của Google</h2>
-      <p>Việc sử dụng và chuyển giao thông tin nhận được từ các API của Google tuân thủ <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener">Chính sách dữ liệu người dùng của Dịch vụ API Google</a>, bao gồm các yêu cầu về Sử dụng có giới hạn (Limited Use). Dữ liệu YouTube chỉ được dùng cho mục đích hiển thị danh tính kênh trên Trang như mô tả ở trên.</p>
+        <h2>9. Thay đổi chính sách</h2>
+        <p>Khi chính sách thay đổi, ngày “Cập nhật lần cuối” ở đầu trang sẽ được đổi. Nếu có thay đổi đáng kể về dữ liệu YouTube, mình sẽ thông báo trên trang Donate.</p>
 
-      <h2>9. Trẻ em</h2>
-      <p>Trang không dành cho trẻ em dưới 13 tuổi và chúng tôi không chủ ý thu thập dữ liệu của trẻ em.</p>
-
-      <h2>10. Thay đổi chính sách</h2>
-      <p>Chính sách có thể được cập nhật. Ngày cập nhật mới nhất luôn hiển thị ở đầu trang này.</p>
-
-      <h2>11. Liên hệ</h2>
-      <p>Mọi câu hỏi hoặc yêu cầu về dữ liệu: <a href="mailto:vtubershinju@gmail.com">vtubershinju@gmail.com</a>.</p>
-
-      <div class="legal-nav">
-        <a href="/donate/">← Quay lại trang donate</a>
-        <a href="/donate/terms/">Điều khoản sử dụng →</a>
+        <h2>10. Liên hệ</h2>
+        <p>Mọi câu hỏi về quyền riêng tư: <a href="mailto:vtubershinju@gmail.com">vtubershinju@gmail.com</a>.</p>
+      </article>
+      <div class="dn-foot">
+        <nav class="dn-legal" aria-label="Pháp lý"><a href="/donate/">Về trang Donate</a><span aria-hidden="true">·</span><a href="/donate/terms/">Điều khoản sử dụng</a></nav>
+        <footer class="site-footer" data-global-footer>© 2026 Shinju Ch. (@ShinjuVNer). All rights reserved.</footer>
       </div>
-    </article>
-
-    <footer class="site-footer" data-global-footer>© 2026 Shinju Ch. (@ShinjuVNer). All rights reserved.</footer>
+    </div>
   </main>
 </body>
 </html>

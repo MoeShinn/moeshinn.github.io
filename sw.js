@@ -2,8 +2,8 @@
    - Trang HTML, JS, CSS, JSON, MD: ưu tiên MẠNG (luôn mới), mất mạng hoặc mạng chậm > 3,5 giây thì dùng bản đã lưu.
    - Ảnh, font: dùng bản đã lưu ngay, rồi cập nhật ngầm cho lần sau.
    - Trang /profile: lưu sẵn trang + dữ liệu lúc cài đặt (xem WARM), và nhận tin nhắn {type:"warm-images", urls:[…]} từ profile/js/main.js để lưu sẵn ảnh của hồ sơ (ảnh model, fan name, nền…) → mở lại khi mất mạng vẫn thấy ảnh.
-   - KHÔNG đụng vào /admin, /s/ (link rút gọn), /sw.js và mọi yêu cầu sang domain khác (bộ đếm, Giscus…). */
-const VERSION = "v3", STATIC = `shinju-static-${VERSION}`, PAGES = `shinju-pages-${VERSION}`, OFFLINE = "/offline.html", MAX = 80;
+   - KHÔNG đụng vào /admin, /s/ (link rút gọn), /api/, /sw.js và mọi yêu cầu sang domain khác (bộ đếm, Giscus, Worker donate, Google đăng nhập…). */
+const VERSION = "v4", STATIC = `shinju-static-${VERSION}`, PAGES = `shinju-pages-${VERSION}`, OFFLINE = "/offline.html", MAX = 80;
 // Mở thẳng link ảnh (bất kỳ ảnh nào của site: /image, /post/photo, /assets…) trên thanh địa chỉ → hiện trang xem ảnh (giao diện kiểu Reddit). Chỉ áp dụng khi mở link ở tab/cửa sổ (gõ địa chỉ, bấm link, chuột phải → mở ảnh trong tab mới):
 // <img>, og:image, iframe, fetch… vẫn nhận file ảnh gốc. Thêm ?raw=1 vào link để luôn lấy ảnh gốc.
 const IMG_LINK = /\.(?:webp|png|jpe?g|gif|avif|svg)$/i, VIEWER = "/assets/viewer/index.html";
@@ -59,6 +59,7 @@ self.addEventListener("fetch", (e) => {
   const u = new URL(req.url);
   if (u.origin !== location.origin) return;
   const p = u.pathname;
+  if (p.startsWith("/api/")) return; // không bao giờ cache yêu cầu API (Worker donate ở domain khác đã bị bỏ qua bởi dòng trên; dòng này phòng khi sau này gắn API cùng domain)
   if (p.startsWith("/admin") || p.startsWith("/s/") || p === "/sw.js") return;
   if (req.mode === "navigate" && !/^(?:iframe|frame|embed|object)$/.test(req.destination) && IMG_LINK.test(p) && !u.searchParams.has("raw")) {
     e.respondWith(networkFirst(new Request(VIEWER), PAGES).catch(() => fetch(req)).catch(() => caches.match(OFFLINE)));

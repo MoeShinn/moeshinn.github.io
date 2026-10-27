@@ -122,5 +122,32 @@
     render($("#main"));
   }
 
-  window.Admin = { api, upload, API, readJson, readText, commitJson, commitFiles, jsonEditor, bindJson, toast, boot, esc, $ };
+  // Nút Copy dùng chung: copy xong đổi chữ thành "Đã Copy ✓" (xanh lá, class .copied) đúng 1,5 giây rồi trả về chữ gốc của nút.
+  // Bấm liên tiếp: xoá timer cũ trước khi đặt timer mới, chữ gốc chỉ ghi nhớ một lần → không bao giờ kẹt ở "Đã Copy ✓".
+  const cpTimers = new WeakMap();
+  async function copyText(text) {
+    try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); return true; } } catch (e) { /* thử cách dự phòng */ }
+    const prev = document.activeElement; // fallback khi không có navigator.clipboard (http, trình duyệt cũ, bị chặn quyền)
+    try {
+      const t = document.createElement("textarea"); t.value = text; t.setAttribute("readonly", ""); t.style.cssText = "position:fixed;top:0;left:0;opacity:0";
+      document.body.appendChild(t); t.select(); t.setSelectionRange(0, text.length);
+      const ok = document.execCommand("copy"); t.remove(); if (prev && prev.focus) prev.focus(); return ok;
+    } catch (e) { if (prev && prev.focus) prev.focus(); return false; }
+  }
+  function flashCopied(btn) {
+    const old = cpTimers.get(btn);
+    if (old) clearTimeout(old); else btn.dataset.cpTxt = btn.textContent;
+    btn.textContent = "Đã Copy ✓"; btn.classList.add("copied");
+    cpTimers.set(btn, setTimeout(() => { btn.textContent = btn.dataset.cpTxt; delete btn.dataset.cpTxt; btn.classList.remove("copied"); cpTimers.delete(btn); }, 1500));
+  }
+  // copy(text, nút?, { toast: "thông báo thêm" }) → true nếu copy được
+  async function copy(text, btn, opts = {}) {
+    const ok = await copyText(String(text));
+    if (!ok) { prompt("Trình duyệt chặn copy, hãy sao chép thủ công:", String(text)); return false; }
+    if (btn) flashCopied(btn);
+    if (opts.toast) toast(opts.toast);
+    return true;
+  }
+
+  window.Admin = { api, upload, API, readJson, readText, commitJson, commitFiles, jsonEditor, bindJson, toast, copy, boot, esc, $ };
 })();

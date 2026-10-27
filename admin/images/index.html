@@ -114,10 +114,10 @@ Admin.boot({ id: "images", title: "Kho ảnh", async render(main) {
     <div class="bar" style="position:sticky;bottom:8px;margin-top:12px;${dirty() ? "" : "opacity:.6"}">${dirty() ? "Có thay đổi album chưa lưu." : "Không có thay đổi album."} <button id="sv" ${dirty() && !busy ? "" : "disabled"}>Lưu album</button> <button class="ghost" id="ud" ${dirty() ? "" : "disabled"}>Hoàn tác</button></div>`;
     main.querySelectorAll("[data-c]").forEach((el) => (el.onclick = () => { cur = el.dataset.c; draw(); }));
     $("#al_add").onclick = () => { const n = (prompt("Tên album mới:") || "").trim(); if (!n) return; let id = PostGen.slugify(n), k = 2; while (idx.albums.some((a) => a.id === id)) id = PostGen.slugify(n) + "-" + k++; idx.albums.push({ id, name: n }); cur = id; draw(); };
-    const copyLink = async (u, extra) => { try { await navigator.clipboard.writeText(u); } catch (e) { prompt("Sao chép link:", u); } Admin.toast("Đã chép: " + u + (extra || "")); };
-    if ($("#al_cp")) $("#al_cp").onclick = () => copyLink(albumUrl(cur), savedAlbums.has(cur) ? "" : " — album chưa lưu, hãy bấm “Lưu album”");
+    const copyLink = (u, extra, btn) => Admin.copy(u, btn, { toast: "Đã chép: " + u + (extra || "") });
+    if ($("#al_cp")) $("#al_cp").onclick = () => copyLink(albumUrl(cur), savedAlbums.has(cur) ? "" : " — album chưa lưu, hãy bấm “Lưu album”", $("#al_cp"));
     if ($("#al_open")) $("#al_open").onclick = () => window.open(albumUrl(cur), "_blank", "noopener");
-    if ($("#al_hub")) $("#al_hub").onclick = () => copyLink(hubUrl);
+    if ($("#al_hub")) $("#al_hub").onclick = () => copyLink(hubUrl, "", $("#al_hub"));
     if ($("#al_ren")) $("#al_ren").onclick = () => { const a = idx.albums.find((x) => x.id === cur), n = (prompt("Tên mới của album:", a.name) || "").trim(); if (n) { a.name = n; draw(); } };
     if ($("#al_del")) $("#al_del").onclick = () => { const n = cnt((i) => i.album === cur); if (!confirm(`Xóa album “${albumName(cur)}”?${n ? ` ${n} ảnh trong đó sẽ chuyển sang “Chưa phân loại” (không bị xóa).` : ""}`)) return; idx.images.forEach((i) => { if (i.album === cur) i.album = ""; }); idx.albums = idx.albums.filter((a) => a.id !== cur); cur = "all"; draw(); };
     const inp = $("#up"); $("#upb").onclick = () => inp.click(); inp.onchange = () => { if (inp.files.length) upload(inp.files); };
@@ -126,7 +126,7 @@ Admin.boot({ id: "images", title: "Kho ảnh", async render(main) {
     $("#oq").oninput = () => { O.q = +$("#oq").value; $("#qv").textContent = O.q; saveO(); }; $("#oraw").onchange = () => { O.raw = $("#oraw").checked; saveO(); };
     main.querySelectorAll("[data-s]").forEach((el) => (el.onchange = () => { el.checked ? sel.add(el.dataset.s) : sel.delete(el.dataset.s); draw(); }));
     main.querySelectorAll("[data-mv]").forEach((el) => (el.onchange = () => { idx.images.find((i) => i.file === el.dataset.mv).album = el.value; draw(); }));
-    main.querySelectorAll("[data-cp]").forEach((el) => (el.onclick = async () => { const u = urlOf(el.dataset.cp); try { await navigator.clipboard.writeText(u); } catch (e) { prompt("Sao chép link:", u); } Admin.toast("Đã chép: " + u); }));
+    main.querySelectorAll("[data-cp]").forEach((el) => (el.onclick = () => { const u = urlOf(el.dataset.cp); Admin.copy(u, el, { toast: "Đã chép: " + u }); }));
     main.querySelectorAll("[data-dl]").forEach((el) => (el.onclick = () => remove([el.dataset.dl])));
     if ($("#del_sel")) { $("#del_sel").onclick = () => remove([...sel]); $("#clr").onclick = () => { sel.clear(); draw(); }; }
     $("#sv").onclick = saveIndex; $("#ud").onclick = () => { if (confirm("Bỏ hết thay đổi album chưa lưu?")) location.reload(); };
