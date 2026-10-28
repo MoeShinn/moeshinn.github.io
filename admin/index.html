@@ -19,7 +19,8 @@ Admin.boot({ id: "dashboard", title: "Dashboard", async render(main) {
     document.getElementById("st").innerHTML = `<span class="dot ok"></span>Worker admin hoạt động (${Math.round(performance.now() - t0)} ms)<br>` +
       (g.ok ? `<span class="dot ${g.canPush === false ? "bad" : "ok"}"></span>GitHub: ${esc(g.repo)} · nhánh ${esc(g.branch)}${g.canPush === false ? " — token KHÔNG có quyền ghi (cần Contents: Read and write)" : " · ghi được"}`
         : `<span class="dot bad"></span>GitHub: ${esc(g.error)}`) +
-      (r.token ? `<br><small class="hint">Token trong Worker: ${r.token.present ? `${r.token.type ? "dạng " + esc(r.token.type) + "…" : "dạng không nhận ra (không bắt đầu bằng github_pat_ hay ghp_)"}, dài ${r.token.length} ký tự${r.token.removed ? `, đã tự bỏ ${r.token.removed} ký tự thừa` : ""}` : "CHƯA có GITHUB_TOKEN"}</small>` : "");
+      (r.token ? `<br><small class="hint">Token trong Worker: ${r.token.present ? `${r.token.type ? "dạng " + esc(r.token.type) + "…" : "dạng không nhận ra (không bắt đầu bằng github_pat_ hay ghp_)"}, dài ${r.token.length} ký tự${r.token.removed ? `, đã tự bỏ ${r.token.removed} ký tự thừa` : ""}` : "CHƯA có GITHUB_TOKEN"}</small>` : "") +
+      (r.gemini ? `<br><span class="dot ${r.gemini.keys ? "ok" : "bad"}"></span>Gemini (gợi ý SEO): ${r.gemini.keys ? r.gemini.keys + " khóa API, dùng luân phiên" : "CHƯA có khóa, đặt secret GEMINI_API_KEYS cho Worker admin-api"}` : "");
   }
   catch (e) { document.getElementById("st").innerHTML = `<span class="dot bad"></span>${esc(e.message)}`; }
   try {

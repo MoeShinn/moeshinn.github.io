@@ -107,7 +107,8 @@ Admin.boot({ id: "buy", title: "Bán hàng", async render(main) {
   function uploadHint() {
     const f = $("#b_file").files[0], h = $("#b_fhint"), max = info ? info.maxUpload : 95e6;
     $("#b_up").disabled = !f || (f && f.size > max) || !$("#b_pname").value.trim();
-    h.textContent = f ? `${f.name} · ${fmtSize(f.size)}${f.size > max ? ` — vượt giới hạn ${fmtSize(max)}, hãy dùng mục “Dùng tệp đã có trong release”.` : ""}` : "";
+    const stored = f ? String(f.name).normalize("NFC").replace(/[\u0000-\u001f\u007f\\/]+/g, "").trim().replace(/[\s\u00a0\u2000-\u200b\u3000]+/g, "-").replace(/^[.\-]+/, "") : ""; // giống releaseFileName() của Worker: chỉ đổi khoảng trắng thành "-"
+    h.textContent = f ? `${f.name}${stored && stored !== f.name ? ` → lưu trong kho: ${stored}` : ""} · ${fmtSize(f.size)}${f.size > max ? ` — vượt giới hạn ${fmtSize(max)}, hãy dùng mục “Dùng tệp đã có trong release”.` : ""}` : "";
     h.className = "hint" + (f && f.size > max ? " err" : "");
   }
   $("#b_file").addEventListener("change", () => { const f = $("#b_file").files[0]; if (f && !$("#b_pname").value.trim()) $("#b_pname").value = f.name.replace(/\.[^.]+$/, ""); uploadHint(); });
@@ -128,7 +129,7 @@ Admin.boot({ id: "buy", title: "Bán hàng", async render(main) {
       $("#b_asset").innerHTML = `<option value="">— chọn —</option>` + assets.map((a) => `<option value="${a.id}" data-n="${esc(a.name)}">${esc(a.name)} · ${fmtSize(a.size)}${used.has(String(a.id)) ? " (đã có sản phẩm)" : ""}</option>`).join("");
     } catch (e) { $("#b_lerr").textContent = e.message; }
   };
-  $("#b_asset").onchange = () => { const o = $("#b_asset").selectedOptions[0]; if (o && o.value && !$("#b_lname").value.trim()) $("#b_lname").value = o.dataset.n.replace(/^[a-z0-9]{8}-/, "").replace(/\.[^.]+$/, ""); $("#b_link").disabled = !$("#b_asset").value; };
+  $("#b_asset").onchange = () => { const o = $("#b_asset").selectedOptions[0]; if (o && o.value && !$("#b_lname").value.trim()) $("#b_lname").value = o.dataset.n.replace(/\.[^.]+$/, ""); $("#b_link").disabled = !$("#b_asset").value; };
   $("#b_link").onclick = async () => {
     $("#b_lerr").textContent = "";
     try { await api("/buy-admin/product/link", { name: $("#b_lname").value.trim(), assetId: $("#b_asset").value }); toast("Đã tạo sản phẩm"); $("#b_lname").value = ""; $("#b_link").disabled = true; await loadAll(); }

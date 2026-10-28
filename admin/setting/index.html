@@ -134,15 +134,8 @@ Admin.boot({ id: "setting", title: "Cài đặt", async render(main) {
   const drawFav = async () => { const f = $("#fav").files[0]; if (!f) return; try { const d = await toIcon(f, 96, "icon", favOpts()); $("#favprev").src = "data:image/png;base64," + d; } catch (e) { /* bỏ qua */ } };
   $("#fav").onchange = drawFav; ["fav_style", "fav_bgon", "fav_bg"].forEach((i) => ($("#" + i).onchange = drawFav)); $("#fav_pad").oninput = () => { $("#fav_pv").textContent = $("#fav_pad").value; drawFav(); };
   $("#favprev2").style.display = "none";
-  main.querySelectorAll("[data-ai]").forEach((b) => (b.onclick = async () => {
-    const k = b.dataset.ai; b.disabled = true;
-    try {
-      const r = await Admin.api("/ai/seo", { title: $("#seo_" + k + "_t").value, body: `Trang "${PAGES[k]}" của website cá nhân ${$("#seo_name").value}. Mô tả hiện tại: ${$("#seo_" + k + "_d").value}. Từ khóa hiện tại: ${$("#seo_" + k + "_k").value}.` });
-      if (r.description) $("#seo_" + k + "_d").value = r.description;
-      if (r.keywords) $("#seo_" + k + "_k").value = [].concat(r.keywords).join(", ");
-      Admin.toast("AI đã điền gợi ý, xem lại rồi bấm Lưu.");
-    } catch (e) { Admin.toast(e.message, true); }
-    b.disabled = false;
+  main.querySelectorAll("[data-ai]").forEach((b) => (b.onclick = () => { const k = b.dataset.ai;
+    Admin.aiSeo({ btn: b, kind: "page", title: $("#seo_" + k + "_t").value, descEl: $("#seo_" + k + "_d"), kwEl: $("#seo_" + k + "_k"), site: $("#seo_name").value, text: `Trang "${PAGES[k]}" của website cá nhân ${$("#seo_name").value}.`, done: "bấm Lưu" });
   }));
   Admin.bindJson(main, { "site-settings.json": "Sửa trực tiếp không tự cập nhật các trang đã tạo sẵn (SEO, manifest). Sau khi sửa phần SEO/favicon, hãy tải lại Cài đặt và bấm Lưu.", "data.json": "Cấu hình menu, nút, footer của các trang chính." });
   $("#tg_test").onclick = async () => { const b = $("#tg_test"); b.disabled = true; try { await Admin.api("/notify/test", {}); Admin.toast("Đã gửi tin thử, kiểm tra Telegram."); } catch (e) { Admin.toast(e.message, true); } b.disabled = false; };

@@ -283,14 +283,9 @@ Admin.boot({ id: "product", title: "Sản phẩm", async render(main) {
       };
     }
     $("#l_add").onclick = () => { lics.push({ title: "", text: "" }); draw(); };
-    $("#e_ai").onclick = async () => {
-      const b = $("#e_ai"); b.disabled = true;
-      try {
-        const r = await Admin.api("/ai/seo", { title: $("#e_title").value, body: `${cat ? "Danh mục" : "Sản phẩm số"} trên website Moe Shinn ${$("#e_desc").value} ${$("#e_body") ? $("#e_body").value : ""} ${$("#e_kw").value}`.slice(0, 6000) });
-        if (r.description) $("#e_desc").value = r.description; if (r.keywords) $("#e_kw").value = [].concat(r.keywords).join(", ");
-        Admin.toast("AI đã điền gợi ý, xem lại rồi lưu.");
-      } catch (err) { Admin.toast(err.message, true); } b.disabled = false;
-    };
+    // Gửi tiêu đề + mô tả/từ khóa đang nhập + giá (nếu có) + NỘI DUNG THUẦN của phần mô tả sản phẩm (bỏ ảnh/màu/định dạng)
+    $("#e_ai").onclick = () => Admin.aiSeo({ btn: $("#e_ai"), kind: cat ? "category" : "product", title: $("#e_title").value, descEl: $("#e_desc"), kwEl: $("#e_kw"), site: "Moe Shinn",
+      text: [$("#e_price") && $("#e_price").value.trim() ? "Giá: " + $("#e_price").value.trim() : "", $("#e_body") ? Admin.plainText($("#e_body").value, renderPostBody) : ""].filter(Boolean).join("\n\n"), done: "lưu" });
 
     $("#e_save").onclick = async () => {
       const v = (i) => ($("#" + i) ? $("#" + i).value.trim() : ""), title = v("e_title").replace(/\s+/g, " ");

@@ -123,9 +123,8 @@ Admin.boot({ id: "post", title: "Bài đăng", async render(main) {
     try { const d = JSON.parse(localStorage.getItem(DK) || "null"); if (d) { $("#draftbar").innerHTML = `<div class="bar">Có bản nháp chưa đăng trên máy này. <a href="#" id="d_ok">Khôi phục</a> · <a href="#" id="d_no">Bỏ nháp</a></div>`;
       $("#d_ok").onclick = (e) => { e.preventDefault(); F.forEach((i) => { if (!($("#" + i).readOnly)) $("#" + i).value = d[i] ?? ""; }); cover = d.cover || ""; $("#p_comments").checked = d.comments !== false; drawCover(); preview(); $("#draftbar").innerHTML = ""; };
       $("#d_no").onclick = (e) => { e.preventDefault(); localStorage.removeItem(DK); $("#draftbar").innerHTML = ""; }; } } catch (e) { /* bỏ qua */ }
-    $("#p_ai").onclick = async () => { const b = $("#p_ai"); b.disabled = true;
-      try { const r = await Admin.api("/ai/seo", { title: $("#p_title").value, body: ta.value }); if (r.description) $("#p_desc").value = r.description; if (r.keywords) $("#p_kw").value = [].concat(r.keywords).join(", "); Admin.toast("AI đã điền gợi ý, xem lại rồi đăng."); onEdit(); }
-      catch (e) { Admin.toast(e.message, true); } b.disabled = false; };
+    // Gửi tiêu đề + mô tả/từ khóa đang nhập + NỘI DUNG THUẦN của bài (đã dựng như người đọc thấy, bỏ ảnh/màu/định dạng)
+    $("#p_ai").onclick = () => Admin.aiSeo({ btn: $("#p_ai"), kind: "post", title: $("#p_title").value, descEl: $("#p_desc"), kwEl: $("#p_kw"), text: Admin.plainText(ta.value, renderPostBody), done: "đăng" });
 
     $("#p_save").onclick = async () => {
       const v = (i) => $("#" + i).value.trim(), title = v("p_title"), text = ta.value.trim();

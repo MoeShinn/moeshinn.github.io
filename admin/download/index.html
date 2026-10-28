@@ -105,9 +105,7 @@ Admin.boot({ id: "download", title: "Download", async render(main) {
       if (t.dataset.rm) { const [k, i] = t.dataset.rm.split(":"); arr(k).splice(+i, 1); draw(); } });
     $("#lb_add").onclick = () => { const n = Math.max(0, ...lbs.map((b) => parseInt(String(b.id).replace(/\D/g, "")) || 0)) + 1; lbs.push({ id: "link" + n, label: "Mở liên kết để ủng hộ mình", seconds: 10, type: "group", categories: [] }); draw(); };
     $("#dl_add").onclick = () => { dls.push({ id: "dl" + (dls.length + 1), label: `Link dự phòng ${dls.length}`, url: "" }); draw(); };
-    $("#d_ai").onclick = async () => { const b = $("#d_ai"); b.disabled = true;
-      try { const r = await Admin.api("/ai/seo", { title: $("#d_title").value, body: `Trang tải xuống. ${$("#d_desc").value} ${$("#d_kw").value}` }); if (r.description) $("#d_desc").value = r.description; if (r.keywords) $("#d_kw").value = [].concat(r.keywords).join(", "); Admin.toast("AI đã điền gợi ý, xem lại rồi đăng."); }
-      catch (err) { Admin.toast(err.message, true); } b.disabled = false; };
+    $("#d_ai").onclick = () => Admin.aiSeo({ btn: $("#d_ai"), kind: "download", title: $("#d_title").value, descEl: $("#d_desc"), kwEl: $("#d_kw"), text: $("#d_hm").value === "custom" ? $("#d_hint").value : "", done: "đăng" }); // nội dung thấy được của trang này chỉ có tiêu đề và câu hướng dẫn tự viết (nếu có)
     $("#d_save").onclick = async () => {
       const v = (i) => $("#" + i).value.trim(), title = v("d_title"), isUrl = (u) => /^https?:\/\//i.test(String(u || "").trim());
       if (!title) return Admin.toast("Cần nhập tiêu đề", true);

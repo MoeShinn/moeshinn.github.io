@@ -86,9 +86,41 @@
   const bindJson = (root, notes = {}) => root.querySelectorAll("[data-json]").forEach((b) => (b.onclick = () => jsonEditor(b.dataset.json, notes[b.dataset.json])));
 
   let tt;
-  function toast(msg, bad) {
+  function toast(msg, bad, ms) {
     const t = $("#toast"); t.textContent = msg; t.className = bad ? "bad" : ""; t.style.display = "block";
-    clearTimeout(tt); tt = setTimeout(() => (t.style.display = "none"), 3500);
+    clearTimeout(tt); tt = setTimeout(() => (t.style.display = "none"), ms || 3500);
+  }
+
+  // ---- Gợi ý mô tả / từ khóa SEO bằng AI (gọi POST /ai/seo của admin-api, Gemini) ----
+  // Chỉ gửi NỘI DUNG THUẦN mà người xem thấy: bỏ ảnh, video, màu và định dạng, mã §, link trần; cắt còn 5000 ký tự đầu (server cũng giới hạn).
+  const AI_TEXT_MAX = 5000;
+  // raw: markdown-lite của bài; render: hàm dựng HTML của trang (renderPostBody) để ra đúng cái người xem thấy. Không có render thì tự gỡ ký pháp markdown.
+  function plainText(raw, render) {
+    let s = String(raw ?? "");
+    if (typeof render === "function") { try { s = render(s); } catch (e) { /* lỗi dựng → dùng bản thô bên dưới */ } }
+    else s = s.replace(/!\[[^\]]*\]\([^)]*\)/g, " ").replace(/\[([^\]]+)\]\([^)]*\)/g, "$1");
+    const doc = new DOMParser().parseFromString("<body>" + s + "</body>", "text/html"); // DOMParser không chạy script, không tải ảnh
+    doc.querySelectorAll("script,style,noscript,template,img,picture,source,svg,canvas,video,audio,iframe,object,embed,form,input,button,select,textarea,link,meta").forEach((n) => n.remove());
+    doc.body.querySelectorAll("br,hr").forEach((n) => n.replaceWith("\n"));
+    doc.body.querySelectorAll("p,div,h1,h2,h3,h4,h5,h6,li,tr,blockquote,pre,section,article,table,ul,ol,figcaption").forEach((n) => { n.prepend("\n"); n.append("\n"); });
+    const t = (doc.body.textContent || "").replace(/§[0-9a-fk-or]/gi, "").replace(/https?:\/\/\S+/gi, " ").replace(/[\u200b-\u200f\ufeff]/g, "").replace(/\u00a0/g, " ")
+      .replace(/[^\S\n]+/g, " ").replace(/ ?\n ?/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+    return [...t].slice(0, AI_TEXT_MAX).join("");
+  }
+  // Một nút "✨ AI gợi ý": đọc tiêu đề + mô tả + từ khóa người dùng đang nhập (để AI giữ ý và bổ sung), gửi kèm nội dung thuần, điền lại vào ô.
+  // o = { btn, kind: post|product|category|download|page, title, descEl, kwEl, text, site, done: "đăng" | "lưu" | "bấm Lưu" }
+  async function aiSeo(o) {
+    const btn = o.btn, label = btn ? btn.textContent : "";
+    if (btn) { btn.disabled = true; btn.textContent = "✨ AI đang viết…"; }
+    try {
+      const r = await api("/ai/seo", { kind: o.kind, title: o.title, description: o.descEl ? o.descEl.value : "", keywords: o.kwEl ? o.kwEl.value : "", text: o.text, site: o.site });
+      const fill = (el, v) => { if (el && v) { el.value = v; el.dispatchEvent(new Event("input", { bubbles: true })); } }; // phát sự kiện input để trang cập nhật bản xem trước / bản nháp
+      const kw = [].concat(r.keywords || []).join(", "), L = r.length || {}, lim = r.limits || {}, w = r.warnings || [];
+      fill(o.descEl, r.description); fill(o.kwEl, kw);
+      toast(`AI đã điền gợi ý: mô tả ${L.description || 0}/${lim.description || 155} ký tự${kw ? ", " + [].concat(r.keywords).length + " từ khóa" : ""}. Xem lại rồi ${o.done || "lưu"}.${w.length ? " ⚠ " + w.join(" ") : ""}`, false, w.length ? 9000 : 5000);
+      return r;
+    } catch (e) { toast(e.message, true, 8000); }
+    finally { if (btn) { btn.disabled = false; btn.textContent = label; } }
   }
 
   function showLogin(root, done) {
@@ -150,5 +182,5 @@
     return true;
   }
 
-  window.Admin = { api, upload, API, readJson, readText, commitJson, commitFiles, jsonEditor, bindJson, toast, copy, boot, esc, $ };
+  window.Admin = { api, upload, API, readJson, readText, commitJson, commitFiles, jsonEditor, bindJson, toast, copy, boot, esc, $, plainText, aiSeo };
 })();
