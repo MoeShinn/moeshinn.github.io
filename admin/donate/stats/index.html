@@ -35,12 +35,20 @@ a.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text
 .ds-amt{color:var(--green);font-weight:800;font-size:17px;white-space:nowrap;font-variant-numeric:tabular-nums}
 .ds-empty{padding:20px 4px;color:var(--mute);text-align:center}.ds-empty.err{color:#ff8b8f}
 .ds-more{text-align:center;margin:10px 0 0}
+/* Xoá lịch sử + thử nhận diện */
+.ds-side{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+button.ds-del{padding:2px 9px;font-size:13px;background:transparent;border:1px solid #6b2a2e;color:#ff9a9e}button.ds-del:hover{background:#4a1a1d}
+button.dng{background:#4a1a1d;border:1px solid #6b2a2e;color:#ffb3b6}button.dng:hover:not(:disabled){background:#6b2a2e}
+.ds-clr{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,1fr) auto;gap:8px;align-items:center}.ds-clr .lbl{color:var(--mute);font-size:14px;white-space:nowrap}
+.ds-clr2{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.ds-mt{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}.ds-out{margin-top:10px;font-size:14px;line-height:1.6}
+.ds-vd{display:inline-block;font-weight:700;border-radius:6px;padding:1px 9px;border:1px solid var(--line)}.ds-vd.ok{background:#12351a;color:#7be07b;border-color:#1f6a2f}.ds-vd.no{background:#3d1a1d;color:#ff9a9e;border-color:#6b2a2e}.ds-vd.mid{background:#3a2d12;color:#ffcf70;border-color:#6b5420}
 /* Popup danh sách đầy đủ */
 .ds-modal{max-width:860px;height:calc(100vh - 24px);height:min(860px,calc(100dvh - 24px))}
 .ds-modal>.ds-head{flex:none;margin-bottom:4px}
 .ds-modal .ds-hh{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
 .ds-modal .ds-list{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain}
-@media(max-width:560px){.ds-tb{grid-template-columns:1fr}.ds-seg{width:100%}.ds-seg button{flex:1 1 auto}}
+@media(max-width:560px){.ds-clr{grid-template-columns:1fr}.ds-mt{grid-template-columns:1fr}.ds-tb{grid-template-columns:1fr}.ds-seg{width:100%}.ds-seg button{flex:1 1 auto}}
 </style></head>
 <body><div id="app"></div><div id="toast"></div>
 <script src="/admin/js/core.js"></script>
@@ -94,6 +102,17 @@ Admin.boot({ id: "donate-stats", title: "Số liệu donate", async render(main)
         <p class="hint" id="ds_note" style="margin:10px 0 0"></p></div>
       <div class="card"><div class="ds-head"><h3>Lịch sử nhận donate <small class="hint">· ${RECENT} gần nhất</small></h3><button id="ds_all">Danh sách đầy đủ</button></div>
         <div id="ds_recent">${historyMarkup()}</div></div>
+      <div class="card"><h3>Xoá lịch sử donate</h3>
+        <p class="hint">Chỉ xoá donate đã nhận tiền và alert thử; đơn đang chờ thanh toán không bị ảnh hưởng. Xoá xong là <b>không khôi phục được</b>. Trước khi xoá sẽ hiện số lượng để bạn xác nhận. Muốn xoá từng donate: bấm “🗑 Xoá” ở mỗi dòng trong lịch sử.</p>
+        <div class="ds-clr"><span class="lbl">Xoá donate</span>
+          <select id="cl_scope" aria-label="Phạm vi"><option value="within">trong vòng</option><option value="older">cũ hơn</option></select>
+          <select id="cl_range" aria-label="Khoảng thời gian"><option value="24h">24 giờ</option><option value="7d">7 ngày</option><option value="1m">1 tháng (30 ngày)</option></select>
+          <button class="dng" id="cl_go">Xoá</button></div>
+        <div class="ds-clr2"><span class="hint" style="margin:0">Dọn sạch toàn bộ lịch sử donate:</span><button class="dng" id="cl_all">Xoá tất cả</button></div></div>
+      <div class="card"><h3>Thử nhận diện nội dung chuyển khoản</h3>
+        <p class="hint">Dán nội dung chuyển khoản để xem Worker sẽ xử lí thế nào với mẫu hiện tại (<span id="mt_tpl" class="mono">…</span>). Không ghi gì vào dữ liệu. Chỉ giao dịch có đúng khung mẫu mới được tính là donate; giao dịch khác bị bỏ qua.</p>
+        <div class="ds-mt"><input id="mt_in" placeholder="vd: MBVCB.123.DONATE ABC234.CT tu NGUYEN VAN A" autocomplete="off" aria-label="Nội dung chuyển khoản"><button id="mt_go">Kiểm tra</button></div>
+        <div class="ds-out" id="mt_out" role="status"></div></div>
     </div>`;
 
   // ---------- Danh sách donate (dùng chung cho thẻ ${RECENT} gần nhất và popup đầy đủ) ----------
@@ -103,11 +122,11 @@ Admin.boot({ id: "donate-stats", title: "Số liệu donate", async render(main)
       ${x.msg ? `<p class="ds-msg">${esc(x.msg)}</p>` : ""}
       <div class="ds-meta">${x.noCode ? '<span class="ds-chip off" title="Chuyển khoản không kèm mã đơn">Không có mã đơn</span>' : `<button type="button" class="ds-chip" data-copy="${esc(x.code)}" title="Bấm để copy mã đơn">${esc(x.code)}</button>`}
         ${x.msgHidden ? '<span class="ds-tag" title="Tin nhắn chưa qua kiểm duyệt nên không hiện trên stream">Tin nhắn bị ẩn</span>' : ""}${x.msgChecking ? '<span class="ds-tag" title="AI đang kiểm duyệt, alert sẽ phát ngay khi kiểm duyệt xong">Đang kiểm duyệt</span>' : ""}<span>${fdt(x.paid)}</span></div></div>
-    <div class="ds-amt">${fm(x.amount)}</div></li>`;
+    <div class="ds-side"><div class="ds-amt">${fm(x.amount)}</div><button type="button" class="ds-del" data-del="${x.id}" title="Xoá donate này" aria-label="Xoá donate này">🗑 Xoá</button></div></li>`;
 
   // local = true: thẻ gọn — máy chủ luôn trả donate mới nhất, việc sắp xếp theo số tiền làm ngay trên máy.
   // local = false: popup — sắp xếp + tìm kiếm chạy trên toàn bộ lịch sử ở máy chủ, tải thêm từng trang.
-  function createHistory(host, { pageSize, local, onAuth }) {
+  function createHistory(host, { pageSize, local, onAuth, onChange }) {
     const q = $("[data-q]", host), sortEl = $("[data-sort]", host), list = $("[data-list]", host), info = $("[data-info]", host), more = $("[data-more]", host), moreBtn = $("[data-more-btn]", host);
     let items = [], total = 0, hasMore = false, seq = 0, timer = 0;
 
@@ -139,12 +158,19 @@ Admin.boot({ id: "donate-stats", title: "Số liệu donate", async render(main)
       } finally { if (my === seq) moreBtn.disabled = false; }
     }
 
+    async function del(id) { // xoá đúng 1 donate (hỏi lại trước khi xoá)
+      const x = items.find((i) => i.id === id); if (!x) return;
+      if (!confirm(`Xoá donate ${fm(x.amount)} của “${x.name || "Ẩn danh"}” lúc ${fdt(x.paid)}?\n\nKhông khôi phục được.`)) return;
+      try { await call("/admin/delete", { mode: "ids", ids: [id] }); items = items.filter((i) => i.id !== id); total = Math.max(0, total - 1); paint(); Admin.toast("Đã xoá donate"); if (onChange) onChange(); }
+      catch (e) { if (e.status === 401) return onAuth(); Admin.toast(e.message, true); }
+    }
     q.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(() => load(), SEARCH_DELAY); });
     q.addEventListener("keydown", (e) => { if (e.key === "Enter") { clearTimeout(timer); load(); } });
     sortEl.addEventListener("change", () => (local ? paint() : load()));
     moreBtn.onclick = () => load(true);
     host.addEventListener("click", (e) => {
       if (e.target.closest("[data-retry]")) return load();
+      const dl = e.target.closest("[data-del]"); if (dl) return del(Number(dl.dataset.del));
       const c = e.target.closest("[data-copy]"); if (c) Admin.copy(c.dataset.copy, c);
     });
     host.addEventListener("error", (e) => { const i = e.target; if (i.tagName === "IMG" && !i.dataset.fb) { i.dataset.fb = "1"; i.src = DEF_AV; } }, true); // ảnh lỗi → ảnh mặc định
@@ -156,7 +182,7 @@ Admin.boot({ id: "donate-stats", title: "Số liệu donate", async render(main)
     const ov = document.createElement("div"); ov.className = "modal";
     ov.innerHTML = `<div class="mbox ds-modal" role="dialog" aria-modal="true" aria-labelledby="ds_mt"><div class="ds-head"><h3 id="ds_mt">Toàn bộ lịch sử donate</h3><button class="ghost" data-x aria-label="Đóng">✕ Đóng</button></div>${historyMarkup()}</div>`;
     document.body.appendChild(ov); document.body.style.overflow = "hidden";
-    const box = $(".mbox", ov), full = createHistory(ov, { pageSize: PAGE, local: false, onAuth: () => { close(); connect(); } });
+    const box = $(".mbox", ov), full = createHistory(ov, { pageSize: PAGE, local: false, onAuth: () => { close(); connect(); }, onChange: () => refresh() });
     let downOnBg = false;
     function close() { full.stop(); document.removeEventListener("keydown", onKey, true); document.body.style.overflow = ""; ov.remove(); if (trigger && trigger.focus) trigger.focus(); }
     function onKey(e) {
@@ -191,8 +217,47 @@ Admin.boot({ id: "donate-stats", title: "Số liệu donate", async render(main)
     pickRange(RANGES[i][0]); seg.querySelector(`[data-r="${RANGES[i][0]}"]`).focus();
   });
 
+  // ---------- Xoá lịch sử hàng loạt ----------
+  const SCOPE_TXT = { within: "trong vòng", older: "cũ hơn" }, RANGE_TXT = { "24h": "24 giờ", "7d": "7 ngày", "1m": "1 tháng (30 ngày)" };
+  async function bulkDelete(btn, body, what) {
+    await busy(btn, async () => {
+      try {
+        const pre = await call("/admin/delete", { ...body, dry: true });        // bước 1: chỉ đếm
+        if (!pre.count) return Admin.toast("Không có donate nào khớp, không xoá gì cả.");
+        const word = body.mode === "all" ? "XOA" : "";
+        const head = `Sẽ xoá ${pre.count.toLocaleString("vi-VN")} donate (${what}), tổng ${fm(pre.amount)}.\n\nKhông khôi phục được.`;
+        if (word) { const t = prompt(head + `\n\nGõ ${word} để xác nhận:`); if (t === null) return; if (t.trim().toUpperCase() !== word) return Admin.toast("Chưa đúng chữ xác nhận, không xoá gì cả.", true); }
+        else if (!confirm(head + "\n\nBấm OK để xoá.")) return;
+        const r = await call("/admin/delete", body);                            // bước 2: xoá thật
+        Admin.toast(`Đã xoá ${r.count.toLocaleString("vi-VN")} donate (${fm(r.amount)}).`); await refresh();
+      } catch (e) { if (e.status === 401) return connect("Admin key không đúng hoặc đã đổi, hãy nhập lại."); Admin.toast(e.message, true); }
+    });
+  }
+  $("#cl_go").onclick = () => { const scope = $("#cl_scope").value, r = $("#cl_range").value; bulkDelete($("#cl_go"), { mode: "range", range: r, scope }, `${SCOPE_TXT[scope]} ${RANGE_TXT[r]}`); };
+  $("#cl_all").onclick = () => bulkDelete($("#cl_all"), { mode: "all" }, "toàn bộ lịch sử");
+
+  // ---------- Thử nhận diện nội dung chuyển khoản ----------
+  const VD = { ORDER: ["ok", "Khớp đơn đang chờ"], REPEAT: ["mid", "Mã đã được trả trước đó"], ANON: ["mid", "Donate ẩn danh"], IGNORED: ["no", "Bị bỏ qua"] };
+  async function matchTest() {
+    const v = $("#mt_in").value.trim(), out = $("#mt_out"); if (!v) return out.textContent = "";
+    await busy($("#mt_go"), async () => {
+      try {
+        const r = await call("/admin/matchtest", { content: v }), [cls, label] = VD[r.verdict] || ["no", r.verdict], o = r.pending || r.paid;
+        $("#mt_tpl").textContent = r.template;
+        out.innerHTML = `<span class="ds-vd ${cls}">${esc(label)}</span> ${esc(r.note)}`
+          + `<div class="hint" style="margin-top:6px">Có khung mẫu: <b>${r.gate ? "có" : "không"}</b>${r.codes.length ? ` · Mã tìm thấy: <span class="mono">${r.codes.map(esc).join(", ")}</span>` : ""}${o ? ` · Đơn: ${esc(o.name)} (${esc(o.code)}, ${fm(o.amount)}, ${o.status === "paid" ? "đã trả" : "đang chờ"})` : ""}`
+          + `${r.acceptedTemplates.length > 1 ? ` · Mẫu cũ còn nhận trong 48 giờ: <span class="mono">${r.acceptedTemplates.slice(1).map(esc).join(" | ")}</span>` : ""}</div>`;
+      } catch (e) { if (e.status === 401) return connect("Admin key không đúng hoặc đã đổi, hãy nhập lại."); out.innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+    });
+  }
+  $("#mt_go").onclick = matchTest;
+  $("#mt_in").addEventListener("keydown", (e) => { if (e.key === "Enter") matchTest(); });
+
+  // Sau khi xoá: tính lại tổng quan + danh sách gần nhất
+  async function refresh() { try { summary = await call("/admin/summary"); paintRange(); await recent.load(); } catch (e) { if (e.status === 401) connect("Admin key không đúng hoặc đã đổi, hãy nhập lại."); } }
+
   // ---------- Kết nối + khởi động ----------
-  const recent = createHistory($("#ds_recent"), { pageSize: RECENT, local: true, onAuth: () => connect("Admin key không đúng hoặc đã đổi, hãy nhập lại.") });
+  const recent = createHistory($("#ds_recent"), { pageSize: RECENT, local: true, onAuth: () => connect("Admin key không đúng hoặc đã đổi, hãy nhập lại."), onChange: () => refresh() });
   function show(ok) { $("#ds_body").hidden = !ok; $("#ds_conn").hidden = ok; }
   async function connect(msg = "") {
     $("#ds_err").textContent = msg;

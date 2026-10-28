@@ -5,6 +5,9 @@
 <style>
 .tbl{width:100%;border-collapse:collapse;font-size:13.5px}.tbl th,.tbl td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
 .tbl th{color:var(--mute);font-weight:600;font-size:12px;white-space:nowrap}.tblw{overflow-x:auto;margin:0 -4px}
+.tblw.scroll{max-height:min(340px,52vh);overflow:auto;overscroll-behavior:contain;border:1px solid var(--line);border-radius:8px;margin:0}
+.tblw.scroll .tbl th{position:sticky;top:0;z-index:1;background:var(--card);box-shadow:0 1px 0 var(--line)}
+.prodcount{font-weight:400;font-size:12.5px;color:var(--mute);margin-left:6px}
 .mono{font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.03em}
 .badge{display:inline-block;padding:1px 9px;border-radius:999px;font-size:12px;border:1px solid var(--line);white-space:nowrap}
 .badge.active{background:#12351a;color:#7be07b;border-color:#1f6a2f}.badge.downloading{background:#3a2d12;color:#ffc861;border-color:#6b5420}
@@ -28,7 +31,9 @@ Admin.boot({ id: "buy", title: "Bán hàng", async render(main) {
   const fmtDT = (t) => (t ? new Date(t).toLocaleString("vi-VN", { dateStyle: "short", timeStyle: "short" }) : "—");
   const pretty = (c) => String(c).match(/.{1,5}/g).join("-");
   const STATE = { active: "Chưa dùng hết", downloading: "Đang tải", used: "Hết lượt", expired: "Hết hạn", revoked: "Đã thu hồi" };
-  const stateOf = (c) => (c.s === "revoked" ? "revoked" : c.e && c.e < Date.now() ? "expired" : c.u >= c.m ? "used" : c.l > Date.now() ? "downloading" : "active");
+  // c.g = hạn chờ xác nhận của lượt tải "đã gửi xong": quá hạn mà chưa có xác nhận thì Worker sẽ tự chốt trừ 1 lượt → hiển thị luôn con số đó
+  const usedOf = (c) => (c.u || 0) + (c.g && c.g < Date.now() ? 1 : 0);
+  const stateOf = (c) => (c.s === "revoked" ? "revoked" : c.e && c.e < Date.now() ? "expired" : usedOf(c) >= c.m ? "used" : c.l > Date.now() ? "downloading" : "active");
   const copy = (text, ok = "Đã sao chép", el) => Admin.copy(text, el, { toast: ok }); // el: nút vừa bấm → đổi thành "Đã Copy ✓" 1,5 giây
   const message = (prodName, code, max, exp) =>
     `Cảm ơn bạn đã mua ${prodName}! 🎉\nMã tải: ${pretty(code)}\nVào ${LINK} và dán mã để tải file.\nMã dùng được ${max} lần${exp ? `, hết hạn ${fmtDate(exp)}` : ""}. Vui lòng không chia sẻ mã cho người khác.`;
@@ -38,7 +43,7 @@ Admin.boot({ id: "buy", title: "Bán hàng", async render(main) {
   main.innerHTML = `<h2>Bán hàng (mã tải)</h2>
     <p class="hint">Khách mua xong → bạn tạo mã gửi cho khách → khách vào <a href="/buy/" target="_blank" class="mono">${esc(LINK)}</a>, dán mã và tải file. File nằm trong release của repo private, không có link công khai nào.</p>
     <div class="card"><h3>Kết nối</h3><div id="b_conn"><span class="dot"></span>Đang kiểm tra…</div></div>
-    <div class="card"><h3>1. Sản phẩm (model)</h3><div id="b_prods"></div>
+    <div class="card"><h3>1. Sản phẩm (model)<span class="prodcount" id="b_pcount"></span></h3><div id="b_prods"></div>
       <h3 style="margin-top:18px">Thêm sản phẩm mới</h3>
       <div class="frow"><label>Chọn tệp (mọi định dạng)<input type="file" id="b_file"></label><label>Tên hiển thị cho khách<input id="b_pname" placeholder="Model Shinju v2" maxlength="100"></label></div>
       <div class="hint" id="b_fhint"></div><div class="bar2" id="b_bar" hidden><i></i></div>
@@ -78,10 +83,11 @@ Admin.boot({ id: "buy", title: "Bán hàng", async render(main) {
   // ---------- sản phẩm ----------
   function drawProducts() {
     const cnt = {}; codes.forEach((c) => (cnt[c.p] = (cnt[c.p] || 0) + 1));
-    $("#b_prods").innerHTML = products.length ? `<div class="tblw"><table class="tbl"><thead><tr><th>Tên</th><th>Tệp</th><th>Dung lượng</th><th>Mã đã tạo</th><th></th></tr></thead><tbody>` +
+    $("#b_prods").innerHTML = products.length ? `<div class="tblw scroll"><table class="tbl"><thead><tr><th>Tên</th><th>Tệp</th><th>Dung lượng</th><th>Mã đã tạo</th><th></th></tr></thead><tbody>` +
       products.map((p) => `<tr><td><b>${esc(p.name)}</b></td><td class="mono">${esc(p.file)}</td><td>${fmtSize(p.size || 0)}</td><td>${cnt[p.id] || 0}</td>
         <td><div class="acts"><button data-pa="rename" data-id="${esc(p.id)}">Đổi tên</button><button class="dng" data-pa="del" data-id="${esc(p.id)}">Xoá</button></div></td></tr>`).join("") + `</tbody></table></div>`
       : `<p class="hint">Chưa có sản phẩm nào. Thêm bên dưới.</p>`;
+    $("#b_pcount").textContent = products.length ? `(${products.length})` : "";
     const opts = products.map((p) => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join("");
     const keep = $("#c_prod").value, keepF = $("#f_prod").value;
     $("#c_prod").innerHTML = opts || `<option value="">(chưa có sản phẩm)</option>`;
@@ -165,7 +171,7 @@ Admin.boot({ id: "buy", title: "Bán hàng", async render(main) {
     const q = filter.q.trim().toLowerCase().replace(/[^a-z0-9\u00c0-\u1ef9 ]/g, "");
     const rows = codes.filter((c) => (!filter.st || stateOf(c) === filter.st) && (!filter.prod || c.p === filter.prod) && (!q || c.code.toLowerCase().includes(q.replace(/ /g, "")) || (c.n || "").toLowerCase().includes(q))).sort((a, b) => (b.c || 0) - (a.c || 0));
     $("#b_codes").innerHTML = rows.length ? `<div class="tblw"><table class="tbl"><thead><tr><th>Mã</th><th>Sản phẩm</th><th>Trạng thái</th><th>Lượt</th><th>Hạn</th><th>Ghi chú</th><th>Tạo lúc</th><th>Thao tác</th></tr></thead><tbody>` +
-      rows.map((c) => { const st = stateOf(c); return `<tr data-code="${esc(c.code)}"><td class="mono">${esc(pretty(c.code))}</td><td>${esc(pname(c.p))}</td><td><span class="badge ${st}">${STATE[st]}</span></td><td>${c.u}/${c.m}</td><td>${c.e ? fmtDate(c.e) : "—"}</td><td>${esc(c.n || "")}</td><td>${fmtDT(c.c)}</td>
+      rows.map((c) => { const st = stateOf(c); return `<tr data-code="${esc(c.code)}"><td class="mono">${esc(pretty(c.code))}</td><td>${esc(pname(c.p))}</td><td><span class="badge ${st}">${STATE[st]}</span></td><td>${usedOf(c)}/${c.m}</td><td>${c.e ? fmtDate(c.e) : "—"}</td><td>${esc(c.n || "")}</td><td>${fmtDT(c.c)}</td>
         <td><div class="acts"><button data-a="copy">Mã</button><button data-a="msg">Tin nhắn</button>${c.s === "revoked" ? `<button data-a="restore">Khôi phục</button>` : `<button data-a="revoke">Thu hồi</button>`}<button data-a="plus">+1 lượt</button>${st === "downloading" ? `<button data-a="unlock">Mở khoá</button>` : ""}<button data-a="expiry">Hạn</button><button data-a="note">Ghi chú</button><button class="dng" data-a="delete">Xoá</button></div></td></tr>`; }).join("") + `</tbody></table></div><p class="hint">${rows.length}/${codes.length} mã${cursor ? " (còn nữa, bấm Tải thêm)" : ""}</p>`
       : `<p class="hint">Không có mã nào${codes.length ? " khớp bộ lọc" : ""}.</p>`;
     $("#b_more").hidden = !cursor;

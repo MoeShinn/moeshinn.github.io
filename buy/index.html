@@ -57,6 +57,11 @@
         </div>
         <p class="buy-file">Tên file sẽ lưu: <code id="r-file"></code></p>
         <button id="btn-dl" class="buy-btn buy-btn-go" type="button">⬇ Tải xuống</button>
+        <div id="r-prog" class="buy-prog" hidden>
+          <div class="buy-prog-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="r-bar"></i></div>
+          <div id="r-ptxt" class="buy-prog-txt"></div>
+        </div>
+        <button id="btn-cancel" class="buy-link" type="button" hidden>Huỷ tải</button>
         <p id="r-msg" class="buy-msg" role="status" aria-live="polite"></p>
         <p id="r-ttl" class="buy-ttl"></p>
         <button id="btn-other" class="buy-link" type="button">Nhập mã khác</button>
@@ -64,7 +69,8 @@
 
       <ul class="buy-notes">
         <li>Mỗi mã chỉ dùng cho một người mua, vui lòng không chia sẻ lại.</li>
-        <li>Lượt tải chỉ bị trừ khi file về máy bạn <b>đầy đủ</b>. Mạng đứt giữa chừng thì không mất lượt.</li>
+        <li>Lượt tải chỉ bị trừ khi file về máy bạn <b>đầy đủ</b>: trang tự đếm số byte nhận được và chỉ báo “xong” khi khớp đúng dung lượng. Mạng đứt giữa chừng hoặc bạn huỷ thì không mất lượt.</li>
+        <li>Đang tải thì đừng đóng trang này và đừng mở thêm tab tải cùng lúc: mỗi lần chỉ chạy một lượt tải.</li>
         <li>Gặp lỗi hoặc mất mã? Nhắn người bán kèm tên người mua để được hỗ trợ.</li>
       </ul>
     </main>

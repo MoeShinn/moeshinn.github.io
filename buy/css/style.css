@@ -71,3 +71,11 @@ body {
 .buy-notes { margin: 4px 0 0; padding: 14px 0 0 18px; border-top: 1px solid var(--panel-border); font-size: 13px; line-height: 1.65; color: rgba(244,236,216,.62); }
 .buy-notes li { margin-bottom: 2px; }
 @media (max-width: 520px) { .page { padding: 28px 14px 20px; } .buy-card { padding: 22px 16px 20px; } .buy-input { font-size: 19px; } .buy-title { font-size: 23px; } }
+
+/* thanh tiến độ tải */
+.buy-prog { display: flex; flex-direction: column; gap: 6px; }
+.buy-prog[hidden], .buy-link[hidden] { display: none; }
+.buy-prog-bar { height: 10px; border-radius: 999px; overflow: hidden; background: rgba(255,255,255,.1); border: 1px solid var(--panel-border); }
+.buy-prog-bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--blue-1), var(--green-1)); transition: width .25s linear; }
+.buy-prog-txt { font-size: 13px; text-align: center; color: rgba(244,236,216,.75); font-variant-numeric: tabular-nums; }
+.buy-btn.busy { cursor: progress; }
