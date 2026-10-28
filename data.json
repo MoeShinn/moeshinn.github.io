@@ -11,23 +11,27 @@
     "pages": [
       {
         "label": "Trang chủ",
-        "url": "/index.html"
+        "url": "/"
       },
       {
         "label": "Kênh",
-        "url": "/channel/index.html"
+        "url": "/channel"
       },
       {
         "label": "Donate",
-        "url": "/donate/index.html"
-      },
-      {
-        "label": "Sản phẩm",
-        "url": "/product/index.html"
+        "url": "/donate"
       },
       {
         "label": "Bài Đăng",
-        "url": "/post/index.html"
+        "url": "/post"
+      },
+      {
+        "label": "Sản phẩm",
+        "url": "/product"
+      },
+      {
+        "label": "Hồ sơ Vtuber",
+        "url": "/profile"
       }
     ]
   },
@@ -44,7 +48,7 @@
       "icon": "",
       "url": "donate",
       "style": "#F687B3",
-      "label": "💰 Donate"
+      "label": "📥 Donate"
     },
     {
       "id": "posts",
