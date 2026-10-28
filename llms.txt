@@ -5,10 +5,11 @@
 ## Trang chính
 
 - [Trang chủ](https://moeshinn.github.io/)
-- [Kênh](https://moeshinn.github.io/channel/)
-- [Donate](https://moeshinn.github.io/donate/)
-- [Sản phẩm](https://moeshinn.github.io/product/)
-- [Bài Đăng](https://moeshinn.github.io/post/)
+- [Kênh](https://moeshinn.github.io/channel)
+- [Donate](https://moeshinn.github.io/donate)
+- [Bài Đăng](https://moeshinn.github.io/post)
+- [Sản phẩm](https://moeshinn.github.io/product)
+- [Hồ sơ Vtuber](https://moeshinn.github.io/profile)
 
 ## Hồ sơ Vtuber
 
