@@ -6,5 +6,12 @@
   "illustrative": true,
   "gallery": [
     "/image/xqnp9t4e.webp"
+  ],
+  "buttons": [
+    {
+      "label": "Liên hệ để mua",
+      "url": "/channel",
+      "style": "red"
+    }
   ]
 }
