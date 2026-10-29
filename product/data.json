@@ -146,6 +146,16 @@
       "order": 3,
       "updated": "2026-10-29",
       "price": "47.000đ"
+    },
+    {
+      "id": "lumie-model",
+      "type": "product",
+      "parent": "ezy-model-paid",
+      "title": "Lumie Model",
+      "thumb": "/image/fa9wlzxi.webp",
+      "order": 4,
+      "updated": "2026-10-29",
+      "price": "79.000đ"
     }
   ]
 }
