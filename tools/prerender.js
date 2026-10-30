@@ -7,6 +7,7 @@
 
    Script này (không cần cài gì, chỉ cần Node 18+):
      1. Gỡ markup màn hình chờ khỏi mọi trang HTML (js/loading.js tự dựng overlay cho người dùng thật).
+     1b. Gắn / gỡ css+script màn hình chờ ở các trang index.html theo LOADING_ENABLED và danh sách NO_LOADING (xem phần "Màn hình chờ").
      2. Điền sẵn vào HTML: menu, avatar + tên + các nút trang chủ, trang Kênh, trang Donate,
         danh sách bài ở /post/, JSON-LD (WebSite + Person) ở trang chủ.
      2b. Trang /profile (hồ sơ Vtuber): dựng sẵn nội dung thật từ profile/data.json + JSON-LD ProfilePage + biến màu (dùng chung profile/js/profilegen.js).
@@ -284,14 +285,60 @@ const inlineCss = () => `<style>${["css/loading.css", "css/header.css", "css/sty
 /* ---------------- Áp dụng cho từng trang ---------------- */
 const OVERLAY = /[ \t]*<!--\s*Shared loading screen[^>]*-->\s*|[ \t]*<div id="site-loading" class="site-loading">[\s\S]*?<div class="site-loading-fill"><\/div><\/div>\s*<\/div>\s*<\/div>\s*/g;
 
-// Trang KHÔNG dùng màn hình chờ: mỗi lần dựng sẽ tự gỡ <link css/loading.css> + <script js/loading.js> nếu có ai chép đè bản cũ
-// (admin lưu, Unzip update, mẫu cũ…). Muốn thêm trang khác thì thêm đường dẫn vào đây (vd "donate/terms/index.html").
-const NO_LOADING = new Set(["donate/index.html", "donate/terms/index.html", "donate/privacy/index.html", "/channel/index.html", "/index.html", "/post/index.html","/buy/index.html"]);
-const LOADING_TAGS = /[ \t]*<link\b[^>]*\/css\/loading\.css[^>]*>[ \t]*\r?\n?|[ \t]*<script\b[^>]*\/js\/loading\.js[^>]*><\/script>[ \t]*\r?\n?/g;
+/* ---------------- Màn hình chờ (loading): gắn / gỡ tự động ----------------
+   LOADING_ENABLED = true  → MỌI trang index.html được gắn loading (css/loading.css + js/loading.js),
+                             trừ các trang liệt kê trong NO_LOADING (những trang đó bị GỠ).
+   LOADING_ENABLED = false → GỠ loading khỏi TẤT CẢ trang index.html (NO_LOADING không còn tác dụng).
+   Mỗi lần dựng đều tự khớp lại, chạy bao nhiêu lần cũng được; chép đè bản cũ (admin lưu, Unzip update…) cũng được sửa lại.
+   NO_LOADING: ghi "donate/index.html" (đúng 1 trang) hoặc "post/" (dấu / cuối = cả thư mục và mọi trang con). Có hay không có dấu / ở đầu đều được.
+   Chỉ gắn cho trang dùng khung chung (có menu data-nav-menu) để không đụng tới trang chuyển hướng; GỠ thì áp dụng cho mọi trang index. */
+const LOADING_ENABLED = true;
+const NO_LOADING = new Set(["donate/index.html", "donate/terms/index.html", "donate/privacy/index.html", "/channel/index.html", "/index.html", "/post/index.html"]);
+
+const noLoadingRules = [...NO_LOADING].map((p) => String(p).trim().replace(/^\/+/, "")).filter(Boolean);
+const isNoLoading = (rel) => noLoadingRules.some((r) => (r.endsWith("/") ? rel.startsWith(r) : rel === r));
+const isIndexPage = (rel) => rel === "index.html" || rel.endsWith("/index.html");
+
+const RX_LINK = /<link\b[^>]*\/css\/loading\.css[^>]*>/;
+const RX_SCRIPT = /<script\b[^>]*\/js\/loading\.js[^>]*><\/script>/;
+const RX_WAIT = /<script>(?:(?!<\/script>)[\s\S])*?sl-wait(?:(?!<\/script>)[\s\S])*?<\/script>/; // script nhỏ trong <head> đặt tấm màn tối "sl-wait"
+const TAG_LINK = '<link rel="stylesheet" href="/css/loading.css" />';
+const TAG_SCRIPT = '<script src="/js/loading.js"></script>';
+const TAG_SCRIPT_DEFER = '<script src="/js/loading.js" defer></script>';
+const TAG_WAIT = '<script>(function(){if(!/bot|crawl|spider|slurp|lighthouse|headless|facebookexternalhit|perplexity|claude|gemini|chatgpt|bytespider/i.test(navigator.userAgent||"")&&navigator.webdriver!==true){var e=document.documentElement;e.classList.add("sl-wait");setTimeout(function(){e.classList.remove("sl-wait")},9000)}})()</script>';
+
+// Gỡ thẻ cùng với xuống dòng + thụt lề đứng trước nó → gắn / gỡ qua lại nhiều lần không để lại dòng trống thừa.
+const stripTag = (html, rx) => html.replace(new RegExp("(?:\\r?\\n){0,2}[ \\t]*" + rx.source, "g"), "");
+// Chèn các dòng ngay TRƯỚC dòng khớp rx (rx phải bắt đầu bằng ^([ \t]*) và có cờ m); không khớp → trả null.
+function insertBeforeLine(html, rx, lines) {
+  const m = rx.exec(html);
+  if (!m) return null;
+  return html.slice(0, m.index) + lines.map((l) => m[1] + l + "\n").join("") + html.slice(m.index);
+}
+
+function applyLoading(rel, html) {
+  if (!isIndexPage(rel)) return html;
+  if (!LOADING_ENABLED || isNoLoading(rel)) return [RX_LINK, RX_SCRIPT, RX_WAIT].reduce(stripTag, html); // GỠ
+  if (!/data-nav-menu/.test(html)) return html; // không dùng khung chung (chuyển hướng…) → không gắn
+  if (rel === "index.html") {
+    // Trang chủ: CSS loading đã nhúng sẵn vào <head> (inlineCss) → chỉ cần tấm màn + loading.js (defer), xếp trước site-chrome.js
+    const lines = [];
+    if (!RX_WAIT.test(html)) lines.push(TAG_WAIT);
+    if (!RX_SCRIPT.test(html)) lines.push(TAG_SCRIPT_DEFER);
+    if (!lines.length) return html;
+    return insertBeforeLine(html, /^([ \t]*)<script\b[^>]*site-chrome\.js/m, lines)
+      || insertBeforeLine(html, /^([ \t]*)<\/head>/m, lines.map((l) => "  " + l)) || html;
+  }
+  // Trang khác: <link> css ở đầu các stylesheet trong <head>, <script> ngay sau <body> (nạp đồng bộ để overlay hiện trước nội dung)
+  if (!RX_LINK.test(html)) html = insertBeforeLine(html, /^([ \t]*)<link\b[^>]*rel="stylesheet"/m, [TAG_LINK])
+    || insertBeforeLine(html, /^([ \t]*)<\/head>/m, ["  " + TAG_LINK]) || html;
+  if (!RX_SCRIPT.test(html)) html = html.replace(/(<body\b[^>]*>)/i, (m) => m + "\n\n  " + TAG_SCRIPT);
+  return html;
+}
 
 function transform(rel, html) {
   html = html.replace(OVERLAY, "\n  "); // 1) gỡ màn hình chờ khỏi HTML tĩnh
-  if (NO_LOADING.has(rel)) html = html.replace(LOADING_TAGS, ""); // 1b) trang không dùng màn hình chờ
+  html = applyLoading(rel, html); // 1b) gắn / gỡ màn hình chờ theo LOADING_ENABLED + NO_LOADING
 
   // 2) header dùng chung: logo → "/", menu dựng sẵn
   html = html.replace(/<a href="[^"]*" class="site-header-logo"/, '<a href="/" class="site-header-logo"');
