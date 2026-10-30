@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Kho liên kết</title>
+<link rel="stylesheet" href="/admin/css/admin.css"></head>
+<body><div id="app"></div><div id="toast"></div>
+<script src="/admin/js/core.js"></script>
+<script src="/admin/js/postgen.js"></script>
+<script src="/admin/js/linkpool.js"></script>
+<script>
+Admin.boot({ id: "linkpool", title: "Kho liên kết", async render(main) {
+  const { esc, $ } = Admin, L = LinkLogic, PATH = "download/link-data.json";
+  main.innerHTML = `<h2>Kho liên kết</h2><p class="hint">Đang tải…</p>`;
+  let pool, files;
+  try {
+    pool = await Admin.readJson(PATH, { links: [] });
+    const ids = (await Admin.api("/tree")).files.map((f) => (f.path.match(/^download\/data\/([^/]+)\.json$/) || [])[1]).filter(Boolean);
+    files = await Promise.all(ids.map(async (id) => ({ id, d: await Admin.readJson(`download/data/${id}.json`) })));
+  } catch (e) { main.innerHTML = `<h2>Kho liên kết</h2><p class="err">${esc(e.message)}</p>`; return; }
+  let links = (pool.links || []).map((l) => ({ ...l })); const orig = JSON.stringify(links);
+  let editIdx = -1, filter = "all", q = "";
+  const dirty = () => JSON.stringify(links) !== orig;
+  window.onbeforeunload = () => (dirty() ? "Có thay đổi chưa lưu" : undefined);
+  // nhóm nào đang được nút liên kết của mục tải nào dùng
+  const usage = {}; files.forEach(({ id, d }) => (d.linkButtons || []).forEach((b) => { if (b.type !== "custom") (b.categories || []).forEach((c) => (usage[c.toLowerCase()] ||= { name: c, by: [] }).by.push(d.title || id)); }));
+
+  function draw() {
+    const st = links.map((l) => L.status(l)), n = (k) => st.filter((x) => x === k).length;
+    const cats = [...new Set([...links.map((l) => l.category), ...Object.values(usage).map((u) => u.name)])];
+    const warns = Object.values(usage).filter((u) => !links.some((l) => l.category.toLowerCase() === u.name.toLowerCase() && L.live(l)));
+    const e = editIdx >= 0 ? links[editIdx] : null, f = (k) => esc(e ? e[k] || "" : "");
+    const pass = (l) => (filter === "all" || L.status(l) === filter) && (!q || (l.url + " " + l.category + " " + (l.note || "")).toLowerCase().includes(q));
+    const groups = cats.map((c) => {
+      const rows = links.map((l, i) => [l, i]).filter(([l]) => l.category.toLowerCase() === c.toLowerCase() && pass(l));
+      const liveN = links.filter((l) => l.category.toLowerCase() === c.toLowerCase() && L.live(l)).length;
+      if (!rows.length && (filter !== "all" || q)) return "";
+      return `<div class="card"><h3>${esc(c)} <small class="hint">· ${liveN} link khả dụng</small></h3>${rows.map(([l, i]) => { const s = L.status(l), [ic, tx] = L.LABEL[s];
+        return `<div style="border-top:1px solid var(--line);padding:8px 0"><div style="word-break:break-all"><span title="${tx}">${ic}</span> <a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.url)}</a></div>
+        <small class="hint">${tx}${L.isInf(l.expires) ? "" : " · hạn " + esc(l.expires)}${l.start ? " · bắt đầu " + esc(l.start) : ""}${l.note ? " · " + esc(l.note) : ""}</small>
+        <div style="margin-top:4px;font-size:13px">${L.isInf(l.expires) ? "" : `<a href="#" data-a="ext:7:${i}">+7 ngày</a> · <a href="#" data-a="ext:30:${i}">+30 ngày</a> · <a href="#" data-a="inf:${i}">Vô hạn</a> · `}<a href="#" data-a="tog:${i}">${l.enabled === false ? "Bật" : "Tắt"}</a> · <a href="#" data-a="edit:${i}">Sửa</a> · <a href="#" data-a="del:${i}" style="color:#ff8b8f">Xóa</a></div></div>`; }).join("") || '<p class="hint">Chưa có link.</p>'}</div>`; }).join("");
+    main.innerHTML = `<h2>Kho liên kết</h2>
+    <p><button type="button" class="ghost" data-json="download/link-data.json">Sửa file link-data.json</button></p>
+    <div class="card"><div class="grid"><div class="stat"><b>${n("ok") + n("inf")}</b><span>khả dụng</span></div><div class="stat"><b>${n("soon")}</b><span>sắp hết hạn</span></div><div class="stat"><b>${n("expired")}</b><span>đã hết hạn</span></div><div class="stat"><b>${n("off") + n("sched")}</b><span>tắt / chưa bắt đầu</span></div></div></div>
+    ${warns.length ? `<div class="bar">⚠ ${warns.map((u) => `Nhóm <b>${esc(u.name)}</b> không còn link khả dụng (nút của: ${esc([...new Set(u.by)].join(", "))} sẽ tự bỏ qua)`).join("<br>")}</div>` : ""}
+    <div class="card"><h3>${e ? "Sửa link" : "Thêm link"}</h3>
+      <label>URL<input id="a_url" placeholder="https://…" value="${f("url")}"></label>
+      <div class="cols"><label>Nhóm (chọn hoặc gõ nhóm mới)<input id="a_cat" list="catl" value="${f("category")}"><datalist id="catl">${cats.map((c) => `<option value="${esc(c)}">`).join("")}</datalist></label>
+        <label>Ghi chú (tùy chọn)<input id="a_note" value="${f("note")}"></label>
+        <label>Hết hạn<input id="a_exp" type="date" value="${e && !L.isInf(e.expires) ? L.toIso(e.expires) : ""}"></label>
+        <label>Bắt đầu từ (tùy chọn)<input id="a_start" type="date" value="${e ? L.toIso(e.start) : ""}"></label></div>
+      <label class="row"><input type="checkbox" id="a_inf" ${!e || L.isInf(e.expires) ? "checked" : ""}>Vô hạn (bỏ tick để dùng ngày hết hạn)</label>
+      <button id="a_ok">${e ? "Cập nhật" : "Thêm vào danh sách"}</button>${e ? ' <button class="ghost" id="a_cancel">Hủy</button>' : ""}</div>
+    <div class="card"><div class="cols"><label>Lọc<select id="a_f">${[["all", "Tất cả"], ["ok", "Còn hạn"], ["soon", "Sắp hết hạn"], ["inf", "Vô hạn"], ["expired", "Đã hết hạn"], ["off", "Đang tắt"], ["sched", "Chưa bắt đầu"]].map(([k, t]) => `<option value="${k}" ${filter === k ? "selected" : ""}>${t}</option>`).join("")}</select></label>
+      <label>Tìm<input id="a_q" value="${esc(q)}" placeholder="url, nhóm, ghi chú"></label></div></div>
+    ${groups || '<p class="hint">Chưa có nhóm nào.</p>'}
+    <div class="bar" style="position:sticky;bottom:8px;${dirty() ? "" : "opacity:.6"}">${dirty() ? "Có thay đổi chưa lưu." : "Không có thay đổi."} <button id="a_save" ${dirty() ? "" : "disabled"}>Lưu lên GitHub</button> <button class="ghost" id="a_undo" ${dirty() ? "" : "disabled"}>Hoàn tác tất cả</button></div>`;
+    Admin.bindJson(main, { "download/link-data.json": "Kho liên kết dùng chung. Thay đổi chưa lưu trong trang này sẽ mất khi lưu file trực tiếp." });
+    $("#a_f").onchange = (ev) => { filter = ev.target.value; draw(); };
+    $("#a_q").oninput = (ev) => { q = ev.target.value.trim().toLowerCase(); const p = ev.target.selectionStart; draw(); const el = $("#a_q"); el.focus(); el.setSelectionRange(p, p); };
+    $("#a_inf").onchange = () => ($("#a_exp").disabled = $("#a_inf").checked); $("#a_exp").disabled = $("#a_inf").checked;
+    if (e) $("#a_cancel").onclick = () => { editIdx = -1; draw(); };
+    $("#a_ok").onclick = () => {
+      const url = $("#a_url").value.trim(), cat = $("#a_cat").value.trim(), inf = $("#a_inf").checked, exp = L.fromIso($("#a_exp").value), start = L.fromIso($("#a_start").value);
+      if (!/^https?:\/\//i.test(url)) return Admin.toast("URL phải bắt đầu bằng http:// hoặc https://", true);
+      if (!cat || cat.length > 40) return Admin.toast("Cần nhập nhóm (tối đa 40 ký tự)", true);
+      if (!inf && !exp) return Admin.toast("Chọn ngày hết hạn hoặc tick Vô hạn", true);
+      if (!inf && start && L.parse(start) > L.parse(exp)) return Admin.toast("Ngày bắt đầu phải trước ngày hết hạn", true);
+      const canon = cats.find((c) => c.toLowerCase() === cat.toLowerCase()) || cat; // giữ đúng cách viết nhóm đã có
+      const link = { ...(e || {}), id: e ? e.id : L.nextId(canon, links, PostGen.slugify), category: canon, url, expires: inf ? "inf" : exp };
+      start ? (link.start = start) : delete link.start; $("#a_note").value.trim() ? (link.note = $("#a_note").value.trim()) : delete link.note;
+      e ? (links[editIdx] = link) : links.push(link); editIdx = -1; draw();
+    };
+    main.querySelectorAll("[data-a]").forEach((el) => (el.onclick = (ev) => { ev.preventDefault(); const [k, a, b] = el.dataset.a.split(":"), i = +(b ?? a), l = links[i];
+      if (k === "ext") l.expires = L.extend(l, +a); else if (k === "inf") l.expires = "inf";
+      else if (k === "tog") l.enabled === false ? delete l.enabled : (l.enabled = false);
+      else if (k === "edit") { editIdx = i; draw(); scrollTo(0, 0); return; }
+      else if (k === "del") { if (!confirm("Xóa link này?")) return; links.splice(i, 1); }
+      draw(); }));
+    $("#a_undo").onclick = () => { if (confirm("Bỏ hết thay đổi chưa lưu?")) location.reload(); };
+    $("#a_save").onclick = async () => {
+      const b = $("#a_save"); b.disabled = true;
+      try { await Admin.commitFiles("Admin: cập nhật kho liên kết", [{ path: PATH, content: JSON.stringify({ ...pool, links: links }, null, 2) + "\n" }]);
+        window.onbeforeunload = null; Admin.toast("Đã lưu. Web cập nhật sau ~1 phút."); setTimeout(() => location.reload(), 1500);
+      } catch (err) { Admin.toast(err.message, true); b.disabled = false; }
+    };
+  }
+  draw();
+}});
+</script></body></html>

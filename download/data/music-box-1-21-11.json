@@ -1,0 +1,33 @@
+{
+  "title": "Music Box for Paper 1.21.11",
+  "description": "Music Box là plugin Minecraft cho phép người chơi lưu và phát nhạc từ link mp3, ogg, wav qua Simple Voice Chat. Hỗ trợ Paper, Purpur, Leaf 1.21+.",
+  "keywords": "Music Box, Minecraft, plugin, phát nhạc, Simple Voice Chat, Paper, Purpur, Leaf, 1.21.11",
+  "hint": "Thực hiện ghé qua các trang sau từ 10-20s để mở khoá link tải nha :3",
+  "linkButtons": [
+    {
+      "id": "link1",
+      "label": "Đăng kí kênh của Moe Shinn #(10s)",
+      "seconds": 10,
+      "categories": [
+        "Youtube Channel"
+      ]
+    },
+    {
+      "id": "link2",
+      "label": "Xem qua trang bài đăng của tui :3 #(20s)",
+      "seconds": 20,
+      "type": "custom",
+      "url": "https://moeshinn.github.io/post"
+    }
+  ],
+  "downloads": [
+    {
+      "id": "primary",
+      "label": "Tải Xuống",
+      "url": "https://github.com/MoeShinn/Plugin-Paper-API/releases/download/Plugin-MusicBox/MusicBox.jar"
+    }
+  ],
+  "short": "S2gYpX",
+  "createdAt": "2026-10-16T05:31:37.000Z",
+  "requireAllLinks": false
+}

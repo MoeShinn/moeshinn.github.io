@@ -1,0 +1,17 @@
+{
+  "description": "Tải về Ezy Software All in 1",
+  "keywords": "Ezy Software, Ezy All in 1, Ezy Tuber, Ezy Maker, Moe Shinn",
+  "price": "Miễn phí",
+  "body": "§l§fTải §cfull§r 2 công cụ §dEzy Tuber§r & §9Ezy Maker§r",
+  "gallery": [
+    "/image/vje1d3j6.webp",
+    "/image/8tom4y3p.webp"
+  ],
+  "buttons": [
+    {
+      "label": "Tải xuống",
+      "url": "https://github.com/MoeShinn/Ezy-Software-and-Model/releases/download/Software/EzySoftware.zip",
+      "style": "blue"
+    }
+  ]
+}

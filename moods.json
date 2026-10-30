@@ -1,0 +1,27 @@
+{
+  "moods": [
+    { "id": "happy", "icon": "😊", "label": "Vui", "phrase": "đang cảm thấy vui", "theme": "sunny" },
+    { "id": "excited", "icon": "🤩", "label": "Hào hứng", "phrase": "đang cảm thấy hào hứng", "theme": "sunny" },
+    { "id": "love", "icon": "🥰", "label": "Yêu đời", "phrase": "đang cảm thấy yêu đời", "theme": "sunset" },
+    { "id": "chill", "icon": "😌", "label": "Thư giãn", "phrase": "đang thư giãn", "theme": "calm" },
+    { "id": "music", "icon": "🎧", "label": "Nghe nhạc", "phrase": "đang nghe nhạc", "theme": "calm" },
+    { "id": "sad", "icon": "😢", "label": "Buồn", "phrase": "đang cảm thấy buồn", "theme": "rain" },
+    { "id": "bored", "icon": "🥱", "label": "Chán", "phrase": "đang cảm thấy chán", "theme": "fog" },
+    { "id": "tired", "icon": "😴", "label": "Mệt", "phrase": "đang cảm thấy mệt", "theme": "night" },
+    { "id": "sleep", "icon": "🌙", "label": "Đi ngủ", "phrase": "đang ngủ", "theme": "night" },
+    { "id": "angry", "icon": "😠", "label": "Bực", "phrase": "đang cảm thấy bực", "theme": "storm" },
+    { "id": "sick", "icon": "🤒", "label": "Không khỏe", "phrase": "đang không khỏe", "theme": "fog" },
+    { "id": "busy", "icon": "💻", "label": "Đang bận", "phrase": "đang bận", "theme": "focus" },
+    { "id": "gaming", "icon": "🎮", "label": "Chơi game", "phrase": "đang chơi game", "theme": "focus" }
+  ],
+  "themes": [
+    { "id": "sunset", "label": "🌇 Hoàng hôn (mặc định)" },
+    { "id": "sunny", "label": "☀️ Nắng đẹp" },
+    { "id": "rain", "label": "🌧️ Mưa" },
+    { "id": "night", "label": "🌙 Đêm sao" },
+    { "id": "storm", "label": "🔥 Giông bão" },
+    { "id": "calm", "label": "🌊 Êm dịu" },
+    { "id": "fog", "label": "🌫️ Sương mù" },
+    { "id": "focus", "label": "💻 Tập trung" }
+  ]
+}

@@ -1,0 +1,292 @@
+:root {
+    --bg-deep: #050b16;
+    --bg-mid: #0c1a2e;
+    --card-cream: #f4ecd8;
+    --blue-btn-1: #1f6fd6;
+    --blue-btn-2: #1450a3;
+    --green-btn-1: #3fce3f;
+    --green-btn-2: #1f9a2f;
+    --dot-online: #3ddc3d;
+    --text-cream: #f4ecd8;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: "Baloo 2", "Comic Sans MS", "Segoe UI", sans-serif;
+    color: var(--text-cream);
+    background: radial-gradient(ellipse at 30% 10%, var(--bg-mid) 0%, var(--bg-deep) 65%);
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Soft vignette that darkens the edges a touch and breathes very gently,
+   so text/buttons stay readable over the animated theme background
+   (js/theme.js). Sits above the theme layer, below the page content. */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 50% 40%, rgba(0,0,0,0) 45%, rgba(0,0,0,0.45) 100%);
+    animation: bg-breathe 8s ease-in-out infinite;
+}
+
+@keyframes bg-breathe {
+    0%, 100% { opacity: 0.85; }
+    50%      { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body::before {
+        animation: none;
+    }
+}
+
+.page {
+    position: relative;
+    z-index: 1;
+    flex: 1;            /* thay cho min-height: 100vh */
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 24px 32px;
+}
+
+/* ---------- Avatar ---------- */
+.avatar-wrap {
+    position: relative;
+    width: 168px;
+    height: 168px;
+    margin-bottom: 22px;
+}
+
+    .avatar-wrap img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #fff;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+
+/* Chấm "đang online" nằm đúng trên mép tròn của avatar ở góc chéo dưới-phải (45°): tâm cách mép khung 14,645% */
+.status-dot {
+    position: absolute;
+    right: calc(14.645% - 14px);
+    bottom: calc(14.645% - 14px);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--dot, var(--dot-online));
+    border: 2px solid var(--bg-deep);
+    box-shadow: 0 0 10px var(--dot, var(--dot-online));
+}
+
+    .status-dot::after {
+        content: "";
+        position: absolute;
+        inset: -2px;
+        border-radius: 50%;
+        border: 2px solid var(--dot, var(--dot-online));
+        opacity: 0;
+        animation: dot-ring 2.4s ease-out infinite;
+    }
+
+@keyframes dot-ring {
+    0% { transform: scale(.8); opacity: .55; }
+    100% { transform: scale(1.9); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .status-dot::after { animation: none; }
+}
+
+.display-name {
+    font-size: 30px;
+    font-weight: 800;
+    margin: 0 0 26px;
+    text-align: center;
+    color: var(--text-cream);
+    text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+}
+
+/* ---------- Link buttons ---------- */
+.link-list {
+    width: 100%;
+    max-width: 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.link-btn {
+    /* Lưới 3 cột: [icon] [chữ] [chừa trống đối xứng] → chữ luôn nằm đúng GIỮA nút dù có icon/emoji hay không */
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) 30px;
+    align-items: center;
+    column-gap: 8px;
+    text-align: center;
+    padding: 11px 20px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 700;
+    color: #eaf3ff;
+    border: 2px solid rgba(255,255,255,0.35);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.25);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+    .link-btn:hover,
+    .link-btn:focus-visible {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 22px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+    }
+
+    .link-btn:active {
+        transform: translateY(0);
+    }
+
+    .link-btn.blue {
+        background: linear-gradient(180deg, var(--blue-btn-1), var(--blue-btn-2));
+    }
+
+    .link-btn.green {
+        background: linear-gradient(180deg, var(--green-btn-1), var(--green-btn-2));
+        color: #f4fff0;
+    }
+
+    /* Bảng màu nút trang chủ — đặt trong data.json → buttons[].style: blue, green, red, orange, yellow, purple, pink, teal, gray, black, white,
+       hoặc mã màu tự chọn dạng "#ff8800" (tự sinh màu đậm hơn cho phần dưới nút). */
+    .link-btn.red    { background: linear-gradient(180deg, #e5484d, #a52a2f); color: #fff3f3; }
+    .link-btn.orange { background: linear-gradient(180deg, #ff9f1c, #d9730d); color: #fff8ee; }
+    .link-btn.yellow { background: linear-gradient(180deg, #ffd93d, #e0a800); color: #3a2a00; }
+    .link-btn.purple { background: linear-gradient(180deg, #9b5de5, #6a35b0); color: #f6eeff; }
+    .link-btn.pink   { background: linear-gradient(180deg, #ff6fae, #d63c85); color: #fff0f7; }
+    .link-btn.teal   { background: linear-gradient(180deg, #1fc8c8, #128a8a); color: #eefffe; }
+    .link-btn.gray   { background: linear-gradient(180deg, #6b7688, #434c5c); color: #f1f4f9; }
+    .link-btn.black  { background: linear-gradient(180deg, #2b2f38, #0d0f14); color: #eaf0fa; }
+    .link-btn.white  { background: linear-gradient(180deg, #ffffff, #d9e2ef); color: #1a2433; }
+    .link-btn.custom { background: linear-gradient(180deg, var(--c1, #1f6fd6), var(--c2, #1450a3)); }
+    .link-btn.custom.light { color: #1a2433; }
+
+.link-icon {
+    grid-column: 1;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;      /* emoji được tách từ đầu nhãn nằm ở đây */
+    line-height: 1;
+}
+
+/* Chữ của nút: cột giữa, tự xuống dòng gọn khi nhãn dài */
+.link-btn > span:last-child {
+    grid-column: 2;
+    min-width: 0;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+}
+
+    .link-icon svg {
+        width: 100%;
+        height: 100%;
+    }
+
+/* ---------- Footer ---------- */
+.site-footer {
+    margin-top: auto;
+    padding-top: 64px;
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.6;
+    color: rgba(244, 236, 216, 0.75);
+}
+
+@media (max-width: 420px) {
+    .display-name {
+        font-size: 26px;
+    }
+
+    .link-btn {
+        font-size: 15px;
+        padding: 10px 18px;
+    }
+
+    .avatar-wrap {
+        width: 140px;
+        height: 140px;
+    }
+}
+
+/* ---------- Câu giới thiệu dưới tên (dựng sẵn trong HTML để bot/AI hiểu trang là gì; xem tools/prerender.js) ---------- */
+.site-tagline {
+    max-width: 360px;
+    margin: -16px 0 26px;
+    font-size: 15px;
+    line-height: 1.45;
+    text-align: center;
+    color: var(--text-cream);
+    opacity: 0.78;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+
+/* ---------- Khối "Bài viết mới" ở trang chủ (dựng sẵn bởi tools/prerender.js, để bot/AI thấy link bài ngay từ trang chủ) ---------- */
+.home-posts {
+    width: 100%;
+    max-width: 360px;
+    margin: 28px 0 0;
+    text-align: left;
+    color: var(--text-cream);
+}
+.home-posts h2 {
+    margin: 0 0 10px;
+    font-size: 17px;
+    text-align: center;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+.home-posts ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.home-posts li {
+    font-size: 14px;
+    line-height: 1.4;
+    opacity: 0.9;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+.home-posts li a,
+.home-posts-all {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+.home-posts time {
+    opacity: 0.65;
+    font-size: 12px;
+    white-space: nowrap;
+}
+.home-posts-all {
+    display: block;
+    margin-top: 12px;
+    font-size: 14px;
+    text-align: center;
+}

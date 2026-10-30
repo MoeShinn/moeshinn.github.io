@@ -1,0 +1,31 @@
+{
+  "name": "Moe Shinn",
+  "short_name": "Moe Shinn",
+  "description": "Moe Shinn cung cấp các liên kết mạng xã hội, thông tin ủng hộ và các bài đăng blog mới nhất trên trang cá nhân chính thức.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#050b16",
+  "theme_color": "#050b16",
+  "lang": "vi",
+  "icons": [
+    {
+      "src": "/assets/favicon/favicon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/favicon/favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/favicon/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

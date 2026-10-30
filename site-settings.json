@@ -1,0 +1,114 @@
+{
+  "giscus": {
+    "enabled": true,
+    "repo": "MoeShinn/giscus-data",
+    "repoId": "R_kgDOVAMWOQ",
+    "category": "Announcements",
+    "categoryId": "DIC_kwDOVAMWOc4DHS7p",
+    "mapping": "pathname"
+  },
+  "announcement": {
+    "enabled": false,
+    "text": "Moe Shinn. đã ra mắt trên Youtube ✨",
+    "url": "https://www.youtube.com/channel/UCoZR9unQFHLfqoOQ22lPcGA",
+    "expires": "2026-10-23"
+  },
+  "maintenance": {
+    "enabled": false,
+    "message": "Trang web đang được xây dựng, vui lòng quay lại sau nha :3"
+  },
+  "theme": {
+    "default": "stars",
+    "intensity": 0.85,
+    "wash": 0.2,
+    "dim": 0.25,
+    "forceMotion": true,
+    "pages": {
+      "home": "stars",
+      "post": "fireflies",
+      "product": "aurora",
+      "download": "aurora",
+      "channel": "stars",
+      "profile": "",
+      "donate": "snow"
+    }
+  },
+  "seo": {
+    "siteUrl": "https://moeshinn.github.io",
+    "siteName": "Moe Shinn",
+    "ogImage": "https://moeshinn.github.io/assets/avatar/avatar.webp",
+    "shortLength": 6,
+    "favicon": {
+      "icon": "/assets/favicon/favicon-32.png?v=mvdx4gck",
+      "apple": "/assets/favicon/favicon-180.png?v=mvdx4gck",
+      "v": "mvdx4gck",
+      "maskable": true,
+      "style": "rounded",
+      "bg": "#ffffff",
+      "bgOn": true,
+      "pad": 0.08
+    },
+    "pages": {
+      "home": {
+        "title": "Moe Shinn",
+        "description": "Moe Shinn cung cấp các liên kết mạng xã hội, thông tin ủng hộ và các bài đăng blog mới nhất trên trang cá nhân chính thức.",
+        "keywords": "Moe Shinn, MoeShinn, mạng xã hội, blog, trang cá nhân, ủng hộ Moe Shinn"
+      },
+      "post": {
+        "title": "Bài viết & hướng dẫn Minecraft, OBS, Vtuber — Moe Shinn",
+        "description": "Bài viết và hướng dẫn của Moe Shinn về tối ưu Minecraft, cài đặt OBS cho máy yếu, plugin âm thanh cùng nhiều tin tức Vtuber và PNGtuber hữu ích.",
+        "keywords": "bài viết, hướng dẫn, Minecraft, OBS, Vtuber, PNGtuber, plugin, Moe Shinn"
+      },
+      "product": {
+        "title": "Sản phẩm — Moe Shinn",
+        "description": "Sản phẩm số của Moe Shinn gồm phần mềm và model PNGTuber hoặc Vtuber như Ezy Tuber, kèm theo các chính sách sử dụng dịch vụ rõ ràng.",
+        "keywords": "sản phẩm số, phần mềm Ezy Tuber, model PNGTuber, Vtuber Moe Shinn, phần mềm Vtuber, Ezy Tuber"
+      },
+      "download": {
+        "title": "Tải xuống — Moe Shinn",
+        "description": "Tải xuống các tệp tài nguyên và nội dung độc quyền do Moe Shinn chia sẻ chính thức tại trang tải xuống nhanh chóng và tiện lợi.",
+        "keywords": "tải xuống, download, Moe Shinn, tài liệu Moe Shinn, tệp chia sẻ, tài nguyên"
+      },
+      "channel": {
+        "title": "Moe Shinn Channel",
+        "description": "Moe Shinn kênh mạng xã hội cá nhân chính thức cập nhật nhanh chóng các video và hoạt động mới nhất của VTuber Moe Shinn.",
+        "keywords": "Moe Shinn, MoeShinn, YouTube, mạng xã hội, VTuber, kênh cá nhân"
+      },
+      "profile": {
+        "title": "Hồ sơ Vtuber Moe Shinn — Model, fan name, thông tin",
+        "description": "Hồ sơ Moe Shinn, PNGTuber Việt Nam: thông tin cơ bản, lore, fan name, các model và kênh mạng xã hội chính thức của Shinn Moeji.",
+        "keywords": "Moe Shinn, MoeShinn, hồ sơ Vtuber, Shinn Moeji, Ezy Tuber, PNGTuber Việt Nam, model Vtuber, fan name, lore Vtuber"
+      },
+      "donate": {
+        "title": "Ủng Hộ — Moe Shinn",
+        "description": "Ủng hộ Moe Shinn để giúp kênh duy trì hoạt động và phát triển thêm nhiều nội dung giải trí hấp dẫn. Mọi đóng góp của bạn là động lực lớn cho tôi.",
+        "keywords": "ủng hộ Moe Shinn, đóng góp, donate Moe Shinn, hỗ trợ streamer, Moe Shinn"
+      }
+    }
+  },
+  "telegram": {
+    "login": true,
+    "loginFail": true,
+    "views": {
+      "enabled": true,
+      "thresholds": [
+        100,
+        1000
+      ]
+    },
+    "downloads": {
+      "enabled": true,
+      "thresholds": [
+        50,
+        100,
+        500,
+        1000
+      ]
+    }
+  },
+  "blog": {
+    "featuredCount": 4,
+    "featuredTitle": "",
+    "recentCount": 12
+  }
+}

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Link rút gọn</title>
+<link rel="stylesheet" href="/admin/css/admin.css"></head>
+<body><div id="app"></div><div id="toast"></div>
+<script src="/admin/js/core.js"></script>
+<script src="/admin/js/seo.js"></script>
+<script src="/admin/js/postgen.js"></script>
+<script src="/admin/js/imgutil.js"></script>
+<script>
+Admin.boot({ id: "links", title: "Link rút gọn", async render(main) {
+  const { esc, $ } = Admin;
+  main.innerHTML = `<h2>Link rút gọn</h2><p class="hint">Đang tải…</p>`;
+  let links, posts, S, tree, dls;
+  try {
+    [links, posts, S, tree] = await Promise.all([Admin.readJson("site-links.json", []), Admin.readJson("post/data/posts.json", []), Admin.readJson("site-settings.json", {}), Admin.api("/tree")]);
+    const ids = tree.files.map((f) => (f.path.match(/^download\/data\/([^/]+)\.json$/) || [])[1]).filter(Boolean);
+    dls = await Promise.all(ids.map(async (id) => ({ id, d: await Admin.readJson(`download/data/${id}.json`) })));
+  } catch (e) { main.innerHTML = `<h2>Link rút gọn</h2><p class="err">${esc(e.message)}</p>`; return; }
+  const seo = AdminSeo.merge(S.seo), site = seo.siteUrl.replace(/\/$/, "");
+  const full = (id) => `${site}/s/${id}/`;
+  const auto = [...posts.filter((p) => p.short && p.visibility !== "private").map((p) => [p.short, "/post/" + p.id + "/", "Bài: " + p.title]), ...dls.filter(({ d }) => d.short).map(({ id, d }) => [d.short, "/download/" + id + "/", "Tải: " + (d.title || id)])];
+  const sDirs = tree.files.map((f) => (f.path.match(/^s\/([^/]+)\/index\.html$/) || [])[1]).filter(Boolean);
+  let editing = null, pend = null; // pend: ảnh vừa chọn từ máy { b64, ext, url } — chỉ ghi lên GitHub khi bấm Lưu
+  const SHARE = "assets/share/", isLocal = (u) => typeof u === "string" && u.startsWith("/" + SHARE);
+  const used = new Set(tree.files.map((f) => (f.path.startsWith(SHARE) ? f.path.slice(SHARE.length).replace(/\.[^.]+$/, "") : "")).filter(Boolean));
+  // Ảnh chia sẻ: thu nhỏ tối đa 1200 px, ưu tiên WebP (GIF/SVG giữ nguyên)
+  async function prep(file) {
+    const raw = (b) => new Promise((r) => { const f = new FileReader(); f.onload = () => r(f.result.split(",")[1]); f.readAsDataURL(b); });
+    if (/gif|svg/.test(file.type)) return { b64: await raw(file), ext: file.type.includes("gif") ? "gif" : "svg", url: URL.createObjectURL(file) };
+    const bm = await createImageBitmap(file), k = Math.min(1, 1200 / bm.width), c = document.createElement("canvas");
+    c.width = Math.round(bm.width * k); c.height = Math.round(bm.height * k); c.getContext("2d").drawImage(bm, 0, 0, c.width, c.height);
+    let blob = await new Promise((r) => c.toBlob(r, "image/webp", 0.85)), ext = "webp";
+    if (!blob || blob.type !== "image/webp") { blob = await new Promise((r) => c.toBlob(r, "image/png")); ext = "png"; }
+    return { b64: await raw(blob), ext, url: URL.createObjectURL(blob) };
+  }
+  const draw = () => {
+    main.innerHTML = `<h2>Link rút gọn</h2>
+    <div class="card"><h3 id="ft">${editing ? "Sửa link" : "Thêm link tự đặt"}</h3>
+      <label>ID (phần sau ${esc(site)}/s/) — để trống: tự sinh ngẫu nhiên ${esc(seo.shortLength || 10)} ký tự<input id="l_id" placeholder="musicboxplugin" value="${esc(editing ? editing.id : "")}"></label>
+      <label>Đích: đường dẫn trong web (vd /post/ten-bai/) hoặc link đầy đủ (https://…)<input id="l_url" value="${esc(editing ? editing.url : "")}"></label>
+      <label>Tiêu đề khi chia sẻ (tùy chọn)<input id="l_title" value="${esc(editing ? editing.title : "")}"></label>
+      <label>Mô tả khi chia sẻ (tùy chọn)<input id="l_desc" value="${esc(editing ? editing.description : "")}"></label>
+      <label>Ảnh khi chia sẻ — nhập URL hoặc /đường-dẫn, hoặc chọn tệp ảnh từ máy (tùy chọn)<input id="l_img" placeholder="https://… hoặc /assets/share/ten-anh.webp" value="${esc(editing ? editing.image : "")}"></label>
+      <div class="row" style="gap:10px;align-items:center;margin:6px 0"><input id="l_file" type="file" accept="image/*"><button type="button" class="ghost" id="l_clear">Bỏ ảnh</button></div>
+      <img id="l_prev" alt="" style="display:none;max-width:260px;max-height:140px;border-radius:8px;margin:4px 0 10px">
+      <p class="hint" style="margin:0 0 8px">Ảnh chọn từ máy được lưu trong /assets/share/ (không làm đầy Kho ảnh) và tự xóa khi bạn đổi ảnh hoặc xóa link.</p>
+      <button id="l_save">${editing ? "Lưu thay đổi" : "Thêm link"}</button>${editing ? ' <button class="ghost" id="l_cancel">Hủy</button>' : ""}</div>
+    <div class="card"><h3>Link tự đặt (${links.length})</h3>${links.length ? `<table style="width:100%;border-collapse:collapse">${links.map((l, i) => `<tr style="border-top:1px solid var(--line)"><td style="padding:8px 0"><b>/s/${esc(l.id)}</b><br><small class="hint">→ ${esc(l.url)}</small></td>
+      <td style="text-align:right;white-space:nowrap"><a href="#" data-copy="${esc(full(l.id))}">Chép</a> · <a href="#" data-edit="${i}">Sửa</a> · <a href="#" data-del="${i}" style="color:#ff8b8f">Xóa</a></td></tr>`).join("")}</table>` : '<p class="hint">Chưa có link tự đặt.</p>'}</div>
+    <details class="card"><summary>Link tự động của bài viết và mục tải (${auto.length}) — chỉ xem</summary>${auto.map(([c, to, name]) => `<p style="margin:6px 0"><a href="#" data-copy="${esc(full(c))}">/s/${esc(c)}</a> <small class="hint">→ ${esc(to)} · ${esc(name)}</small></p>`).join("") || '<p class="hint">Chưa có.</p>'}</details>`;
+    main.querySelectorAll("[data-copy]").forEach((el) => (el.onclick = (e) => { e.preventDefault(); Admin.copy(el.dataset.copy, el, { toast: "Đã chép: " + el.dataset.copy }); }));
+    main.querySelectorAll("[data-edit]").forEach((el) => (el.onclick = (e) => { e.preventDefault(); editing = links[+el.dataset.edit]; draw(); scrollTo(0, 0); }));
+    main.querySelectorAll("[data-del]").forEach((el) => (el.onclick = async (e) => {
+      e.preventDefault(); const l = links[+el.dataset.del]; if (!confirm(`Xóa link /s/${l.id}?`)) return;
+      try { const rest = links.filter((x) => x !== l), gone = isLocal(l.image) && !rest.some((x) => x.image === l.image) ? [l.image.slice(1)] : [];
+        await Admin.commitFiles("Admin: xóa link rút gọn " + l.id, [{ path: "site-links.json", content: JSON.stringify(rest, null, 2) + "\n" }], [`s/${l.id}/index.html`, ...gone.filter((x) => tree.files.some((f) => f.path === x))]); Admin.toast("Đã xóa. Web cập nhật sau ~1 phút."); setTimeout(() => location.reload(), 1200); }
+      catch (err) { Admin.toast(err.message, true); }
+    }));
+    const prev = $("#l_prev"), showPrev = (src) => { prev.src = src || ""; prev.style.display = src ? "block" : "none"; };
+    pend = null; if (editing && /^https?:|^\//.test(editing.image || "")) showPrev(editing.image);
+    $("#l_file").onchange = async (e) => { const f = e.target.files[0]; if (!f) return;
+      try { pend = await prep(f); $("#l_img").value = ""; $("#l_img").placeholder = "(dùng ảnh vừa chọn từ máy)"; showPrev(pend.url); } catch (err) { Admin.toast("Không đọc được ảnh: " + err.message, true); } };
+    $("#l_img").oninput = () => { pend = null; $("#l_file").value = ""; const v = $("#l_img").value.trim(); showPrev(/^https?:|^\//.test(v) ? v : ""); };
+    $("#l_clear").onclick = () => { pend = null; $("#l_file").value = ""; $("#l_img").value = ""; $("#l_img").placeholder = "https://… hoặc /assets/share/ten-anh.webp"; showPrev(""); };
+    if (editing) $("#l_cancel").onclick = () => { editing = null; draw(); };
+    $("#l_save").onclick = async () => {
+      const v = (i) => $("#" + i).value.trim(), r = PostGen.resolveTarget(seo, v("l_url")); let id = v("l_id");
+      const taken = new Set([...sDirs, ...auto.map((a) => a[0]), ...links.map((l) => l.id)].map((x) => x.toLowerCase())); if (editing) taken.delete(editing.id.toLowerCase());
+      // ID để trống: tự sinh mã ngẫu nhiên (a-z, A-Z, 0-9) dài đúng số ký tự đặt trong Cài đặt, không trùng link nào (kể cả khác hoa/thường). Đang sửa mà xóa trống ID thì giữ ID cũ.
+      if (!id) { if (editing) id = editing.id; else do { id = PostGen.newShortCode(new Set(), seo.shortLength); } while (taken.has(id.toLowerCase())); }
+      const err = PostGen.linkIdError(id, taken) || (!r.ok && r.error) || (r.url.replace(/\/$/, "").toLowerCase().endsWith("/s/" + id.toLowerCase()) && "Đích không được trỏ về chính link này");
+      if (err) return Admin.toast(err, true);
+      const newPath = pend ? SHARE + ImgUtil.rand8(used) + "." + pend.ext : "", image = pend ? "/" + newPath : v("l_img");
+      const link = { id, url: v("l_url"), ...(v("l_title") && { title: v("l_title") }), ...(v("l_desc") && { description: v("l_desc") }), ...(image && { image }) };
+      const next = editing ? links.map((l) => (l === editing ? link : l)) : [...links, link];
+      const b = $("#l_save"); b.disabled = true;
+      try {
+        const oldImg = editing && isLocal(editing.image) && editing.image !== image && !next.some((x) => x.image === editing.image) ? editing.image.slice(1) : "";
+        const files = [{ path: "site-links.json", content: JSON.stringify(next, null, 2) + "\n" }, { path: `s/${id}/index.html`, content: PostGen.buildLinkPage(link, seo) }];
+        if (pend) files.push({ path: newPath, content: pend.b64, encoding: "base64" });
+        const dels = [...(editing && editing.id !== id ? [`s/${editing.id}/index.html`] : []), ...(oldImg && tree.files.some((f) => f.path === oldImg) ? [oldImg] : [])];
+        await Admin.commitFiles("Admin: " + (editing ? "sửa" : "thêm") + " link rút gọn " + id, files, dels);
+        Admin.toast(`Đã lưu: ${full(id)} (hoạt động sau ~1 phút)`); setTimeout(() => location.reload(), 1500);
+      } catch (e) { Admin.toast(e.message, true); b.disabled = false; }
+    };
+  };
+  draw();
+}});
+</script></body></html>

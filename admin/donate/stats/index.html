@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><title>Số liệu donate</title>
+<link rel="stylesheet" href="/admin/css/admin.css">
+<style>
+/* Khung trang */
+.ds-top,.ds-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.ds-top{margin-bottom:16px}.ds-top h2,.ds-head h3{margin:0}.ds-head{margin-bottom:14px}
+.ds-acts{display:flex;flex-wrap:wrap;gap:8px}
+a.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
+/* Tổng quan: chọn mốc thời gian + 2 ô số liệu */
+.ds-seg{display:inline-flex;flex-wrap:wrap;gap:4px;padding:4px;background:#0a1626;border:1px solid var(--line);border-radius:10px}
+.ds-seg button{background:transparent;color:var(--mute);padding:6px 12px;font-size:13px}
+.ds-seg button:hover{color:var(--text)}.ds-seg button[aria-selected=true]{background:var(--blue);color:#fff}
+.ds-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.ds-tile{background:#0a1626;border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.ds-tile span{display:block;color:var(--mute);font-size:13px}
+.ds-tile b{display:block;margin-top:2px;font-size:30px;line-height:1.25;font-variant-numeric:tabular-nums}.ds-tile b.money{color:var(--green)}
+/* Tìm kiếm + sắp xếp */
+.ds-tb{display:grid;grid-template-columns:minmax(0,1fr) 210px;gap:8px;margin-bottom:6px}
+.ds-info{margin:0 0 4px;min-height:20px}
+/* Danh sách */
+.ds-list{list-style:none;margin:0;padding:0}
+.ds-row{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:start;padding:12px 2px;border-top:1px solid var(--line)}
+.ds-row:first-child{border-top:0}
+.ds-av{width:40px;height:40px;border-radius:50%;object-fit:cover;background:#16233b;display:block}
+.ds-nm{display:flex;flex-wrap:wrap;align-items:center;gap:2px 6px;min-width:0}.ds-nm b{overflow-wrap:anywhere}
+.ds-handle{color:var(--mute);font-size:13px}
+.ds-vf{display:inline-flex;cursor:help}.ds-vf svg{display:block}
+.ds-msg{margin:4px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;color:#cfe0ff}
+.ds-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin-top:6px;font-size:12px;color:var(--mute)}
+.ds-chip{font:12px ui-monospace,Menlo,Consolas,monospace;background:#0a1626;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:1px 7px;cursor:copy}
+.ds-chip:hover{border-color:#3a5a8a}.ds-chip.off{font-family:inherit;color:var(--mute);cursor:default}
+.ds-tag{border:1px solid #6b5420;background:#3a2d12;color:#ffcf70;border-radius:6px;padding:1px 7px}
+.ds-amt{color:var(--green);font-weight:800;font-size:17px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ds-empty{padding:20px 4px;color:var(--mute);text-align:center}.ds-empty.err{color:#ff8b8f}
+.ds-more{text-align:center;margin:10px 0 0}
+/* Xoá lịch sử + thử nhận diện */
+.ds-side{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+button.ds-del{padding:2px 9px;font-size:13px;background:transparent;border:1px solid #6b2a2e;color:#ff9a9e}button.ds-del:hover{background:#4a1a1d}
+button.dng{background:#4a1a1d;border:1px solid #6b2a2e;color:#ffb3b6}button.dng:hover:not(:disabled){background:#6b2a2e}
+.ds-clr{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,1fr) auto;gap:8px;align-items:center}.ds-clr .lbl{color:var(--mute);font-size:14px;white-space:nowrap}
+.ds-clr2{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.ds-mt{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}.ds-out{margin-top:10px;font-size:14px;line-height:1.6}
+.ds-vd{display:inline-block;font-weight:700;border-radius:6px;padding:1px 9px;border:1px solid var(--line)}.ds-vd.ok{background:#12351a;color:#7be07b;border-color:#1f6a2f}.ds-vd.no{background:#3d1a1d;color:#ff9a9e;border-color:#6b2a2e}.ds-vd.mid{background:#3a2d12;color:#ffcf70;border-color:#6b5420}
+/* Popup danh sách đầy đủ */
+.ds-modal{max-width:860px;height:calc(100vh - 24px);height:min(860px,calc(100dvh - 24px))}
+.ds-modal>.ds-head{flex:none;margin-bottom:4px}
+.ds-modal .ds-hh{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
+.ds-modal .ds-list{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain}
+@media(max-width:560px){.ds-clr{grid-template-columns:1fr}.ds-mt{grid-template-columns:1fr}.ds-tb{grid-template-columns:1fr}.ds-seg{width:100%}.ds-seg button{flex:1 1 auto}}
+</style></head>
+<body><div id="app"></div><div id="toast"></div>
+<script src="/admin/js/core.js"></script>
+<script>
+Admin.boot({ id: "donate-stats", title: "Số liệu donate", async render(main) {
+  const { esc, $ } = Admin;
+
+  // ---------- Hằng số + tiện ích ----------
+  const KEY_LS = "dn_ak"; // cùng khoá với trang /admin/donate nên nhập một lần là dùng được cả hai
+  const DAY = 864e5, RECENT = 30, PAGE = 50, SEARCH_DELAY = 300;
+  const RANGES = [["24h", "24 giờ qua", DAY], ["7d", "7 ngày qua", 7 * DAY], ["1y", "1 năm qua", 365 * DAY], ["all", "Từ trước đến nay", 0]];
+  const DEF_AV = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#223250"/><circle cx="32" cy="25" r="11" fill="#7f93b8"/><path d="M10 60c2-13 12-20 22-20s20 7 22 20z" fill="#7f93b8"/></svg>');
+  const BADGE = '<span class="ds-vf" title="Đăng nhập bằng YouTube" role="img" aria-label="Đăng nhập bằng YouTube"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#909090"/><path d="M6.8 12.6l3.3 3.3 7.1-7.4" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+  const fm = (n) => Number(n || 0).toLocaleString("vi-VN") + "đ";
+  const fdt = (t) => new Date(Number(t)).toLocaleString("vi-VN", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit", year: "numeric" });
+  const keyStore = { get() { try { return localStorage.getItem(KEY_LS) || ""; } catch { return ""; } }, set(v) { try { localStorage.setItem(KEY_LS, v); } catch {} } };
+
+  // ---------- Gọi donate-api ----------
+  let base = "", adminKey = keyStore.get();
+  async function getBase() { // địa chỉ Worker lấy từ donate/data.json, cùng nơi trang /donate đọc
+    let c; try { const r = await fetch("/donate/data.json", { cache: "no-cache" }); if (!r.ok) throw 0; c = await r.json(); } catch { throw new Error("Không đọc được donate/data.json."); }
+    const api = String(c.api || "").trim().replace(/\/+$/, "");
+    if (!/^https:\/\//i.test(api)) throw new Error("Chưa có địa chỉ Worker: điền ở trang Cài đặt donate → Kết nối Cloudflare, rồi Lưu lên GitHub.");
+    return api;
+  }
+  async function call(path, body = {}) {
+    let r; try { r = await fetch(base + path, { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + adminKey }, body: JSON.stringify(body) }); }
+    catch { throw new Error("Không kết nối được donate-api, hãy kiểm tra mạng hoặc địa chỉ Worker."); }
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw Object.assign(new Error(d.error || "Lỗi " + r.status), { status: r.status });
+    return d;
+  }
+
+  // ---------- Khung trang ----------
+  const historyMarkup = () => `<div class="ds-hh">
+    <div class="ds-tb"><input type="search" data-q placeholder="Tìm theo tin nhắn, mã đơn, số tiền, tên…" autocomplete="off" aria-label="Tìm kiếm donate">
+      <select data-sort aria-label="Sắp xếp"><option value="new">Mới nhất</option><option value="amount_desc">Số tiền: cao → thấp</option><option value="amount_asc">Số tiền: thấp → cao</option></select></div>
+    <p class="hint ds-info" data-info role="status"></p><ul class="ds-list" data-list></ul>
+    <p class="ds-more" data-more hidden><button class="ghost" data-more-btn>Tải thêm</button></p></div>`;
+
+  main.innerHTML = `<div class="ds-top"><h2>Số liệu donate</h2>
+      <div class="ds-acts"><button class="ghost" id="ds_re">Làm mới</button><a class="btn ghost" href="/admin/donate/">Cài đặt donate</a></div></div>
+    <div class="card" id="ds_conn" hidden><h3>Kết nối donate-api</h3>
+      <p class="hint">Nhập Admin key của Worker donate (cùng khoá ở trang Cài đặt donate). Khoá chỉ lưu trên trình duyệt này.</p>
+      <label>Admin key<input id="ds_key" type="password" autocomplete="off"></label>
+      <p class="row"><button id="ds_go">Kết nối</button></p><div class="err" id="ds_err" role="alert"></div></div>
+    <div id="ds_body" hidden>
+      <div class="card"><div class="ds-head"><h3>Tổng quan</h3>
+        <div class="ds-seg" id="ds_seg" role="tablist" aria-label="Khoảng thời gian">${RANGES.map(([k, l]) => `<button type="button" role="tab" data-r="${k}">${l}</button>`).join("")}</div></div>
+        <div class="ds-tiles"><div class="ds-tile"><span>Số lượt donate</span><b id="ds_c">–</b></div><div class="ds-tile"><span>Số tiền đã nhận</span><b class="money" id="ds_a">–</b></div></div>
+        <p class="hint" id="ds_note" style="margin:10px 0 0"></p></div>
+      <div class="card"><div class="ds-head"><h3>Lịch sử nhận donate <small class="hint">· ${RECENT} gần nhất</small></h3><button id="ds_all">Danh sách đầy đủ</button></div>
+        <div id="ds_recent">${historyMarkup()}</div></div>
+      <div class="card"><h3>Xoá lịch sử donate</h3>
+        <p class="hint">Chỉ xoá donate đã nhận tiền và alert thử; đơn đang chờ thanh toán không bị ảnh hưởng. Xoá xong là <b>không khôi phục được</b>. Trước khi xoá sẽ hiện số lượng để bạn xác nhận. Muốn xoá từng donate: bấm “🗑 Xoá” ở mỗi dòng trong lịch sử.</p>
+        <div class="ds-clr"><span class="lbl">Xoá donate</span>
+          <select id="cl_scope" aria-label="Phạm vi"><option value="within">trong vòng</option><option value="older">cũ hơn</option></select>
+          <select id="cl_range" aria-label="Khoảng thời gian"><option value="24h">24 giờ</option><option value="7d">7 ngày</option><option value="1m">1 tháng (30 ngày)</option></select>
+          <button class="dng" id="cl_go">Xoá</button></div>
+        <div class="ds-clr2"><span class="hint" style="margin:0">Dọn sạch toàn bộ lịch sử donate:</span><button class="dng" id="cl_all">Xoá tất cả</button></div></div>
+      <div class="card"><h3>Thử nhận diện nội dung chuyển khoản</h3>
+        <p class="hint">Dán nội dung chuyển khoản để xem Worker sẽ xử lí thế nào với mẫu hiện tại (<span id="mt_tpl" class="mono">…</span>). Không ghi gì vào dữ liệu. Chỉ giao dịch có đúng khung mẫu mới được tính là donate; giao dịch khác bị bỏ qua.</p>
+        <div class="ds-mt"><input id="mt_in" placeholder="vd: MBVCB.123.DONATE ABC234.CT tu NGUYEN VAN A" autocomplete="off" aria-label="Nội dung chuyển khoản"><button id="mt_go">Kiểm tra</button></div>
+        <div class="ds-out" id="mt_out" role="status"></div></div>
+    </div>`;
+
+  // ---------- Danh sách donate (dùng chung cho thẻ ${RECENT} gần nhất và popup đầy đủ) ----------
+  const row = (x) => `<li class="ds-row">
+    <img class="ds-av" src="${esc(x.avatar || DEF_AV)}" alt="" width="40" height="40" loading="lazy" decoding="async" referrerpolicy="no-referrer">
+    <div><div class="ds-nm"><b>${esc(x.name || "Ẩn danh")}</b>${x.verified ? BADGE : ""}${x.handle ? `<span class="ds-handle">${esc(x.handle)}</span>` : ""}</div>
+      ${x.msg ? `<p class="ds-msg">${esc(x.msg)}</p>` : ""}
+      <div class="ds-meta">${x.noCode ? '<span class="ds-chip off" title="Chuyển khoản không kèm mã đơn">Không có mã đơn</span>' : `<button type="button" class="ds-chip" data-copy="${esc(x.code)}" title="Bấm để copy mã đơn">${esc(x.code)}</button>`}
+        ${x.msgHidden ? '<span class="ds-tag" title="Tin nhắn chưa qua kiểm duyệt nên không hiện trên stream">Tin nhắn bị ẩn</span>' : ""}${x.msgChecking ? '<span class="ds-tag" title="AI đang kiểm duyệt, alert sẽ phát ngay khi kiểm duyệt xong">Đang kiểm duyệt</span>' : ""}<span>${fdt(x.paid)}</span></div></div>
+    <div class="ds-side"><div class="ds-amt">${fm(x.amount)}</div><button type="button" class="ds-del" data-del="${x.id}" title="Xoá donate này" aria-label="Xoá donate này">🗑 Xoá</button></div></li>`;
+
+  // local = true: thẻ gọn — máy chủ luôn trả donate mới nhất, việc sắp xếp theo số tiền làm ngay trên máy.
+  // local = false: popup — sắp xếp + tìm kiếm chạy trên toàn bộ lịch sử ở máy chủ, tải thêm từng trang.
+  function createHistory(host, { pageSize, local, onAuth, onChange }) {
+    const q = $("[data-q]", host), sortEl = $("[data-sort]", host), list = $("[data-list]", host), info = $("[data-info]", host), more = $("[data-more]", host), moreBtn = $("[data-more-btn]", host);
+    let items = [], total = 0, hasMore = false, seq = 0, timer = 0;
+
+    const view = () => {
+      const by = sortEl.value; if (!local || by === "new") return items;
+      return [...items].sort((a, b) => (by === "amount_desc" ? b.amount - a.amount : a.amount - b.amount));
+    };
+    function paint(appendFrom = 0) {
+      const rows = view(), term = q.value.trim();
+      if (appendFrom && rows.length > appendFrom) list.insertAdjacentHTML("beforeend", rows.slice(appendFrom).map(row).join(""));
+      else list.innerHTML = rows.length ? rows.map(row).join("") : `<li class="ds-empty">${term ? `Không tìm thấy kết quả cho “${esc(term)}”.` : "Chưa có donate nào."}</li>`;
+      more.hidden = local || !hasMore;
+      let t = `Hiển thị ${items.length} / ${total} ${term ? "kết quả" : "donate"}`;
+      if (local && total > items.length) t += sortEl.value === "new" ? " — mở “Danh sách đầy đủ” để xem hết." : " — chỉ sắp xếp trong số đang hiển thị, mở “Danh sách đầy đủ” để sắp xếp toàn bộ.";
+      info.textContent = total ? t : "";
+    }
+    async function load(append = false) {
+      const my = ++seq, prev = items.length;
+      info.textContent = "Đang tải…"; moreBtn.disabled = true;
+      try {
+        const d = await call("/admin/donations", { q: q.value.trim(), sort: local ? "new" : sortEl.value, limit: pageSize, offset: append ? prev : 0 });
+        if (my !== seq) return;
+        items = append ? items.concat(d.items) : d.items; total = d.total; hasMore = d.hasMore; paint(append ? prev : 0);
+      } catch (e) {
+        if (my !== seq) return;
+        if (e.status === 401) return onAuth();
+        info.textContent = ""; more.hidden = true;
+        list.innerHTML = `<li class="ds-empty err">${esc(e.message)} <button class="ghost" data-retry>Thử lại</button></li>`;
+      } finally { if (my === seq) moreBtn.disabled = false; }
+    }
+
+    async function del(id) { // xoá đúng 1 donate (hỏi lại trước khi xoá)
+      const x = items.find((i) => i.id === id); if (!x) return;
+      if (!confirm(`Xoá donate ${fm(x.amount)} của “${x.name || "Ẩn danh"}” lúc ${fdt(x.paid)}?\n\nKhông khôi phục được.`)) return;
+      try { await call("/admin/delete", { mode: "ids", ids: [id] }); items = items.filter((i) => i.id !== id); total = Math.max(0, total - 1); paint(); Admin.toast("Đã xoá donate"); if (onChange) onChange(); }
+      catch (e) { if (e.status === 401) return onAuth(); Admin.toast(e.message, true); }
+    }
+    q.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(() => load(), SEARCH_DELAY); });
+    q.addEventListener("keydown", (e) => { if (e.key === "Enter") { clearTimeout(timer); load(); } });
+    sortEl.addEventListener("change", () => (local ? paint() : load()));
+    moreBtn.onclick = () => load(true);
+    host.addEventListener("click", (e) => {
+      if (e.target.closest("[data-retry]")) return load();
+      const dl = e.target.closest("[data-del]"); if (dl) return del(Number(dl.dataset.del));
+      const c = e.target.closest("[data-copy]"); if (c) Admin.copy(c.dataset.copy, c);
+    });
+    host.addEventListener("error", (e) => { const i = e.target; if (i.tagName === "IMG" && !i.dataset.fb) { i.dataset.fb = "1"; i.src = DEF_AV; } }, true); // ảnh lỗi → ảnh mặc định
+    return { load, stop() { seq++; clearTimeout(timer); } };
+  }
+
+  // ---------- Popup danh sách đầy đủ ----------
+  function openAll(trigger) {
+    const ov = document.createElement("div"); ov.className = "modal";
+    ov.innerHTML = `<div class="mbox ds-modal" role="dialog" aria-modal="true" aria-labelledby="ds_mt"><div class="ds-head"><h3 id="ds_mt">Toàn bộ lịch sử donate</h3><button class="ghost" data-x aria-label="Đóng">✕ Đóng</button></div>${historyMarkup()}</div>`;
+    document.body.appendChild(ov); document.body.style.overflow = "hidden";
+    const box = $(".mbox", ov), full = createHistory(ov, { pageSize: PAGE, local: false, onAuth: () => { close(); connect(); }, onChange: () => refresh() });
+    let downOnBg = false;
+    function close() { full.stop(); document.removeEventListener("keydown", onKey, true); document.body.style.overflow = ""; ov.remove(); if (trigger && trigger.focus) trigger.focus(); }
+    function onKey(e) {
+      if (e.key === "Escape") { e.preventDefault(); return close(); }
+      if (e.key !== "Tab") return;
+      const f = [...box.querySelectorAll("button:not([disabled]),input,select")].filter((x) => x.offsetParent), a = document.activeElement;
+      if (!f.length) return;
+      if (e.shiftKey && a === f[0]) { e.preventDefault(); f[f.length - 1].focus(); } else if (!e.shiftKey && a === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+    }
+    ov.addEventListener("pointerdown", (e) => (downOnBg = e.target === ov));
+    ov.addEventListener("click", (e) => { if (e.target === ov && downOnBg) close(); });
+    $("[data-x]", ov).onclick = close;
+    document.addEventListener("keydown", onKey, true);
+    $("[data-q]", ov).focus(); full.load();
+  }
+
+  // ---------- Tổng quan ----------
+  let summary = null, range = "24h";
+  const seg = $("#ds_seg");
+  function paintRange() {
+    const r = summary.ranges[range], [, label, span] = RANGES.find((x) => x[0] === range);
+    $("#ds_c").textContent = Number(r.count).toLocaleString("vi-VN");
+    $("#ds_a").textContent = fm(r.amount);
+    $("#ds_note").textContent = span ? `${label}: từ ${fdt(summary.now - span)} đến nay.` : "Tất cả donate đã nhận tiền, không tính alert thử.";
+    seg.querySelectorAll("[role=tab]").forEach((b) => { const on = b.dataset.r === range; b.setAttribute("aria-selected", on); b.tabIndex = on ? 0 : -1; });
+  }
+  const pickRange = (k) => { range = k; if (summary) paintRange(); };
+  seg.addEventListener("click", (e) => { const b = e.target.closest("[data-r]"); if (b) pickRange(b.dataset.r); });
+  seg.addEventListener("keydown", (e) => { // ← → đổi mốc thời gian
+    const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0; if (!d) return;
+    e.preventDefault(); const i = (RANGES.findIndex((x) => x[0] === range) + d + RANGES.length) % RANGES.length;
+    pickRange(RANGES[i][0]); seg.querySelector(`[data-r="${RANGES[i][0]}"]`).focus();
+  });
+
+  // ---------- Xoá lịch sử hàng loạt ----------
+  const SCOPE_TXT = { within: "trong vòng", older: "cũ hơn" }, RANGE_TXT = { "24h": "24 giờ", "7d": "7 ngày", "1m": "1 tháng (30 ngày)" };
+  async function bulkDelete(btn, body, what) {
+    await busy(btn, async () => {
+      try {
+        const pre = await call("/admin/delete", { ...body, dry: true });        // bước 1: chỉ đếm
+        if (!pre.count) return Admin.toast("Không có donate nào khớp, không xoá gì cả.");
+        const word = body.mode === "all" ? "XOA" : "";
+        const head = `Sẽ xoá ${pre.count.toLocaleString("vi-VN")} donate (${what}), tổng ${fm(pre.amount)}.\n\nKhông khôi phục được.`;
+        if (word) { const t = prompt(head + `\n\nGõ ${word} để xác nhận:`); if (t === null) return; if (t.trim().toUpperCase() !== word) return Admin.toast("Chưa đúng chữ xác nhận, không xoá gì cả.", true); }
+        else if (!confirm(head + "\n\nBấm OK để xoá.")) return;
+        const r = await call("/admin/delete", body);                            // bước 2: xoá thật
+        Admin.toast(`Đã xoá ${r.count.toLocaleString("vi-VN")} donate (${fm(r.amount)}).`); await refresh();
+      } catch (e) { if (e.status === 401) return connect("Admin key không đúng hoặc đã đổi, hãy nhập lại."); Admin.toast(e.message, true); }
+    });
+  }
+  $("#cl_go").onclick = () => { const scope = $("#cl_scope").value, r = $("#cl_range").value; bulkDelete($("#cl_go"), { mode: "range", range: r, scope }, `${SCOPE_TXT[scope]} ${RANGE_TXT[r]}`); };
+  $("#cl_all").onclick = () => bulkDelete($("#cl_all"), { mode: "all" }, "toàn bộ lịch sử");
+
+  // ---------- Thử nhận diện nội dung chuyển khoản ----------
+  const VD = { ORDER: ["ok", "Khớp đơn đang chờ"], REPEAT: ["mid", "Mã đã được trả trước đó"], ANON: ["mid", "Donate ẩn danh"], IGNORED: ["no", "Bị bỏ qua"] };
+  async function matchTest() {
+    const v = $("#mt_in").value.trim(), out = $("#mt_out"); if (!v) return out.textContent = "";
+    await busy($("#mt_go"), async () => {
+      try {
+        const r = await call("/admin/matchtest", { content: v }), [cls, label] = VD[r.verdict] || ["no", r.verdict], o = r.pending || r.paid;
+        $("#mt_tpl").textContent = r.template;
+        out.innerHTML = `<span class="ds-vd ${cls}">${esc(label)}</span> ${esc(r.note)}`
+          + `<div class="hint" style="margin-top:6px">Có khung mẫu: <b>${r.gate ? "có" : "không"}</b>${r.codes.length ? ` · Mã tìm thấy: <span class="mono">${r.codes.map(esc).join(", ")}</span>` : ""}${o ? ` · Đơn: ${esc(o.name)} (${esc(o.code)}, ${fm(o.amount)}, ${o.status === "paid" ? "đã trả" : "đang chờ"})` : ""}`
+          + `${r.acceptedTemplates.length > 1 ? ` · Mẫu cũ còn nhận trong 48 giờ: <span class="mono">${r.acceptedTemplates.slice(1).map(esc).join(" | ")}</span>` : ""}</div>`;
+      } catch (e) { if (e.status === 401) return connect("Admin key không đúng hoặc đã đổi, hãy nhập lại."); out.innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+    });
+  }
+  $("#mt_go").onclick = matchTest;
+  $("#mt_in").addEventListener("keydown", (e) => { if (e.key === "Enter") matchTest(); });
+
+  // Sau khi xoá: tính lại tổng quan + danh sách gần nhất
+  async function refresh() { try { summary = await call("/admin/summary"); paintRange(); await recent.load(); } catch (e) { if (e.status === 401) connect("Admin key không đúng hoặc đã đổi, hãy nhập lại."); } }
+
+  // ---------- Kết nối + khởi động ----------
+  const recent = createHistory($("#ds_recent"), { pageSize: RECENT, local: true, onAuth: () => connect("Admin key không đúng hoặc đã đổi, hãy nhập lại."), onChange: () => refresh() });
+  function show(ok) { $("#ds_body").hidden = !ok; $("#ds_conn").hidden = ok; }
+  async function connect(msg = "") {
+    $("#ds_err").textContent = msg;
+    try {
+      if (!base) base = await getBase();
+      if (!adminKey) { show(false); return $("#ds_key").focus(); }
+      summary = await call("/admin/summary");
+      keyStore.set(adminKey); show(true); paintRange(); await recent.load();
+    } catch (e) {
+      show(false); $("#ds_err").textContent = e.status === 401 ? "Admin key không đúng." : e.message;
+      if (e.status === 401) $("#ds_key").select();
+    }
+  }
+  async function busy(btn, fn) { btn.disabled = true; btn.classList.add("busy"); try { await fn(); } finally { btn.disabled = false; btn.classList.remove("busy"); } }
+
+  $("#ds_go").onclick = () => { const v = $("#ds_key").value.trim(); if (!v) return; adminKey = v; busy($("#ds_go"), () => connect()); };
+  $("#ds_key").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#ds_go").click(); });
+  $("#ds_re").onclick = () => busy($("#ds_re"), () => connect());
+  $("#ds_all").onclick = (e) => openAll(e.currentTarget);
+  connect();
+} });
+</script></body></html>

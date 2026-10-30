@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /buy/
+Disallow: /worker/
+
+Sitemap: https://moeshinn.github.io/sitemap.xml

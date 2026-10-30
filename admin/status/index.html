@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Trạng thái</title>
+<link rel="stylesheet" href="/admin/css/admin.css">
+<style>.pv-wrap{display:grid;place-items:center;padding:34px 10px 10px}
+.pv-b{position:relative;background:#fff;color:#1d2433;border-radius:20px;padding:10px 16px 10px 20px;min-width:96px;font:700 14px/1.35 system-ui,sans-serif;text-align:center;max-width:260px;box-shadow:0 6px 18px #0006}
+.pv-b::before,.pv-b::after{content:"";position:absolute;left:50%;border-radius:50%;background:#fff;transform:translateX(-50%)}
+.pv-i{position:absolute;left:-12px;bottom:-12px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#fff;box-shadow:0 2px 8px #0006;font-size:17px;line-height:1}
+.pv-b::before{bottom:-9px;width:12px;height:12px}.pv-b::after{bottom:-17px;width:7px;height:7px}
+.pv-only{padding:8px 14px;min-width:0;border-radius:18px}
+.pv-av{width:72px;height:72px;border-radius:50%;background:#16304f;margin-top:24px;border:2px solid var(--line)}</style></head>
+<body><div id="app"></div><div id="toast"></div>
+<script src="/admin/js/core.js"></script>
+<script>
+Admin.boot({ id: "status", title: "Trạng thái", async render(main) {
+  const { esc, $ } = Admin;
+  main.innerHTML = `<h2>Trạng thái</h2><p class="hint">Đang tải…</p>`;
+  let st, M, name = "Moe Shinn";
+  try {
+    [st, M] = await Promise.all([Admin.readJson("status.json", {}), fetch("/moods.json", { cache: "no-cache" }).then((r) => r.json())]);
+    try { name = (await Admin.readJson("data.json")).profile?.name || name; } catch (e) { /* dùng tên mặc định */ }
+  } catch (e) { main.innerHTML = `<h2>Trạng thái</h2><p class="err">${esc(e.message)}</p>`; return; }
+  const moods = M.moods || [], themes = M.themes || [];
+  let custom = (st.custom || []).map((c) => ({ ...c })); // trạng thái tự tạo: { id, icon, label, text, theme }
+  const allM = () => moods.concat(custom.map((c) => ({ ...c, custom: true, theme: c.theme || "sunset" })));
+  const moodOpts = (sel) => '<option value="">— Không chọn —</option>' + moods.map((m) => `<option value="${esc(m.id)}" ${sel === m.id ? "selected" : ""}>${esc(m.icon)}  ${esc(m.label)}</option>`).join("") +
+    (custom.length ? `<optgroup label="⭐ Của tôi">${custom.map((c) => `<option value="${esc(c.id)}" ${sel === c.id ? "selected" : ""}>${esc(c.icon)}  ${esc(c.label || "(không tên)")}</option>`).join("")}</optgroup>` : "");
+  const exp = st.expires ? new Date(st.expires) : null, live = exp ? exp.getTime() > Date.now() : true;
+  const when = (d) => d.toLocaleString("vi-VN");
+  const state = !st.text && !st.mood ? "Chưa đặt trạng thái nào." : live ? `Đang hiển thị${exp ? ` — hết hạn lúc ${when(exp)}` : " — không hết hạn"}.` : `Đã hết hạn lúc ${when(exp)} (không còn hiển thị).`;
+  const keepOpt = exp && live ? `<option value="keep">Giữ nguyên (hết hạn lúc ${esc(when(exp))})</option>` : "";
+  main.innerHTML = `<h2>Trạng thái</h2>
+  <div class="card"><p class="hint" style="margin:0">${esc(state)}</p></div>
+  <div class="card"><h3>Bong bóng trên avatar</h3>
+    <label>Cảm xúc<select id="s_mood">${moodOpts(st.mood)}</select></label>
+    <label>Lời trạng thái (tùy chọn, tối đa 80 ký tự)<input id="s_text" maxlength="80" value="${esc(st.text || "")}" placeholder="Để trống: tự hiện “${esc(name)} đang cảm thấy …” theo cảm xúc đã chọn"></label>
+    <label>Hiển thị trong bao lâu<select id="s_exp">${keepOpt}<option value="none" ${keepOpt ? "" : "selected"}>Không hết hạn</option><option value="1h">1 giờ</option><option value="3h">3 giờ</option><option value="today">Hết hôm nay (23:59)</option><option value="24h">24 giờ</option><option value="3d">3 ngày</option><option value="7d">7 ngày</option><option value="custom">Tự chọn thời điểm…</option></select></label>
+    <label id="s_cw" style="display:none">Hết hạn lúc<input id="s_custom" type="datetime-local"></label>
+    <div class="pv-wrap"><div class="pv-b" id="pv_text"></div><div class="pv-av"></div></div></div>
+  <div class="card"><h3>Trạng thái riêng của tôi</h3>
+    <div id="cu_list"></div>
+    <div class="cols"><label>Icon (dán emoji bất kỳ)<input id="cu_icon" maxlength="8" placeholder="🎉"></label><label>Tên trong menu<input id="cu_label" maxlength="30" placeholder="Ăn mừng"></label></div>
+    <label>Lời mặc định (để trống: không hiện chữ, chỉ hiện icon trong khung trắng)<input id="cu_text" maxlength="80" placeholder="Để trống cũng được"></label>
+    <label>Theme loading của trạng thái này<select id="cu_theme">${themes.map((t) => `<option value="${esc(t.id)}">${esc(t.label)}</option>`).join("")}</select></label>
+    <button type="button" class="ghost" id="cu_add">＋ Thêm trạng thái riêng</button>
+    <p class="hint">Danh sách được lưu cùng lúc khi bạn bấm “Lưu trạng thái”. Chọn một trạng thái riêng ở ô Cảm xúc phía trên để dùng.</p></div>
+  <div class="card"><h3>Theme màn hình loading</h3>
+    <label>Chọn theme<select id="s_load"><option value="auto" ${!themes.some((t) => t.id === st.loading) ? "selected" : ""}>Tự động theo cảm xúc (không có cảm xúc: hoàng hôn)</option>${themes.map((t) => `<option value="${esc(t.id)}" ${st.loading === t.id ? "selected" : ""}>${esc(t.label)}</option>`).join("")}</select></label>
+    <iframe id="lp" title="Xem thử loading" style="width:100%;height:220px;border:1px solid var(--line);border-radius:10px;background:#050b16"></iframe>
+    <p class="hint">Khung trên chạy thử màn hình loading thật (theo lựa chọn hiện tại, chưa cần lưu).</p></div>
+  <button id="s_save">Lưu trạng thái</button> <button class="ghost" id="s_clear">Xóa trạng thái</button>`;
+  const moodOf = () => allM().find((m) => m.id === $("#s_mood").value);
+  const themeNow = () => { const v = $("#s_load").value; return v !== "auto" ? v : moodOf()?.theme || "sunset"; };
+  let lastTheme = "";
+  const refresh = () => {
+    const m = moodOf(), t = $("#s_text").value.trim();
+    const txt = t || (m ? (m.custom ? (m.text || "") : `${name} ${m.phrase}`) : ""); // trạng thái riêng không lời → chỉ hiện icon
+    $("#pv_text").className = "pv-b" + (m && !txt ? " pv-only" : "");
+    $("#pv_text").innerHTML = !m ? "(chưa có trạng thái)" : txt ? `<span class="pv-i">${esc(m.icon)}</span>${esc(txt)}` : `<span style="font-size:24px;line-height:1">${esc(m.icon)}</span>`;
+    $("#s_cw").style.display = $("#s_exp").value === "custom" ? "" : "none";
+    const th = themeNow(); if (th !== lastTheme) { lastTheme = th; $("#lp").src = "/?loadpreview=" + th; }
+  };
+  const drawCustom = () => {
+    $("#cu_list").innerHTML = custom.map((c, i) => `<div class="row" style="justify-content:space-between;border-top:1px solid var(--line);padding:6px 0"><span>${esc(c.icon)} <b>${esc(c.label || "(không tên)")}</b> <small class="hint">${c.text ? "· " + esc(c.text) : "· chỉ icon"}</small></span><a href="#" data-cd="${i}" style="color:#ff8b8f">Xóa</a></div>`).join("") || '<p class="hint">Chưa có trạng thái riêng.</p>';
+    const cur = $("#s_mood").value; $("#s_mood").innerHTML = moodOpts(cur); if (!allM().some((m) => m.id === cur)) $("#s_mood").value = "";
+    main.querySelectorAll("[data-cd]").forEach((a) => (a.onclick = (e) => { e.preventDefault(); custom.splice(+a.dataset.cd, 1); drawCustom(); refresh(); }));
+  };
+  $("#cu_add").onclick = () => {
+    const icon = $("#cu_icon").value.trim(), label = $("#cu_label").value.trim();
+    if (!icon) return Admin.toast("Cần nhập icon (dán một emoji)", true);
+    if (!label) return Admin.toast("Cần đặt tên để nhận ra trong menu", true);
+    custom.push({ id: "c-" + Math.random().toString(36).slice(2, 8), icon, label, text: $("#cu_text").value.trim(), theme: $("#cu_theme").value });
+    ["cu_icon", "cu_label", "cu_text"].forEach((i) => ($("#" + i).value = "")); drawCustom(); refresh();
+  };
+  ["s_mood", "s_text", "s_exp", "s_load"].forEach((i) => ($("#" + i).oninput = refresh)); drawCustom(); refresh();
+  function expiry() {
+    const v = $("#s_exp").value, now = Date.now(), H = 3600e3;
+    if (v === "keep") return st.expires;
+    if (v === "none") return "";
+    if (v === "custom") { const c = $("#s_custom").value; return c ? new Date(c).toISOString() : null; }
+    if (v === "today") { const d = new Date(); d.setHours(23, 59, 0, 0); return d.toISOString(); }
+    return new Date(now + { "1h": H, "3h": 3 * H, "24h": 24 * H, "3d": 72 * H, "7d": 168 * H }[v]).toISOString();
+  }
+  async function save(obj, msg) {
+    for (const b of main.querySelectorAll("button")) b.disabled = true;
+    try { await Admin.commitFiles("Admin: " + msg, [{ path: "status.json", content: JSON.stringify({ ...obj, updated: new Date().toISOString() }, null, 2) + "\n" }]); Admin.toast("Đã lưu. Web cập nhật sau ~1 phút."); setTimeout(() => location.reload(), 1300); }
+    catch (e) { Admin.toast(e.message, true); for (const b of main.querySelectorAll("button")) b.disabled = false; }
+  }
+  $("#s_save").onclick = () => {
+    const e = expiry(); if (e === null) return Admin.toast("Hãy chọn thời điểm hết hạn", true);
+    if (e && new Date(e).getTime() <= Date.now()) return Admin.toast("Thời điểm hết hạn phải ở tương lai", true);
+    save({ text: $("#s_text").value.trim(), mood: $("#s_mood").value, expires: e, loading: $("#s_load").value, custom }, "cập nhật trạng thái");
+  };
+  $("#s_clear").onclick = () => { if (confirm("Xóa trạng thái hiện tại?")) save({ text: "", mood: "", expires: "", loading: $("#s_load").value, custom }, "xóa trạng thái"); };
+}});
+</script></body></html>

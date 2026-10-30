@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Trang riêng cho người mua: không để Google lập chỉ mục (đã có trong robots.txt và sitemap loại trừ) -->
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Nhận file đã mua — Moe Shinn</title>
+  <meta name="description" content="Dán mã người bán gửi để tải file bạn đã mua" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32.png?v=mvdx4gck" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon/favicon-192.png?v=mvdx4gck" />
+  <link rel="apple-touch-icon" href="/assets/favicon/favicon-180.png?v=mvdx4gck" />
+  <link rel="stylesheet" href="/css/header.css" />
+  <link rel="stylesheet" href="/buy/css/style.css" />
+<script src="/js/theme.js" defer></script>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#050b16" />
+  <script src="/js/pwa.js" defer></script>
+</head>
+<body>
+
+  <header class="site-header">
+    <a href="/" class="site-header-logo" data-nav-home aria-label="Về trang chủ">
+      <img src="/assets/avatar/avatar-336.webp" alt="Moe Shinn" width="36" height="36" srcset="/assets/avatar/avatar-168.webp 1x, /assets/avatar/avatar-336.webp 2x" data-nav-logo />
+    </a>
+    <div class="site-header-menu-wrap">
+      <button type="button" class="site-header-menu-btn" data-nav-menu-toggle aria-haspopup="true" aria-expanded="false" aria-label="Menu">☰</button>
+      <nav class="site-header-menu" data-nav-menu role="menu"><!--pre:nav--><a href="/" role="menuitem">Trang chủ</a><a href="/channel" role="menuitem">Kênh</a><a href="/donate" role="menuitem">Donate</a><a href="/post" role="menuitem">Bài Đăng</a><a href="/product" role="menuitem">Sản phẩm</a><a href="/profile" role="menuitem">Hồ sơ Vtuber</a><!--/pre:nav--></nav>
+    </div>
+  </header>
+  <script src="/js/site-chrome.js"></script>
+
+  <div id="app" class="page">
+    <main class="buy-card" id="buy">
+      <h1 class="buy-title">Nhận file đã mua</h1>
+
+      <!-- Bước 1: nhập mã -->
+      <form id="f-code" class="buy-step" autocomplete="off" novalidate>
+        <p class="buy-hint">Dán mã người bán gửi cho bạn vào ô bên dưới. Dấu cách hay dấu gạch bị thừa khi sao chép không sao, trang sẽ tự lọc.</p>
+        <label class="buy-label" for="code">Mã tải</label>
+        <input id="code" class="buy-input" type="text" inputmode="text" placeholder="XXXXX-XXXXX-XXXXX" maxlength="40" autocapitalize="characters" spellcheck="false" autocomplete="off" aria-describedby="err" />
+        <button id="btn-check" class="buy-btn" type="submit">Kiểm tra mã</button>
+        <p id="err" class="buy-err" role="alert" aria-live="polite"></p>
+      </form>
+
+      <!-- Bước 2: có mã hợp lệ -->
+      <section id="s-result" class="buy-step" hidden>
+        <div class="buy-prod">
+          <span class="buy-prod-icon" aria-hidden="true">📦</span>
+          <div class="buy-prod-info">
+            <h2 id="r-name" class="buy-prod-name"></h2>
+            <div class="buy-chips" id="r-chips"></div>
+          </div>
+        </div>
+        <p class="buy-file">Tên file sẽ lưu: <code id="r-file"></code></p>
+        <button id="btn-dl" class="buy-btn buy-btn-go" type="button">⬇ Tải xuống</button>
+        <div id="r-prog" class="buy-prog" hidden>
+          <div class="buy-prog-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="r-bar"></i></div>
+          <div id="r-ptxt" class="buy-prog-txt"></div>
+        </div>
+        <button id="btn-cancel" class="buy-link" type="button" hidden>Huỷ tải</button>
+        <p id="r-msg" class="buy-msg" role="status" aria-live="polite"></p>
+        <p id="r-ttl" class="buy-ttl"></p>
+        <button id="btn-other" class="buy-link" type="button">Nhập mã khác</button>
+      </section>
+
+      <ul class="buy-notes">
+        <li>Mỗi mã chỉ dùng cho một người mua, vui lòng không chia sẻ lại.</li>
+        <li>Lượt tải chỉ bị trừ khi file về máy bạn <b>đầy đủ</b>: trang tự đếm số byte nhận được và chỉ báo “xong” khi khớp đúng dung lượng. Mạng đứt giữa chừng hoặc bạn huỷ thì không mất lượt.</li>
+        <li>Đang tải thì đừng đóng trang này và đừng mở thêm tab tải cùng lúc: mỗi lần chỉ chạy một lượt tải.</li>
+        <li>Gặp lỗi hoặc mất mã? Nhắn người bán kèm tên người mua để được hỗ trợ.</li>
+      </ul>
+    </main>
+  </div>
+
+  <footer class="site-footer" data-global-footer>© 2026 Moe Shinn (@MoeShinn). All rights reserved.</footer>
+
+  <script src="/buy/js/main.js"></script>
+</body>
+</html>

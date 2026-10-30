@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chính sách bảo mật — Moe Shinn</title>
+  <meta name="description" content="Chính sách bảo mật trang Donate của Moe Shinn: dữ liệu YouTube nào được đọc, dùng để làm gì, không lưu token Google, cách thu hồi quyền và yêu cầu xoá dữ liệu." />
+  <meta name="robots" content="index,follow" />
+  <link rel="canonical" href="https://moeshinn.github.io/donate/privacy/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Moe Shinn" />
+  <meta property="og:title" content="Chính sách bảo mật — Moe Shinn" />
+  <meta property="og:description" content="Chính sách bảo mật trang Donate của Moe Shinn: dữ liệu YouTube nào được đọc, dùng để làm gì, không lưu token Google, cách thu hồi quyền và yêu cầu xoá dữ liệu." />
+  <meta property="og:url" content="https://moeshinn.github.io/donate/privacy/" />
+  <meta property="og:image" content="https://moeshinn.github.io/assets/avatar/avatar.webp" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32.png?v=mvdx4gck" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon/favicon-192.png?v=mvdx4gck" />
+  <link rel="apple-touch-icon" href="/assets/favicon/favicon-180.png?v=mvdx4gck" />
+  <link rel="stylesheet" href="/css/header.css" />
+  <link rel="stylesheet" href="/donate/css/style.css" />
+  <link rel="stylesheet" href="/donate/css/donate.css" />
+  <script src="/js/theme.js" defer></script>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#050b16" />
+  <script src="/js/pwa.js" defer></script>
+</head>
+<body>
+  <!-- Cố ý KHÔNG nạp script màn hình chờ: trang pháp lý phải đọc được ngay (Google/bot không phải chờ màn hình chờ). loading.css giữ lại vì chứa font Baloo 2. -->
+
+  <header class="site-header">
+    <a href="/" class="site-header-logo" data-nav-home aria-label="Về trang chủ">
+      <img src="/assets/avatar/avatar-336.webp" alt="Moe Shinn" width="36" height="36" srcset="/assets/avatar/avatar-168.webp 1x, /assets/avatar/avatar-336.webp 2x" data-nav-logo />
+    </a>
+    <div class="site-header-menu-wrap">
+      <button type="button" class="site-header-menu-btn" data-nav-menu-toggle aria-haspopup="true" aria-expanded="false" aria-label="Menu">☰</button>
+      <nav class="site-header-menu" data-nav-menu role="menu"><!--pre:nav--><a href="/" role="menuitem">Trang chủ</a><a href="/channel" role="menuitem">Kênh</a><a href="/donate" role="menuitem">Donate</a><a href="/post" role="menuitem">Bài Đăng</a><a href="/product" role="menuitem">Sản phẩm</a><a href="/profile" role="menuitem">Hồ sơ Vtuber</a><!--/pre:nav--></nav>
+    </div>
+  </header>
+  <script src="/js/site-chrome.js"></script>
+
+  <main class="page dn-page">
+    <div class="dn-wrap dn-doc-wrap">
+      <h1 class="page-title">Chính sách bảo mật</h1>
+      <article class="dn-card dn-doc">
+        <p class="dn-upd">Cập nhật lần cuối: 28/10/2026</p>
+        <p>Trang <a href="/donate/">Donate</a> của Moe Shinn (“chúng tôi”, “mình”) cho phép bạn ủng hộ kênh và, nếu muốn, đăng nhập bằng tài khoản YouTube để tên kênh và avatar hiện trong lịch sử/bảng xếp hạng ủng hộ. Trang này giải thích mình thu thập dữ liệu nào, dùng để làm gì và bạn kiểm soát nó ra sao.</p>
+
+        <h2>1. Dữ liệu mình thu thập</h2>
+        <p><b>Khi bạn đăng nhập bằng YouTube</b>, mình chỉ xin <b>một quyền chỉ-đọc</b> của Google: <code>https://www.googleapis.com/auth/youtube.readonly</code>. Từ quyền này mình chỉ đọc:</p>
+        <ul>
+          <li>ID kênh YouTube của bạn;</li>
+          <li>tên kênh;</li>
+          <li>tên người dùng dạng @handle (nếu kênh có);</li>
+          <li>ảnh đại diện (avatar) của kênh (chỉ lưu đường dẫn ảnh).</li>
+        </ul>
+        <p><b>Mình không đọc</b> video, bình luận, danh sách đăng ký, danh sách phát, email, tin nhắn hay bất kỳ dữ liệu nào khác trong tài khoản Google/YouTube của bạn, và không thể thay đổi hay đăng gì lên tài khoản của bạn vì quyền chỉ cho phép đọc.</p>
+        <p><b>Khi bạn donate</b> (dù đăng nhập hay không), hệ thống ghi: tên hiển thị, lời nhắn (nếu có), số tiền, thời gian, mã đơn và mã giao dịch ngân hàng do dịch vụ nhận tiền gửi về. Nếu bạn đăng nhập, khoản donate được gắn với ID kênh YouTube của bạn.</p>
+
+        <h2>2. Mục đích sử dụng</h2>
+        <p>Dữ liệu kênh YouTube chỉ dùng để <b>hiển thị tên/@handle, avatar và dấu xác minh trong lịch sử donate và Top 10</b>, hiện tên kênh trên alert/giọng đọc lúc stream, và chặn việc mạo danh kênh khác. Mình không dùng dữ liệu này để quảng cáo, lập hồ sơ, huấn luyện mô hình hay bất kỳ mục đích nào khác.</p>
+
+        <h2>3. Mã truy cập (token) của Google không được lưu</h2>
+        <p>Sau khi bạn đồng ý, Google đưa trình duyệt của bạn một mã truy cập tạm thời. Mã này được gửi tới máy chủ của mình <b>một lần</b> để kiểm tra và lấy thông tin kênh, rồi <b>bị bỏ ngay</b>: không ghi vào cơ sở dữ liệu, bộ nhớ KV hay nhật ký. Mình chỉ phát cho trình duyệt của bạn một “thẻ phiên” do chính mình ký (không chứa mã của Google), hiệu lực 30 ngày, dùng để nhận ra bạn khi donate.</p>
+
+        <h2>4. Nơi lưu trữ</h2>
+        <ul>
+          <li><b>Cloudflare</b> (Workers, cơ sở dữ liệu D1 và bộ nhớ KV): lưu thông tin kênh (ID, tên, @handle, đường dẫn avatar) và các bản ghi donate. KV còn giữ bộ đếm chống spam theo địa chỉ IP trong tối đa khoảng 2 phút rồi tự xoá.</li>
+          <li><b>Trình duyệt của bạn (<code>localStorage</code>)</b>: thẻ phiên và thông tin hiển thị (tên, @handle, avatar) để bạn không phải đăng nhập lại; cùng tên khách bạn đã nhập lần trước. Bấm “Đăng xuất” hoặc xoá dữ liệu trang web là các mục này mất.</li>
+          <li>Kiểm duyệt tự động: tên hiển thị và lời nhắn (chỉ phần chữ, không kèm ID kênh, số tiền hay địa chỉ IP) có thể được gửi tới <b>Google Gemini API</b> (gói miễn phí) để lọc nội dung không phù hợp; nếu dịch vụ này lỗi, mình dùng Cloudflare Workers AI làm dự phòng. Với người đã đăng nhập YouTube, tên được kiểm tra là tên kênh hoặc @handle. Theo điều khoản của Google, nội dung gửi qua gói miễn phí có thể được Google dùng để cải thiện sản phẩm của họ.</li>
+          <li>Giọng đọc alert: khi stream, tên, số tiền và lời nhắn đã qua kiểm duyệt có thể được gửi tới dịch vụ chuyển văn bản thành giọng nói của Google (translate.google.com) từ trình duyệt của người phát stream để tạo âm thanh; nếu dịch vụ này lỗi, trình duyệt dùng giọng đọc có sẵn trong máy.</li>
+          <li>Mã QR được tạo bởi dịch vụ VietQR (img.vietqr.io) từ số tiền và nội dung chuyển khoản; việc chuyển tiền do ngân hàng của bạn và dịch vụ SePay xử lý theo chính sách riêng của họ.</li>
+        </ul>
+
+        <h2>5. Chia sẻ dữ liệu</h2>
+        <p>Mình <b>không bán, không cho thuê và không chia sẻ</b> dữ liệu của bạn cho bên thứ ba vì mục đích riêng của họ. Dữ liệu chỉ đi qua các nhà cung cấp nêu ở mục 4 để trang hoạt động; riêng nội dung gửi tới các dịch vụ của Google (kiểm duyệt, giọng đọc) thì Google xử lý theo điều khoản của chính Google. Phần bạn tự chọn để hiển thị (tên/@handle, avatar, số tiền, lời nhắn đã qua kiểm duyệt) là thông tin công khai trên trang Donate.</p>
+
+        <h2>6. Tuân thủ chính sách dữ liệu của Google</h2>
+        <p>Việc sử dụng và chuyển giao thông tin nhận được từ các Google API sang bất kỳ ứng dụng nào khác của Moe Shinn sẽ tuân thủ <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer">Chính sách dữ liệu người dùng của Google API Services</a> (Google API Services User Data Policy), bao gồm các yêu cầu về <b>Giới hạn sử dụng</b> (Limited Use requirements): dữ liệu chỉ dùng để cung cấp tính năng hiển thị tên kênh mà bạn thấy trên trang này, không chuyển cho bên khác ngoài mục đích đó, không dùng để quảng cáo và không cho người đọc thủ công trừ khi cần để bảo mật hoặc theo yêu cầu pháp luật.</p>
+
+        <h2>7. Quyền của bạn</h2>
+        <ul>
+          <li><b>Thu hồi quyền:</b> bạn có thể gỡ quyền truy cập đã cấp bất cứ lúc nào tại <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener noreferrer">myaccount.google.com/permissions</a> (tìm ứng dụng của Moe Shinn và chọn “Xoá quyền truy cập”).</li>
+          <li><b>Đăng xuất:</b> nút “Đăng xuất” trên trang Donate xoá thẻ phiên khỏi trình duyệt.</li>
+          <li><b>Yêu cầu xoá dữ liệu:</b> gửi email tới <a href="mailto:vtubershinju@gmail.com">vtubershinju@gmail.com</a> kèm tên kênh hoặc @handle của bạn. Mình sẽ xoá thông tin kênh đã lưu và gỡ liên kết giữa kênh với các khoản donate (các bản ghi giao dịch có thể được giữ ở dạng ẩn danh để đối soát). Mình cố gắng phản hồi trong vòng vài ngày làm việc.</li>
+        </ul>
+
+        <h2>8. Trẻ em</h2>
+        <p>Trang không dành cho trẻ dưới 13 tuổi và mình không cố ý thu thập dữ liệu của trẻ em.</p>
+
+        <h2>9. Thay đổi chính sách</h2>
+        <p>Khi chính sách thay đổi, ngày “Cập nhật lần cuối” ở đầu trang sẽ được đổi. Nếu có thay đổi đáng kể về dữ liệu YouTube, mình sẽ thông báo trên trang Donate.</p>
+
+        <h2>10. Liên hệ</h2>
+        <p>Mọi câu hỏi về quyền riêng tư: <a href="mailto:vtubershinju@gmail.com">vtubershinju@gmail.com</a>.</p>
+      </article>
+      <div class="dn-foot">
+        <nav class="dn-legal" aria-label="Pháp lý"><a href="/donate/">Về trang Donate</a><span aria-hidden="true">·</span><a href="/donate/terms/">Điều khoản sử dụng</a></nav>
+        <footer class="site-footer" data-global-footer>© 2026 Moe Shinn (@MoeShinn). All rights reserved.</footer>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

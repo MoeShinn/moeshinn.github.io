@@ -1,0 +1,76 @@
+{
+  "profile": {
+    "name": "Moe Shinn",
+    "avatar": "/assets/avatar/avatar-336.webp",
+    "statusColor": "#3ddc3d",
+    "showOnline": true
+  },
+  "nav": {
+    "logo": "/assets/avatar/avatar-336.webp",
+    "home": "/index.html",
+    "pages": [
+      {
+        "label": "Trang chủ",
+        "url": "/"
+      },
+      {
+        "label": "Kênh",
+        "url": "/channel"
+      },
+      {
+        "label": "Donate",
+        "url": "/donate"
+      },
+      {
+        "label": "Bài Đăng",
+        "url": "/post"
+      },
+      {
+        "label": "Sản phẩm",
+        "url": "/product"
+      },
+      {
+        "label": "Hồ sơ Vtuber",
+        "url": "/profile"
+      }
+    ]
+  },
+  "buttons": [
+    {
+      "id": "social",
+      "icon": "youtube",
+      "url": "channel",
+      "style": "#63B3ED",
+      "label": "Mạng Xã Hội"
+    },
+    {
+      "id": "donate",
+      "icon": "",
+      "url": "donate",
+      "style": "#F687B3",
+      "label": "📥 Donate"
+    },
+    {
+      "id": "posts",
+      "icon": "",
+      "url": "post",
+      "style": "#F6E05E",
+      "label": "💬 Bài Đăng"
+    },
+    {
+      "id": "product",
+      "icon": "",
+      "url": "product",
+      "style": "#4FD1C5",
+      "label": "🛒 Cửa hàng"
+    },
+    {
+      "id": "profile",
+      "icon": "",
+      "url": "profile",
+      "style": "#00F5D4",
+      "label": "📑 Hồ Sơ Vtuber"
+    }
+  ],
+  "footer": "© 2026 Moe Shinn (@MoeShinn). All rights reserved."
+}
