@@ -1,0 +1,81 @@
+name: Prerender
+
+on:
+  push:
+    branches: [main]
+    # Chỉ chạy khi commit/push có đụng tới các định dạng dưới đây (các dòng bắt đầu bằng ! là loại trừ).
+    # Commit chỉ có .png/.jpg, .xml, .txt, .zip… thì KHÔNG chạy.
+    paths:
+      - "*.json"            # JSON ở gốc repo (data.json, site-settings.json, site-links.json…)
+      - "**/*.json"         # JSON ở mọi thư mục (posts.json, product/data/*.json, download/data/*.json, image/index.json…)
+      - "*.md"
+      - "**/*.md"           # nội dung bài (post/data/*.md)
+      - "*.html"
+      - "**/*.html"         # khung trang (index.html, post/index.html, product/index.html…)
+      - "*.webp"
+      - "**/*.webp"         # ảnh WebP (ảnh bài, album, avatar…) — site dùng 100% webp
+      - "css/*.css"         # CSS được nhúng vào trang chủ
+      - "js/icons.js"       # 6 file JS mà prerender đọc/gọi trực tiếp (5 file dưới đây + admin/js/postgen.js ở cuối danh sách)
+      - "post/js/render.js"
+      - "product/js/productgen.js"
+      - "assets/album/albumgen.js"
+      - "profile/js/profilegen.js"   # dựng trang /profile
+      - "tools/prerender.js"
+      # --- loại trừ: file đổi liên tục hoặc không ảnh hưởng tới kết quả dựng sẵn ---
+      - "!admin/**"                   # trang quản trị (prerender bỏ qua thư mục này)
+      - "!s/**"                       # trang chuyển hướng link rút gọn
+      - "!site-notify-state.json"     # trạng thái Telegram, Worker ghi mỗi giờ
+      - "!status.json"
+      - "!moods.json"
+      - "!manifest.webmanifest"
+      - "!download/link-data.json"
+      # --- ngoại lệ của !admin/**: phải đặt SAU dòng loại trừ vì GitHub xử lý theo thứ tự ---
+      - "admin/js/postgen.js"        # prerender require trực tiếp để dựng lại mọi trang /post/<id>/
+  workflow_dispatch:         # có nút chạy tay trong tab Actions (không còn cron định kỳ; chạy khi push có đụng file ở mục paths ở trên)
+
+concurrency:
+  group: prerender
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+# Sau khi Prerender xong, workflow "Deploy Pages (tự động)" (deploy-auto.yml) tự chạy nhờ workflow_run,
+# rồi chờ đủ 5 phút không có commit mới mới deploy
+# (commit của bot bằng GITHUB_TOKEN không kích hoạt được workflow push).
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node tools/prerender.js
+      - name: Commit nếu có thay đổi
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for i in 1 2 3 4; do
+            git add -A
+            if git diff --cached --quiet; then
+              echo "Không có thay đổi để commit."
+              exit 0
+            fi
+            git commit -m "Prerender: cập nhật nội dung dựng sẵn"
+            if git pull --rebase origin main && git push; then
+              exit 0
+            fi
+            echo "Push lần $i lỗi (có commit mới chen vào)."
+            if [ "$i" -eq 4 ]; then break; fi   # lần cuối thì thôi, khỏi dựng lại vô ích
+            echo "Dựng lại trên bản mới nhất…"
+            git rebase --abort 2>/dev/null || true
+            git fetch origin main
+            git reset --hard origin/main
+            node tools/prerender.js
+            sleep $((i * 3))
+          done
+          echo "::error::Push thất bại sau 4 lần"
+          exit 1

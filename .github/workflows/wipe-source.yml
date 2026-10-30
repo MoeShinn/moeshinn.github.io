@@ -1,0 +1,83 @@
+name: Wipe source
+
+# Chạy tay: tab Actions → "Wipe source" → Run workflow → gõ XOA vào ô xác nhận.
+# Việc làm: xóa TOÀN BỘ file/thư mục ở gốc repo, CHỪA LẠI:
+#   • mọi thứ bắt đầu bằng dấu chấm: .github/, .nojekyll, .gitignore, ...
+#   • file xác minh Google Search Console: google*.html
+#   • update.zip (nếu bật "keep_update_zip", để chạy tiếp workflow "Unzip update")
+# Không đụng tới .git, nên lịch sử commit vẫn còn và có thể khôi phục bằng git revert.
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Gõ chính xác XOA để xác nhận xóa sạch mã nguồn'
+        required: true
+        type: string
+      keep_update_zip:
+        description: 'Giữ lại update.zip ở gốc repo (nếu có)'
+        required: true
+        type: boolean
+        default: true
+
+concurrency:
+  group: prerender        # dùng chung nhóm với Prerender / Unzip update → không chạy chồng
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  wipe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kiểm tra xác nhận
+        env:
+          CONFIRM: ${{ inputs.confirm }}
+        run: |
+          if [ "$CONFIRM" != "XOA" ]; then
+            echo "::error::Chưa xác nhận đúng. Hãy chạy lại và gõ chính xác: XOA"
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - name: Xóa mã nguồn (chừa file bắt đầu bằng '.', google*.html)
+        env:
+          KEEP_ZIP: ${{ inputs.keep_update_zip }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob   # glob * mặc định KHÔNG khớp file ẩn (bắt đầu bằng '.') → .github, .git, .nojekyll an toàn
+
+          removed=0
+          for p in *; do
+            case "$p" in
+              google*.html) echo "Giữ: $p"; continue ;;
+              update.zip)
+                if [ "$KEEP_ZIP" = "true" ]; then echo "Giữ: $p"; continue; fi ;;
+            esac
+            echo "Xóa: $p"
+            rm -rf -- "$p"
+            removed=$((removed + 1))
+          done
+
+          echo "Đã xóa $removed mục. Còn lại ở gốc repo:"
+          ls -A
+
+      - name: Commit và push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Không có gì để xóa (repo đã sạch)."
+            exit 0
+          fi
+          git commit -m "Wipe: xóa toàn bộ mã nguồn (chừa .github, file ẩn, google*.html)"
+          for i in 1 2 3; do
+            git pull --rebase origin main && git push && exit 0
+            echo "Push lần $i lỗi, thử lại…"
+            sleep 5
+          done
+          echo "::error::Push thất bại sau 3 lần"
+          exit 1
