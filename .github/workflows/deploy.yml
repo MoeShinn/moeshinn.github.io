@@ -1,0 +1,82 @@
+name: Deploy Pages
+
+# Deploy site lên GitHub Pages (Settings → Pages → Source phải là "GitHub Actions").
+# Tự chạy khi:
+#  • push lên main (chờ 45s, có commit mới hơn thì lần chờ cũ tự hủy → commit dồn dập chỉ deploy 1 lần)
+#  • Prerender / Unzip update chạy xong (bot commit bằng GITHUB_TOKEN không kích hoạt push, nên phải dùng workflow_run)
+#  • mỗi 6 giờ (dự phòng khi GitHub không tự deploy)
+#  • bấm tay: tab Actions → Deploy Pages → Run workflow
+# Không đưa "Wipe source" vào workflow_run để tránh deploy bản rỗng sau khi xóa sạch.
+
+on:
+  push:
+    branches: [main]
+  workflow_run:
+    workflows: ["Prerender", "Unzip update"]
+    types: [completed]
+    branches: [main]
+  schedule:
+    - cron: "17 */6 * * *"      # giờ UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  debounce:
+    # workflow_run chỉ deploy khi workflow trước đó thành công
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    concurrency:
+      group: pages-debounce
+      cancel-in-progress: true   # có lần chạy mới hơn thì lần đang chờ tự hủy (hiện màu xám "cancelled", không phải lỗi)
+    steps:
+      - name: Chờ xem có commit mới không
+        if: github.event_name == 'push'
+        run: sleep 45
+
+  build:
+    needs: debounce
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main              # luôn lấy bản mới nhất (gồm cả commit của bot)
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: "."
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: pages
+      cancel-in-progress: false  # không ngắt deploy đang chạy dở
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  # Deploy lỗi thì thử lại 1 lần (dùng lại artifact đã build, không build lại)
+  deploy-retry:
+    needs: deploy
+    if: ${{ always() && needs.deploy.result == 'failure' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - run: sleep 90
+      - id: deployment
+        uses: actions/deploy-pages@v4

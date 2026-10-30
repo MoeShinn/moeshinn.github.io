@@ -37,9 +37,13 @@ concurrency:
 permissions:
   contents: write
 
+# Sau khi Prerender xong, workflow "Deploy Pages" (deploy.yml) tự chạy nhờ workflow_run
+# (commit của bot bằng GITHUB_TOKEN không kích hoạt được workflow push).
+
 jobs:
   run:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -50,8 +54,22 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git diff --cached --quiet && exit 0
-          git commit -m "Prerender: cập nhật nội dung dựng sẵn"
-          git pull --rebase origin main
-          git push
+          for i in 1 2 3 4; do
+            git add -A
+            if git diff --cached --quiet; then
+              echo "Không có thay đổi để commit."
+              exit 0
+            fi
+            git commit -m "Prerender: cập nhật nội dung dựng sẵn"
+            if git pull --rebase origin main && git push; then
+              exit 0
+            fi
+            echo "Push lần $i lỗi (có commit mới chen vào), dựng lại trên bản mới nhất…"
+            git rebase --abort 2>/dev/null || true
+            git fetch origin main
+            git reset --hard origin/main
+            node tools/prerender.js
+            sleep $((i * 3))
+          done
+          echo "::error::Push thất bại sau 4 lần"
+          exit 1
