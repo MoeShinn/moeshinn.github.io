@@ -292,7 +292,7 @@ const OVERLAY = /[ \t]*<!--\s*Shared loading screen[^>]*-->\s*|[ \t]*<div id="si
    Mỗi lần dựng đều tự khớp lại, chạy bao nhiêu lần cũng được; chép đè bản cũ (admin lưu, Unzip update…) cũng được sửa lại.
    NO_LOADING: ghi "donate/index.html" (đúng 1 trang) hoặc "post/" (dấu / cuối = cả thư mục và mọi trang con). Có hay không có dấu / ở đầu đều được.
    Chỉ gắn cho trang dùng khung chung (có menu data-nav-menu) để không đụng tới trang chuyển hướng; GỠ thì áp dụng cho mọi trang index. */
-const LOADING_ENABLED = true;
+const LOADING_ENABLED = false;
 const NO_LOADING = new Set(["donate/index.html", "donate/terms/index.html", "donate/privacy/index.html", "/channel/index.html", "/index.html", "/post/index.html"]);
 
 const noLoadingRules = [...NO_LOADING].map((p) => String(p).trim().replace(/^\/+/, "")).filter(Boolean);
