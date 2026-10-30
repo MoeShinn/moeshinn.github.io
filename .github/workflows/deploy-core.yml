@@ -1,0 +1,60 @@
+name: Deploy core
+
+# Workflow dùng chung (không tự chạy, chỉ được gọi bởi "Deploy Pages (chạy tay)" và "Deploy Pages (tự động)").
+# Làm đúng 3 việc: build artifact → deploy → deploy lỗi thì thử lại 1 lần.
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: Nhánh hoặc commit cần deploy
+        type: string
+        default: main
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: "."
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: pages              # tự động và chạy tay dùng chung hàng chờ này → không bao giờ deploy chồng nhau
+      cancel-in-progress: false # không ngắt deploy đang chạy dở
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  # Deploy lỗi thì thử lại 1 lần (dùng lại artifact đã build, không build lại)
+  deploy-retry:
+    needs: deploy
+    if: ${{ always() && needs.deploy.result == 'failure' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - run: sleep 90
+      - id: deployment
+        uses: actions/deploy-pages@v4

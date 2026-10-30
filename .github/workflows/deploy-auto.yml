@@ -1,0 +1,111 @@
+name: Deploy Pages (tự động)
+
+# Tự động deploy khi:
+#  • push lên main, hoặc Prerender / Unzip update chạy xong → CHỜ đến khi commit gần nhất đã cách đủ 5 phút
+#    (trong lúc chờ mà có commit mới thì lần chờ cũ tự hủy, đồng hồ tính lại từ commit mới nhất)
+#  • mỗi 6 giờ (dự phòng, không chờ)
+# Chờ xong mà bản mới nhất ĐÃ được deploy (kể cả do bạn bấm tay) thì BỎ QUA, không deploy lặp.
+# Muốn deploy ngay: dùng workflow "Deploy Pages (chạy tay)" — hai cái hoàn toàn độc lập, không chặn nhau.
+#
+# Không đưa "Wipe source" vào workflow_run để tránh deploy bản rỗng sau khi xóa sạch.
+
+on:
+  push:
+    branches: [main]
+  workflow_run:
+    workflows: ["Prerender", "Unzip update"]
+    types: [completed]
+    branches: [main]
+  schedule:
+    - cron: "17 */6 * * *"      # giờ UTC
+
+env:
+  QUIET_SECONDS: 300            # 5 phút không có commit mới thì mới deploy
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  deployments: read             # để bước kiểm tra "đã deploy chưa" đọc lịch sử deployment
+
+jobs:
+  gate:
+    # workflow_run chỉ deploy khi workflow trước đó thành công
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: pages-gate
+      cancel-in-progress: true  # lần chạy mới hơn thay thế lần đang chờ (hiện màu xám "cancelled", không phải lỗi)
+    outputs:
+      proceed: ${{ steps.result.outputs.proceed }}
+      sha: ${{ steps.result.outputs.sha }}
+    env:
+      EVENT: ${{ github.event_name }}
+      REPO: ${{ github.repository }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Chờ đến khi 5 phút không có commit mới
+        if: github.event_name == 'push' || github.event_name == 'workflow_run'
+        run: |
+          while :; do
+            git fetch --quiet --depth=1 origin main
+            last=$(git log -1 --format=%ct FETCH_HEAD)
+            now=$(date +%s)
+            remain=$(( last + QUIET_SECONDS - now ))
+            if [ "$remain" -gt "$QUIET_SECONDS" ]; then remain=$QUIET_SECONDS; fi   # phòng đồng hồ máy bạn lệch giờ
+            if [ "$remain" -le 0 ]; then
+              echo "Commit gần nhất đã cách đây $((now - last))s → đủ yên tĩnh, tiến hành deploy."
+              break
+            fi
+            echo "Commit gần nhất cách đây $((now - last))s → chờ thêm ${remain}s…"
+            sleep "$remain"
+          done
+
+      - name: Bỏ qua nếu bản mới nhất đã được deploy
+        id: already
+        run: |
+          # Deploy tính là "đã gồm commit cuối" nếu được tạo sau commit đó ít nhất MARGIN giây
+          # (chừa khoảng build → deploy, tránh bỏ sót commit chen vào giữa lúc đó).
+          MARGIN=60
+          git fetch --quiet --depth=1 origin main
+          last_commit=$(git log -1 --format=%ct FETCH_HEAD)
+          dep_id=$(gh api "repos/$REPO/deployments?environment=github-pages&per_page=1" --jq '.[0].id // empty' 2>/dev/null || true)
+          if [ -n "$dep_id" ]; then
+            state=$(gh api "repos/$REPO/deployments/$dep_id/statuses?per_page=1" --jq '.[0].state // empty' 2>/dev/null || true)
+            created=$(gh api "repos/$REPO/deployments/$dep_id" --jq '.created_at' 2>/dev/null || true)
+            dep_time=$(date -d "$created" +%s 2>/dev/null || echo 0)
+            case "$state" in
+              success|in_progress|queued|pending)
+                if [ $(( dep_time - MARGIN )) -ge "$last_commit" ]; then
+                  echo "Bản mới nhất đã được deploy (trạng thái: $state) → bỏ qua."
+                  echo "skip=true" >> "$GITHUB_OUTPUT"
+                  exit 0
+                fi ;;
+            esac
+          fi
+          echo "Có commit chưa deploy, hoặc deploy gần nhất chưa thành công → deploy."
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+
+      - name: Kết quả
+        id: result
+        run: |
+          git fetch --quiet --depth=1 origin main
+          echo "sha=$(git rev-parse FETCH_HEAD)" >> "$GITHUB_OUTPUT"
+          if [ "${{ steps.already.outputs.skip }}" = "true" ]; then
+            echo "proceed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "proceed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  deploy:
+    needs: gate
+    if: needs.gate.outputs.proceed == 'true'
+    uses: ./.github/workflows/deploy-core.yml
+    with:
+      ref: ${{ needs.gate.outputs.sha }}   # đúng bản đã chờ xong, gồm cả commit của bot
