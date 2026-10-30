@@ -5,13 +5,14 @@ name: Deploy Pages
 # Khi nào chạy:
 #  • push lên main, hoặc Prerender / Unzip update chạy xong  → CHỜ đến khi commit gần nhất đã cách đủ 5 phút
 #    (trong lúc chờ mà có commit mới thì lần chờ cũ tự hủy, đồng hồ tính lại từ commit mới nhất)
-#  • bấm tay (Actions → Deploy Pages → Run workflow)         → deploy NGAY, không chờ
-#  • mỗi 6 giờ (dự phòng)                                    → chỉ deploy nếu có commit mới hơn lần deploy
-#                                                              thành công gần nhất, hoặc lần đó bị lỗi
+#  • bấm tay (Actions → Deploy Pages → Run workflow)         → deploy NGAY, không chờ, không kiểm tra
+#  • mỗi 6 giờ (dự phòng)
+# Với push / workflow_run / lịch: sau khi chờ xong, nếu bản mới nhất ĐÃ được deploy (thành công hoặc đang chạy)
+# thì BỎ QUA, không deploy lặp. Chỉ deploy khi có commit mới hơn lần deploy gần nhất, hoặc lần đó bị lỗi.
 #
 # Chống deploy lặp:
 #  • mọi lần chạy dùng chung 1 hàng chờ "gate" → chỉ còn đúng 1 lần chạy sống sót sau mỗi đợt commit
-#  • Prerender commit xong (bot) sẽ làm đồng hồ 5 phút tính lại → sau 1 đợt sửa chỉ deploy 1 lần
+#  • bấm tay sẽ hủy các lần đang chờ; lần Prerender sau đó chỉ deploy tiếp nếu bot có commit mới
 #  • job deploy xếp hàng riêng, không bao giờ bị ngắt giữa chừng
 #
 # Không đưa "Wipe source" vào workflow_run để tránh deploy bản rỗng sau khi xóa sạch.
@@ -75,10 +76,13 @@ jobs:
             sleep "$remain"
           done
 
-      - name: Lần chạy theo lịch → bỏ qua nếu bản mới nhất đã được deploy
-        id: schedule
-        if: github.event_name == 'schedule'
+      - name: Bỏ qua nếu bản mới nhất đã được deploy
+        id: already
+        if: github.event_name != 'workflow_dispatch'   # bấm tay thì luôn deploy
         run: |
+          # Deploy tính là "đã gồm commit cuối" nếu được tạo sau commit đó ít nhất MARGIN giây
+          # (chừa khoảng build → deploy, tránh bỏ sót commit chen vào giữa lúc đó).
+          MARGIN=60
           git fetch --quiet --depth=1 origin main
           last_commit=$(git log -1 --format=%ct FETCH_HEAD)
           dep_id=$(gh api "repos/$REPO/deployments?environment=github-pages&per_page=1" --jq '.[0].id // empty' 2>/dev/null || true)
@@ -86,11 +90,14 @@ jobs:
             state=$(gh api "repos/$REPO/deployments/$dep_id/statuses?per_page=1" --jq '.[0].state // empty' 2>/dev/null || true)
             created=$(gh api "repos/$REPO/deployments/$dep_id" --jq '.created_at' 2>/dev/null || true)
             dep_time=$(date -d "$created" +%s 2>/dev/null || echo 0)
-            if [ "$state" = "success" ] && [ "$dep_time" -ge "$last_commit" ]; then
-              echo "Deploy gần nhất thành công và mới hơn commit cuối → bỏ qua."
-              echo "skip=true" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
+            case "$state" in
+              success|in_progress|queued|pending)
+                if [ $(( dep_time - MARGIN )) -ge "$last_commit" ]; then
+                  echo "Bản mới nhất đã được deploy (trạng thái: $state) → bỏ qua."
+                  echo "skip=true" >> "$GITHUB_OUTPUT"
+                  exit 0
+                fi ;;
+            esac
           fi
           echo "Có commit chưa deploy, hoặc deploy gần nhất chưa thành công → deploy."
           echo "skip=false" >> "$GITHUB_OUTPUT"
@@ -100,7 +107,7 @@ jobs:
         run: |
           git fetch --quiet --depth=1 origin main
           echo "sha=$(git rev-parse FETCH_HEAD)" >> "$GITHUB_OUTPUT"
-          if [ "${{ steps.schedule.outputs.skip }}" = "true" ]; then
+          if [ "${{ steps.already.outputs.skip }}" = "true" ]; then
             echo "proceed=false" >> "$GITHUB_OUTPUT"
           else
             echo "proceed=true" >> "$GITHUB_OUTPUT"
