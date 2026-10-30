@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- seo:start -->
+  <title>Hướng dẫn rig model PNGTuber bằng Ezy Maker — Moe Shinn</title>
+  <meta name="description" content="Hướng dẫn rig model PNGTuber bằng Ezy Maker: nhập layer, tự rig, biểu cảm, xuất model.zip rồi dùng trong Ezy Tuber. Có ảnh từng bước cho người mới." />
+  <meta name="keywords" content="Ezy Maker, Ezy Tuber, rig model PNGTuber, rig PNGTuber, cách rig model, tạo model PNGTuber, hướng dẫn Ezy Maker, See-through, PSD sang PNGTuber, tách layer PNGTuber, biểu cảm emote PNGTuber, xuất model zip, EzyMaker.exe, model PNGTuber cho OBS, PNGTuber nhép miệng theo giọng nói, chớp mắt PNGTuber" />
+  <link rel="canonical" href="https://moeshinn.github.io/post/huong-dan-rig-model-pngtuber-bang-ezy-maker-117561226/" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Moe Shinn" />
+  <meta property="og:title" content="Hướng dẫn rig model PNGTuber bằng Ezy Maker" />
+  <meta property="og:description" content="Hướng dẫn rig model PNGTuber bằng Ezy Maker: nhập layer, tự rig, biểu cảm, xuất model.zip rồi dùng trong Ezy Tuber. Có ảnh từng bước cho người mới." />
+  <meta property="og:url" content="https://moeshinn.github.io/post/huong-dan-rig-model-pngtuber-bang-ezy-maker-117561226/" />
+  <meta property="og:image" content="https://moeshinn.github.io/assets/avatar/avatar.webp" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32.png?v=mvdx4gck" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon/favicon-192.png?v=mvdx4gck" />
+  <link rel="apple-touch-icon" href="/assets/favicon/favicon-180.png?v=mvdx4gck" />
+  <script type="application/ld+json" id="post-jsonld">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Hướng dẫn rig model PNGTuber bằng Ezy Maker","description":"Hướng dẫn rig model PNGTuber bằng Ezy Maker: nhập layer, tự rig, biểu cảm, xuất model.zip rồi dùng trong Ezy Tuber. Có ảnh từng bước cho người mới.","url":"https://moeshinn.github.io/post/huong-dan-rig-model-pngtuber-bang-ezy-maker-117561226/","mainEntityOfPage":"https://moeshinn.github.io/post/huong-dan-rig-model-pngtuber-bang-ezy-maker-117561226/","inLanguage":"vi","author":{"@type":"Person","name":"Moe Shinn"},"datePublished":"2026-10-30","image":"https://moeshinn.github.io/assets/avatar/avatar.webp","keywords":"Ezy Maker, Ezy Tuber, rig model PNGTuber, rig PNGTuber, cách rig model, tạo model PNGTuber, hướng dẫn Ezy Maker, See-through, PSD sang PNGTuber, tách layer PNGTuber, biểu cảm emote PNGTuber, xuất model zip, EzyMaker.exe, model PNGTuber cho OBS, PNGTuber nhép miệng theo giọng nói, chớp mắt PNGTuber"}</script>
+  <!-- seo:end -->
+    <link rel="stylesheet" href="/css/header.css" />
+    <link rel="stylesheet" href="/post/css/style.css" />
+<script src="/js/theme.js" defer></script>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#050b16" />
+  <script src="/js/pwa.js" defer></script>
+</head>
+<body>
+
+  
+
+  <header class="site-header">
+    <a href="/" class="site-header-logo" data-nav-home aria-label="Về trang chủ">
+      <img src="/assets/avatar/avatar-336.webp" alt="Moe Shinn" width="36" height="36" srcset="/assets/avatar/avatar-168.webp 1x, /assets/avatar/avatar-336.webp 2x" data-nav-logo />
+    </a>
+    <div class="site-header-menu-wrap">
+      <button type="button" class="site-header-menu-btn" data-nav-menu-toggle aria-haspopup="true" aria-expanded="false" aria-label="Menu">☰</button>
+      <nav class="site-header-menu" data-nav-menu role="menu"><!--pre:nav--><a href="/" role="menuitem">Trang chủ</a><a href="/channel" role="menuitem">Kênh</a><a href="/donate" role="menuitem">Donate</a><a href="/post" role="menuitem">Bài Đăng</a><a href="/product" role="menuitem">Sản phẩm</a><a href="/profile" role="menuitem">Hồ sơ Vtuber</a><!--/pre:nav--></nav>
+    </div>
+  </header>
+  <script src="/js/site-chrome.js"></script>
+
+  <div id="app" class="page"><article class="post-article"><h1 class="post-title">Hướng dẫn rig model PNGTuber bằng Ezy Maker</h1><div class="post-body"><p><span style="font-style:italic;">Hướng dẫn từng bước biến bộ layer PNG của nhân vật thành model PNGTuber biết nhìn theo chuột, chớp mắt, mở miệng theo giọng nói và đổi biểu cảm bằng phím tắt.</span></p>
+<p>Bài này viết cho người <span style="font-weight:bold;">mới hoàn toàn</span>, chưa từng rig bao giờ. Bạn chỉ cần có sẵn các layer PNG của nhân vật, còn lại cứ làm theo từng ảnh bên dưới là có model dùng được.</p>
+<div class="post-image"><img src="/post/photo/ezymaker-giao-dien-tong-quan-mvukfznw.webp" alt="Giao diện tổng quan của Ezy Maker với model demo đã được tự rig, các số 1 đến 8 đánh dấu từng khu vực" loading="lazy"></div>
+<p><span style="font-weight:bold;">Ezy Maker</span> là công cụ để <span style="color:#55FFFF;">tạo model</span>: nhập layer, rig (gắn khung xương cho nhân vật), xem thử và xuất ra file <span style="color:#FFFF55;">model.zip</span>. <span style="font-weight:bold;">Ezy Tuber</span> là app <span style="color:#55FFFF;">hiển thị model</span>: model nhìn theo chuột, mở miệng theo giọng nói của bạn, và bạn đưa nó vào OBS để stream. Nói gọn: <span style="font-weight:bold;">Maker = làm model, Tuber = dùng model</span>.</p>
+<p>Xuyên suốt bài mình dùng một nhân vật demo tóc xanh bạc hà (bộ layer <span style="color:#FFFF55;">Shikiri</span>) để các bước nối tiếp nhau. Toàn bộ ảnh chụp là giao diện thật của app. <span style="color:#AAAAAA;">Mình có vẽ thêm vài layer đơn giản chỉ để làm demo biểu cảm: mắt cười, miệng cười và một trái tim.</span></p>
+<blockquote>
+<p><span style="color:#55FF55;font-weight:bold;">Làm nhanh trong 6 bước</span></p>
+<ol>
+<li><span style="font-weight:bold;">Chuẩn bị layer</span> PNG cùng kích thước canvas, đặt tên có nghĩa <span style="color:#AAAAAA;">(xem mục 1)</span></li>
+<li><span style="font-weight:bold;">Nhập layer</span> vào Ezy Maker <span style="color:#AAAAAA;">(xem mục 3)</span></li>
+<li>Bấm <span style="font-weight:bold;">🧩 Tạo khung xương tự động</span> <span style="color:#AAAAAA;">(xem mục 4)</span></li>
+<li><span style="font-weight:bold;">Kiểm tra và chỉnh</span> layer, khớp, mắt, miệng, biểu cảm, rồi <span style="font-weight:bold;">▶ Xem thử</span> <span style="color:#AAAAAA;">(xem mục 5 đến 10)</span></li>
+<li>Bấm <span style="font-weight:bold;">📦 Xuất zip</span> <span style="color:#AAAAAA;">(xem mục 11)</span></li>
+<li><span style="font-weight:bold;">Nhập zip vào Ezy Tuber</span> và dùng <span style="color:#AAAAAA;">(xem mục 12)</span></li>
+</ol>
+</blockquote>
+<hr>
+<h2>1. Chuẩn bị những thứ cần có</h2>
+<h3>Phần mềm</h3>
+<p>Bạn cần hai app: <span style="color:#FFFF55;">EzyMaker.exe</span> và <span style="color:#FFFF55;">EzyTuber.exe</span>. <span style="color:#AAAAAA;">[Link tải: tôi sẽ cập nhật sau]</span></p>
+<p>Nếu bạn đang có bản mã nguồn thì tự dựng được app theo một trong hai cách:</p>
+<ul>
+<li><span style="font-weight:bold;">Chạy thử:</span> bấm đúp <span style="color:#FFFF55;">start.bat</span>. Cần cài <span style="font-weight:bold;">Node.js LTS</span> trước, lần đầu app tự chạy <span style="color:#FFFF55;">npm install</span>.</li>
+<li><span style="font-weight:bold;">Đóng gói thành exe:</span> bấm đúp <span style="color:#FFFF55;">build-exe.bat</span>. Xong sẽ có <span style="color:#FFFF55;">dist\EzyMaker.exe</span> (với Ezy Tuber là <span style="color:#FFFF55;">dist\EzyTuber.exe</span> kèm thư mục <span style="color:#FFFF55;">model\</span>).</li>
+</ul>
+<h3>Bộ layer PNG của nhân vật</h3>
+<p><span style="font-weight:bold;">Layer</span> là từng mảnh của nhân vật được tách riêng thành ảnh: tóc sau, mặt, mắt, miệng, áo, tay... Khi xếp chồng lên nhau theo đúng thứ tự thì ra nhân vật hoàn chỉnh. Bạn tách layer từ ảnh gốc hoặc file PSD bằng công cụ tách layer như <span style="font-weight:bold;">See-through</span>. <span style="color:#AAAAAA;">Ezy Maker không vẽ lại hay sửa ảnh, nó chỉ cắt gọn vùng trống. Muốn đổi hình thì sửa bằng phần mềm vẽ rồi nhập lại.</span></p>
+<ul>
+<li>File <span style="color:#FFFF55;">.png</span> hoặc <span style="color:#FFFF55;">.webp</span> có <span style="color:#55FF55;">nền trong suốt</span></li>
+<li>Tất cả layer có <span style="font-weight:bold;">cùng kích thước canvas</span> (canvas là tờ giấy vẽ chung, ví dụ 1024×1024). <span style="color:#FF5555;">Đừng cắt gọn từng layer</span>, vì app tự cắt gọn và tự nhớ vị trí</li>
+<li>Nhập được: file ảnh lẻ, file <span style="color:#FFFF55;">.zip</span> hoặc cả thư mục. Nếu có thêm <span style="color:#FFFF55;">layers.json</span> đi kèm thì app dùng luôn thông tin trong đó</li>
+<li>Thứ tự chồng lớp: nếu không có <span style="color:#FFFF55;">layers.json</span>, app sắp theo <span style="font-weight:bold;">tên file</span>, file đứng trước nằm <span style="font-weight:bold;">dưới</span>. Vì vậy hãy đặt số đầu tên như <span style="color:#FFFF55;">000_</span>, <span style="color:#FFFF55;">001_</span>, <span style="color:#FFFF55;">002_</span>...</li>
+</ul>
+<h3>Đặt tên layer để app tự nhận diện</h3>
+<p>Khi bạn bấm <span style="font-weight:bold;">🧩 Tạo khung xương tự động</span>, app đọc <span style="font-weight:bold;">tên layer</span> để đoán nó là bộ phận nào. Tên càng rõ thì càng ít phải chỉnh tay. Mẫu tên app nhận (không phân biệt hoa thường, gạch dưới, gạch ngang hay khoảng trắng đều được):</p>
+<ul>
+<li><span style="color:#FFFF55;">...eyewhite...</span> hoặc <span style="color:#FFFF55;">...eye white...</span>: lòng trắng mắt</li>
+<li><span style="color:#FFFF55;">...irides...</span>, <span style="color:#FFFF55;">...iris...</span>, <span style="color:#FFFF55;">...pupil...</span>, <span style="color:#FFFF55;">...eyeball...</span>: tròng mắt</li>
+<li><span style="color:#FFFF55;">...eyelash...</span> hoặc <span style="color:#FFFF55;">...eyelid...</span>: mi mắt</li>
+<li><span style="color:#FFFF55;">...eyebrow...</span>: lông mày</li>
+<li><span style="color:#FFFF55;">...mouth...</span>, <span style="color:#FFFF55;">...lip...</span>, <span style="color:#FFFF55;">...teeth...</span>, <span style="color:#FFFF55;">...tongue...</span>: miệng. Tên có chữ <span style="color:#FFFF55;">open</span> (ví dụ <span style="color:#FFFF55;">mouth_open</span>) là <span style="font-weight:bold;">miệng mở</span></li>
+<li><span style="color:#FFFF55;">...ear...</span> hoặc <span style="color:#FFFF55;">...ears...</span>: tai</li>
+<li><span style="color:#FFFF55;">...hair...</span>, <span style="color:#FFFF55;">...bang...</span>, <span style="color:#FFFF55;">...fringe...</span>: tóc. Có thêm <span style="color:#FFFF55;">back</span> hoặc <span style="color:#FFFF55;">rear</span> (ví dụ <span style="color:#FFFF55;">back_hair</span>) là tóc sau, còn lại là tóc trước</li>
+<li><span style="color:#FFFF55;">...neck...</span>: cổ. <span style="color:#FFFF55;">...face...</span> hoặc <span style="color:#FFFF55;">...head...</span>: mặt</li>
+<li><span style="color:#FFFF55;">...hand...</span>, <span style="color:#FFFF55;">...arm...</span>, <span style="color:#FFFF55;">...sleeve...</span>, <span style="color:#FFFF55;">...glove...</span>: tay</li>
+<li><span style="color:#FFFF55;">...bottom...</span>, <span style="color:#FFFF55;">...skirt...</span>, <span style="color:#FFFF55;">...pant...</span>, <span style="color:#FFFF55;">...short...</span>: váy hoặc quần</li>
+<li><span style="color:#FFFF55;">...top...</span>, <span style="color:#FFFF55;">...shirt...</span>, <span style="color:#FFFF55;">...jacket...</span>, <span style="color:#FFFF55;">...cloth...</span>, <span style="color:#FFFF55;">...body...</span>, <span style="color:#FFFF55;">...dress...</span>, <span style="color:#FFFF55;">...coat...</span>: thân áo</li>
+<li><span style="color:#FFFF55;">...headwear...</span>, <span style="color:#FFFF55;">...hat...</span>, <span style="color:#FFFF55;">...ribbon...</span>, <span style="color:#FFFF55;">...horn...</span>, <span style="color:#FFFF55;">...headband...</span>, <span style="color:#FFFF55;">...hairpin...</span>: phụ kiện đầu</li>
+<li><span style="color:#FFFF55;">...leg...</span>, <span style="color:#FFFF55;">...sock...</span>, <span style="color:#FFFF55;">...foot...</span>, <span style="color:#FFFF55;">...shoe...</span>, <span style="color:#FFFF55;">...boot...</span>, <span style="color:#FFFF55;">...sneaker...</span>: chân và giày <span style="color:#AAAAAA;">(app để đứng yên)</span></li>
+<li><span style="color:#FFFF55;">...emote...</span>, <span style="color:#FFFF55;">...bubble...</span>, <span style="color:#FFFF55;">...heart...</span>, <span style="color:#FFFF55;">...sweat...</span>, <span style="color:#FFFF55;">...sparkle...</span>, <span style="color:#FFFF55;">...tear...</span>, <span style="color:#FFFF55;">...blush...</span>: emote (bong bóng cảm xúc)</li>
+</ul>
+<p>Hai mẹo nhỏ:</p>
+<ul>
+<li><span style="font-weight:bold;">Bên trái/phải:</span> thêm hậu tố <span style="color:#FFFF55;">-l</span> hoặc <span style="color:#FFFF55;">-r</span> (ví dụ <span style="color:#FFFF55;">irides-l</span>, <span style="color:#FFFF55;">ears-r</span>) để app tách hai mắt, hai tai, hai tay.</li>
+<li><span style="font-weight:bold;">Biến thể biểu cảm:</span> thêm một từ sau tên bộ phận. Ví dụ <span style="color:#FFFF55;">irides_happy-l</span> là tròng mắt kiểu vui, <span style="color:#FFFF55;">mouth_smile</span> là miệng cười, <span style="color:#FFFF55;">mouth_smile_open</span> là miệng cười khi mở, <span style="color:#FFFF55;">emote_heart</span> là emote trái tim. App tự gom chúng thành biểu cảm khi tự rig.</li>
+</ul>
+<h3>Checklist trước khi bắt đầu</h3>
+<ul>
+<li>Layer cùng kích thước canvas, nền trong suốt?</li>
+<li>Mắt (lòng trắng, tròng, mi) và miệng đã <span style="font-weight:bold;">tách riêng</span> khỏi mặt?</li>
+<li>Có layer <span style="font-weight:bold;">miệng mở</span> nếu muốn nhép miệng theo giọng nói?</li>
+<li>Có mi mắt hoặc mắt nhắm nếu muốn chớp hoặc đổi biểu cảm?</li>
+<li>Tên layer có nghĩa và có số thứ tự đầu tên?</li>
+</ul>
+<blockquote><span style="color:#FF5555;">Lưu ý quan trọng:</span> Ezy Maker <span style="font-weight:bold;">không tự vẽ thêm</span> layer nào. Thiếu layer miệng mở hay mắt nhắm thì phải có sẵn từ bước tách layer. Cần bổ sung thì vẽ thêm bằng phần mềm vẽ rồi nhập lại.</blockquote>
+<hr>
+<h2>2. Làm quen giao diện Ezy Maker</h2>
+<p>Nhìn lại ảnh tổng quan ở đầu bài, giao diện chia làm các khu vực sau (số khớp với số trong ảnh):</p>
+<ol>
+<li><span style="font-weight:bold;">Thanh trên:</span> ô <span style="font-weight:bold;">Tên model</span>, các nút <span style="font-weight:bold;">📥 Nhập layer</span>, <span style="font-weight:bold;">📁 Nhập thư mục</span>, <span style="font-weight:bold;">📂 Nhập model để chỉnh sửa</span>, <span style="font-weight:bold;">🧩 Tạo khung xương tự động</span>, <span style="font-weight:bold;">🔍 Tìm layer bị che</span>, hoàn tác ↶, làm lại ↷, <span style="font-weight:bold;">▶ Xem thử</span> và <span style="font-weight:bold;">📦 Xuất zip</span>.</li>
+<li><span style="font-weight:bold;">Tab bên trái:</span> hai tab <span style="font-weight:bold;">Layer</span> (danh sách layer) và <span style="font-weight:bold;">Khớp</span> (cây khớp).</li>
+<li><span style="font-weight:bold;">Danh sách layer:</span> ảnh nhỏ, tên và khớp mà layer đang gắn. Layer chưa gắn khớp có nhãn <span style="color:#FFFF55;">đứng yên</span>.</li>
+<li><span style="font-weight:bold;">Thanh công cụ canvas:</span> <span style="font-weight:bold;">⤢ Vừa khung</span>, mức zoom (ví dụ 100%), <span style="font-weight:bold;">＋</span>, <span style="font-weight:bold;">－</span>, và ba ô tick <span style="font-weight:bold;">Khớp</span> (hiện chấm vàng), <span style="font-weight:bold;">Khung xuất</span> (hiện khung nét đứt), <span style="font-weight:bold;">Làm mờ layer khác</span>.</li>
+<li><span style="font-weight:bold;">Canvas:</span> nơi xem và chỉnh nhân vật. <span style="color:#55FFFF;">Cuộn chuột</span> để phóng to hoặc thu nhỏ, <span style="color:#55FFFF;">giữ Space</span> hoặc <span style="color:#55FFFF;">chuột giữa/phải</span> rồi kéo để dời khung nhìn. Phím <span style="color:#FFFF55;">F</span> tương đương nút Vừa khung.</li>
+<li><span style="font-weight:bold;">Tab bên phải:</span> bốn tab <span style="font-weight:bold;">Layer</span>, <span style="font-weight:bold;">Khớp</span>, <span style="font-weight:bold;">Biểu cảm</span>, <span style="font-weight:bold;">Model</span>.</li>
+<li><span style="font-weight:bold;">Bảng chi tiết:</span> hiện thông số của thứ bạn đang chọn (layer hoặc khớp).</li>
+<li><span style="font-weight:bold;">Thanh trạng thái</span> dưới cùng: app báo kết quả mỗi thao tác. Chữ <span style="color:#55FF55;">xanh</span> là ổn, <span style="color:#FFFF55;">vàng</span> là cảnh báo, <span style="color:#FF5555;">đỏ</span> là lỗi. Khi gặp sự cố, hãy đọc dòng này đầu tiên.</li>
+</ol>
+<hr>
+<h2>3. Nhập layer vào Ezy Maker</h2>
+<p>Có ba cách nhập, cách nào cũng được:</p>
+<ul>
+<li>Bấm <span style="font-weight:bold;">📥 Nhập layer</span> rồi chọn các file <span style="color:#FFFF55;">.png/.webp</span> hoặc một file <span style="color:#FFFF55;">.zip</span></li>
+<li>Bấm <span style="font-weight:bold;">📁 Nhập thư mục</span> để nhập cả thư mục</li>
+<li><span style="font-weight:bold;">Kéo thả</span> file, zip hoặc thư mục vào giữa cửa sổ</li>
+</ul>
+<div class="post-image"><img src="/post/photo/ezymaker-thanh-nut-nhap-tu-rig-mvukg0m9.webp" alt="Thanh trên của Ezy Maker với các nút Nhập layer, Nhập thư mục, Nhập model để chỉnh sửa, Tạo khung xương tự động, Tìm layer bị che và ô Tên model" loading="lazy"></div>
+<p>Số 1, 2, 3 là ba cách nhập. Số 6 là ô <span style="font-weight:bold;">Tên model</span>: hãy đặt tên ngay bây giờ, vì đó cũng là tên thư mục khi xuất. Nút số 3 (<span style="font-weight:bold;">📂 Nhập model để chỉnh sửa</span>) chỉ dùng để mở lại model đã làm, mình nói ở mục 11.</p>
+<p>Nhập thành công, thanh trạng thái báo số layer đã nhập (số 2 trong ảnh dưới), và toàn bộ layer hiện trong danh sách (số 1). Lúc này nhân vật đã hiện đúng hình vì layer cùng canvas.</p>
+<div class="post-image"><img src="/post/photo/ezymaker-nhap-layer-thanh-cong-mvukg1km.webp" alt="Sau khi nhập 28 layer, danh sách layer ở bên trái và thanh trạng thái ghi Đã nhập 28 layer" loading="lazy"></div>
+<blockquote><span style="color:#FF5555;">Lỗi hay gặp nhất khi nhập:</span> layer bị cắt gọn và không có vị trí. Xem phần <span style="font-weight:bold;">Lỗi thường gặp</span> ở mục 13 để biết nhận ra và sửa thế nào.</blockquote>
+<hr>
+<h2>4. Tạo khung xương tự động</h2>
+<p><span style="font-weight:bold;">Rig</span> nghĩa là gắn "khung xương" cho nhân vật: chia thành các <span style="font-weight:bold;">khớp</span> (đầu, cổ, tay...), cho mỗi khớp một <span style="font-weight:bold;">điểm xoay</span>, rồi quy định khớp nào di chuyển theo chuột, theo giọng nói, theo nhịp thở. Phần này nghe phức tạp nhưng Ezy Maker làm sẵn cho bạn gần hết.</p>
+<p>Bấm <span style="font-weight:bold;">🧩 Tạo khung xương tự động</span>. Nếu trước đó bạn đã có khớp, app hỏi xác nhận vì thao tác này <span style="font-weight:bold;">xoá khớp và thiết lập chuyển động hiện có</span>. App sẽ:</p>
+<ul>
+<li>Nhận diện layer theo tên và <span style="font-weight:bold;">tạo khớp</span> tương ứng</li>
+<li>Đặt <span style="font-weight:bold;">pivot</span> (điểm xoay) cho từng khớp</li>
+<li>Gán <span style="font-weight:bold;">chuyển động mặc định</span> (nhìn theo chuột, nảy khi nói, nhịp thở, đung đưa tóc/tay/váy)</li>
+<li><span style="font-weight:bold;">Nắn thẳng đầu</span> nếu đầu bị nghiêng (đo từ đường nối hai mắt)</li>
+<li><span style="font-weight:bold;">Ẩn các layer bị che hoàn toàn</span> (nếu có)</li>
+<li>Tự gom các layer có tên biểu cảm/emote thành <span style="font-weight:bold;">nhóm biểu cảm</span> và <span style="font-weight:bold;">emote</span></li>
+</ul>
+<p>Xong sẽ hiện hộp <span style="font-weight:bold;">Kết quả tự rig</span>:</p>
+<div class="post-image"><img src="/post/photo/ezymaker-ket-qua-tu-rig-mvukg3hc.webp" alt="Hộp Kết quả tự rig liệt kê biểu cảm mắt, biểu cảm miệng, emote, layer đứng yên và 13 khớp đã tạo" loading="lazy"></div>
+<p>Cách đọc hộp này với nhân vật demo:</p>
+<ul>
+<li><span style="color:#55FF55;">Phát hiện biểu cảm mắt: Bình thường, Vui</span> và <span style="color:#55FF55;">Phát hiện biểu cảm miệng: Bình thường, Cười</span>: nhờ tên layer <span style="color:#FFFF55;">irides_happy</span> và <span style="color:#FFFF55;">mouth_smile</span></li>
+<li><span style="color:#55FF55;">Phát hiện 1 emote: Trái tim</span>: nhờ layer <span style="color:#FFFF55;">emote_heart</span></li>
+<li><span style="color:#FFFF55;">2 layer đứng yên (legwear, footwear)</span>: chân và giày không có khớp nên không chuyển động. Muốn chúng động thì dùng <span style="font-weight:bold;">Gắn vào khớp</span> ở mục 5</li>
+<li><span style="color:#55FF55;">Đã tạo 13 khớp</span>: torso, neck, head, hair_back, hair_front, eyeR, eyeL, browL, browR, mouth, armR, armL, skirt</li>
+</ul>
+<p>Nếu có layer bị che hoàn toàn, hộp sẽ có thêm dòng <span style="font-weight:bold;">Đã ẩn ... layer bị che hoàn toàn</span>. Layer bị ẩn vẫn còn trong danh sách, bạn bật lại bằng biểu tượng 👁 nếu cần. Bấm Esc hoặc đóng hộp để tiếp tục.</p>
+<p>Giờ bấm <span style="font-weight:bold;">▶ Xem thử</span> (mục 10) ngay để xem model đã nhúc nhích chưa. Nếu ổn, các mục 5 đến 9 là để làm mịn và bổ sung.</p>
+<hr>
+<h2>5. Kiểm tra và chỉnh layer</h2>
+<h3>Chọn và di chuyển layer</h3>
+<ul>
+<li><span style="font-weight:bold;">Bấm lên nhân vật</span> trên canvas để chọn layer (app chọn theo pixel, bấm đúng chỗ có hình). Hoặc bấm tên trong danh sách</li>
+<li><span style="font-weight:bold;">Ctrl hoặc Shift + bấm</span>, hoặc <span style="font-weight:bold;">kéo khung</span> trên vùng trống để chọn nhiều layer</li>
+<li><span style="font-weight:bold;">Alt + bấm</span> để chọn layer nằm <span style="font-weight:bold;">dưới</span> layer đang ở trên cùng (hữu ích khi tóc che mất layer cần chọn)</li>
+<li><span style="font-weight:bold;">Kéo</span> layer để di chuyển. <span style="font-weight:bold;">Phím mũi tên</span> nhích 1px, <span style="font-weight:bold;">Shift + mũi tên</span> nhích 10px</li>
+<li>Tick <span style="font-weight:bold;">Làm mờ layer khác</span> để dễ nhìn layer đang chọn. Thanh lọc phía trên danh sách giúp tìm theo tên hoặc khớp</li>
+<li><span style="font-weight:bold;">Ctrl+Z</span> hoàn tác, <span style="font-weight:bold;">Ctrl+Y</span> làm lại</li>
+</ul>
+<h3>Đổi thứ tự chồng lớp, ẩn, xoá</h3>
+<ul>
+<li><span style="font-weight:bold;">Kéo thả</span> trong danh sách để đổi thứ tự chồng lớp. Hoặc dùng các nút <span style="font-weight:bold;">▲ ▼ ⤒ ⤓</span> (lên một bậc, xuống một bậc, lên trên cùng, xuống dưới cùng)</li>
+<li><span style="font-weight:bold;">👁</span> ẩn/hiện layer. <span style="color:#FF5555;">Layer đang ẩn sẽ không được xuất ra model</span></li>
+<li><span style="font-weight:bold;">🗑</span> hoặc phím <span style="color:#FFFF55;">Delete</span> để xoá layer đã chọn</li>
+<li><span style="font-weight:bold;">🔍 Tìm layer bị che</span>: app tự chọn các layer bị che hoàn toàn (không bao giờ nhìn thấy). Nếu không có, thanh trạng thái báo "Không có layer nào bị che hoàn toàn"</li>
+</ul>
+<h3>Tab Layer bên phải</h3>
+<p>Chọn một layer rồi mở tab <span style="font-weight:bold;">Layer</span> ở bên phải. Ví dụ chọn layer <span style="color:#FFFF55;">face</span> (mặt):</p>
+<div class="post-image"><img src="/post/photo/ezymaker-tab-layer-gan-khop-dieu-kien-hien-mvukg7as.webp" alt="Tab Layer bên phải khi chọn layer face, ô Gắn vào khớp là head và Điều kiện hiển thị là Luôn hiện" loading="lazy"></div>
+<ul>
+<li><span style="font-weight:bold;">Tên (id)</span>: tên định danh của layer trong model</li>
+<li><span style="font-weight:bold;">X, Y</span>: vị trí layer trên canvas, kèm kích thước sau khi cắt gọn</li>
+<li><span style="font-weight:bold;">1. Gắn vào khớp</span>: layer đi theo khớp nào. Mặt gắn vào <span style="color:#FFFF55;">head</span> nên đầu xoay thì mặt xoay theo</li>
+<li><span style="font-weight:bold;">2. Điều kiện hiển thị</span> gồm bốn lựa chọn: <span style="font-weight:bold;">Luôn hiện</span>, <span style="font-weight:bold;">Chỉ hiện khi đang nói</span>, <span style="font-weight:bold;">Chỉ hiện khi KHÔNG nói</span>, <span style="font-weight:bold;">Chỉ hiện khi bật emote</span>. Phần này dùng cho miệng và emote (mục 7, 8)</li>
+</ul>
+<hr>
+<h2>6. Khớp và chuyển động (phần cốt lõi của rig)</h2>
+<h3>Cây khớp</h3>
+<p>Bấm tab <span style="font-weight:bold;">Khớp</span> bên trái. Các khớp xếp thành <span style="font-weight:bold;">cây</span>: khớp con đi theo khớp cha. Ví dụ <span style="color:#FFFF55;">torso</span> (thân) là cha của <span style="color:#FFFF55;">neck</span> (cổ), cổ là cha của <span style="color:#FFFF55;">head</span> (đầu), đầu là cha của tóc, mắt, mày, miệng. Nghĩa là <span style="font-weight:bold;">đầu nghiêng thì tóc, mắt, miệng nghiêng theo</span>, giống người thật.</p>
+<ul>
+<li><span style="font-weight:bold;">＋ Khớp mới</span> tạo khớp mới</li>
+<li><span style="font-weight:bold;">⬇ Gắn layer vào khớp</span> gắn các layer đang chọn vào khớp đang chọn</li>
+<li><span style="font-weight:bold;">Kéo khớp thả lên khớp khác</span> để đổi khớp cha</li>
+<li><span style="font-weight:bold;">☑ Chọn các layer của khớp</span> chọn nhanh toàn bộ layer thuộc khớp. <span style="font-weight:bold;">🗑 Xoá khớp</span> xoá khớp</li>
+</ul>
+<div class="post-image"><img src="/post/photo/ezymaker-cay-khop-va-chi-diem-pivot-mvukg4fp.webp" alt="Tab Khớp ở bên trái hiển thị cây khớp, đang chọn khớp head và chấm pivot màu đỏ trên canvas" loading="lazy"></div>
+<h3>Pivot là gì?</h3>
+<p><span style="font-weight:bold;">Pivot</span> là <span style="color:#55FF55;">điểm xoay</span> của khớp. Số 3 trong ảnh là pivot của khớp <span style="color:#FFFF55;">head</span> (chấm đỏ là khớp đang chọn, chấm vàng là các khớp khác). Pivot của đầu nên đặt ở <span style="font-weight:bold;">cổ</span>, vì đầu xoay quanh cổ. Pivot của tóc đặt ở <span style="font-weight:bold;">chân tóc</span>. Đặt sai chỗ thì đầu xoay trông như đang trượt.</p>
+<ul>
+<li><span style="font-weight:bold;">Kéo chấm trên canvas</span> để dời pivot</li>
+<li>Hoặc nhập số vào ô <span style="font-weight:bold;">Pivot X</span> và <span style="font-weight:bold;">Pivot Y</span> trong tab Khớp bên phải</li>
+<li>Tick <span style="font-weight:bold;">Khớp</span> ở thanh công cụ canvas nếu bạn không thấy các chấm</li>
+</ul>
+<h3>Các nhóm thông số của một khớp</h3>
+<p>Chọn một khớp (ví dụ <span style="color:#FFFF55;">head</span>), tab <span style="font-weight:bold;">Khớp</span> bên phải hiện các nhóm sau:</p>
+<div class="post-image"><img src="/post/photo/ezymaker-tab-khop-pivot-theo-chuot-khi-noi-nhip-tho-mvukg5e2.webp" alt="Tab Khớp bên phải gồm Khớp cha, Pivot X Y, Góc xoay mặc định, Theo chuột, Khi nói, Nhịp thở" loading="lazy"></div>
+<ol>
+<li><span style="font-weight:bold;">Khớp cha</span>: khớp mà khớp này đi theo</li>
+<li><span style="font-weight:bold;">Pivot X / Pivot Y</span>: điểm xoay</li>
+<li><span style="font-weight:bold;">Góc xoay mặc định</span> (độ, dương là xoay thuận chiều kim đồng hồ): dùng để <span style="font-weight:bold;">nắn thẳng</span> đầu nếu ảnh gốc bị nghiêng. Tự rig đã lo giúp, thường để trống</li>
+<li><span style="font-weight:bold;">Theo chuột</span> (giá trị khi chuột lệch hết cỡ): <span style="font-weight:bold;">Dịch X</span>, <span style="font-weight:bold;">Dịch Y</span> (px) và <span style="font-weight:bold;">Xoay</span> (độ). Đầu hay mắt có giá trị lớn hơn thân nên trông như "nhìn" theo chuột</li>
+<li><span style="font-weight:bold;">Khi nói</span> (âm lượng tối đa): <span style="font-weight:bold;">Dịch Y</span> (px) và <span style="font-weight:bold;">Giãn dọc</span>. Giá trị <span style="font-weight:bold;">âm</span> của Dịch Y nghĩa là nảy <span style="font-weight:bold;">lên</span> khi nói</li>
+<li><span style="font-weight:bold;">Nhịp thở</span>: <span style="font-weight:bold;">Dịch Y</span> và <span style="font-weight:bold;">Giãn dọc</span>, nhẹ nhàng lên xuống khi đứng yên</li>
+</ol>
+<p>Giá trị mặc định tự rig đặt (với nhân vật cao khoảng 1000px, và tự co theo chiều cao nhân vật của bạn), mình lấy từ chính app làm mốc <span style="color:#AAAAAA;">(giá trị gợi ý, không phải bắt buộc)</span>:</p>
+<ul>
+<li><span style="font-weight:bold;">Đầu (head):</span> xoay theo chuột <span style="color:#FFFF55;">3,5°</span>, dịch X <span style="color:#FFFF55;">2,4px</span>, dịch Y <span style="color:#FFFF55;">3,9px</span>; nảy khi nói <span style="color:#FFFF55;">-1,5px</span>; thở <span style="color:#FFFF55;">-0,8px</span></li>
+<li><span style="font-weight:bold;">Thân (torso):</span> xoay theo chuột <span style="color:#FFFF55;">0,8°</span>; nảy khi nói <span style="color:#FFFF55;">-2,5px</span>; thở <span style="color:#FFFF55;">-0,6px</span></li>
+<li><span style="font-weight:bold;">Miệng:</span> theo chuột dịch X <span style="color:#FFFF55;">0,9px</span>, dịch Y <span style="color:#FFFF55;">1,8px</span></li>
+</ul>
+<h3>Lò xo: tóc, tay áo và váy đung đưa</h3>
+<p>Để tóc đung đưa có quán tính (đầu quay trước rồi tóc mới "đuổi theo"), app dùng <span style="font-weight:bold;">lò xo</span>. Chọn khớp tóc (ví dụ <span style="color:#FFFF55;">hair_back</span>) và nhìn xuống nhóm <span style="font-weight:bold;">Lò xo xoay</span>:</p>
+<div class="post-image"><img src="/post/photo/ezymaker-lo-xo-dung-dua-toc-mvukg6cf.webp" alt="Nhóm Lò xo xoay và Lò xo dọc của khớp hair_back với Bám theo tín hiệu, Độ mạnh, Hệ số tín hiệu, Độ cứng, Giảm chấn" loading="lazy"></div>
+<ol>
+<li><span style="font-weight:bold;">Lò xo xoay (đung đưa có quán tính)</span>: tick để bật</li>
+<li><span style="font-weight:bold;">Bám theo tín hiệu</span>: tóc đuổi theo chuyển động nào. Với tóc là <span style="font-weight:bold;">Góc xoay của head</span></li>
+<li><span style="font-weight:bold;">Độ mạnh</span> và <span style="font-weight:bold;">Hệ số tín hiệu</span>: đung đưa nhiều hay ít. Mặc định tóc sau là <span style="color:#FFFF55;">1,3</span></li>
+<li><span style="font-weight:bold;">Độ cứng</span> (cao = lắc nhanh) và <span style="font-weight:bold;">Giảm chấn</span> (cao = nhanh dừng). Mặc định tóc sau là <span style="color:#FFFF55;">70</span> và <span style="color:#FFFF55;">7</span></li>
+<li><span style="font-weight:bold;">Lò xo dọc (nhún lên xuống)</span>: tương tự nhưng cho chuyển động lên xuống</li>
+</ol>
+<p>Muốn lắc nhiều hơn thì tăng <span style="font-weight:bold;">Độ mạnh</span>. Muốn dừng nhanh hơn thì tăng <span style="font-weight:bold;">Giảm chấn</span>. Tóc trước, tay áo, váy dùng cùng cách này với giá trị mặc định riêng. <span style="color:#AAAAAA;">Mẹo: chỉnh nhỏ từng chút rồi bấm ▶ Xem thử để thấy ngay, đừng chỉnh nhiều thứ cùng lúc.</span></p>
+<hr>
+<h2>7. Mắt và miệng</h2>
+<h3>Chớp mắt</h3>
+<p>App chớp mắt bằng hai cách, tuỳ layer:</p>
+<ul>
+<li>Layer <span style="font-weight:bold;">mắt</span> (tròng, lòng trắng): tick <span style="font-weight:bold;">Ép dẹt khi chớp (mắt)</span>. Mắt bị ép dẹt xuống khi chớp</li>
+<li>Layer <span style="font-weight:bold;">mi mắt</span>: nhập số px vào <span style="font-weight:bold;">Hạ xuống khi chớp (px) — mi mắt</span>. Mi hạ xuống che mắt</li>
+</ul>
+<div class="post-image"><img src="/post/photo/ezymaker-chop-mat-ep-det-ha-mi-mvukg895.webp" alt="Layer irides_l đã gắn khớp eyeL, tick Ép dẹt khi chớp và ô Hạ xuống khi chớp" loading="lazy"></div>
+<p>Bạn không cần làm tay nếu tên layer chuẩn, tự rig đã cài sẵn. Có thể dùng <span style="font-weight:bold;">Preset nhanh</span> ở cuối tab Layer: <span style="font-weight:bold;">👁 Mắt</span> (ép dẹt khi chớp) và <span style="font-weight:bold;">〰 Mi mắt</span> (hạ mi). <span style="color:#FF5555;">Chỉ gắn hiệu ứng chớp cho mắt ở trạng thái gốc</span> (bình thường), không gắn cho mắt cười hay mắt nhắm.</p>
+<h3>Miệng đóng và miệng mở</h3>
+<p>Nhép miệng chỉ cần hai layer cùng gắn vào một khớp <span style="color:#FFFF55;">mouth</span>:</p>
+<ul>
+<li><span style="font-weight:bold;">Miệng đóng:</span> <span style="font-weight:bold;">Điều kiện hiển thị</span> = <span style="font-weight:bold;">Chỉ hiện khi KHÔNG nói</span> (preset <span style="font-weight:bold;">😶 Miệng đóng</span>)</li>
+<li><span style="font-weight:bold;">Miệng mở:</span> <span style="font-weight:bold;">Chỉ hiện khi đang nói</span> (preset <span style="font-weight:bold;">👄 Miệng mở</span>), kèm tick <span style="font-weight:bold;">Bật co giãn theo âm lượng</span></li>
+</ul>
+<div class="post-image"><img src="/post/photo/ezymaker-mieng-mo-co-gian-theo-giong-noi-mvukg97i.webp" alt="Layer mouth_open gắn khớp mouth, chỉ hiện khi đang nói, bật co giãn theo âm lượng với các ô Ngang, Dọc và Gốc co giãn" loading="lazy"></div>
+<p>Khi bật co giãn, miệng mở to nhỏ theo độ lớn giọng nói. Có bốn ô điều khiển (số 3) và gốc co giãn (số 4):</p>
+<ul>
+<li><span style="font-weight:bold;">Ngang: nhỏ nhất</span> và <span style="font-weight:bold;">Ngang: thêm khi to</span> (mặc định <span style="color:#FFFF55;">0,8</span> và <span style="color:#FFFF55;">0,3</span>): bề ngang lúc nói khẽ và phần nở thêm khi nói lớn</li>
+<li><span style="font-weight:bold;">Dọc: nhỏ nhất</span> và <span style="font-weight:bold;">Dọc: thêm khi to</span> (mặc định <span style="color:#FFFF55;">0,35</span> và <span style="color:#FFFF55;">0,65</span>): miệng nói khẽ chỉ mở hé, nói lớn thì mở hết cỡ</li>
+<li><span style="font-weight:bold;">Gốc co giãn X, Y (0–1)</span> (mặc định <span style="color:#FFFF55;">0,5</span> và <span style="color:#FFFF55;">0</span>): điểm cố định khi co giãn. Y = 0 là <span style="font-weight:bold;">mép trên</span> đứng yên, miệng mở xuống dưới</li>
+</ul>
+<p>Muốn gỡ hiệu ứng khỏi layer thì bấm <span style="font-weight:bold;">✕ Xoá hiệu ứng</span>.</p>
+<hr>
+<h2>8. Biểu cảm và emote (tab Biểu cảm)</h2>
+<h3>Khái niệm</h3>
+<ul>
+<li><span style="font-weight:bold;">Nhóm</span> (ví dụ <span style="font-weight:bold;">Mắt</span>, <span style="font-weight:bold;">Miệng</span>) chứa nhiều <span style="font-weight:bold;">trạng thái</span> (Bình thường, Vui, Cười...). <span style="font-weight:bold;">Mỗi lúc chỉ có một trạng thái</span> của nhóm được hiện</li>
+<li><span style="font-weight:bold;">Emote</span> là hiệu ứng bật/tắt <span style="font-style:italic;">độc lập</span> (trái tim, giọt mồ hôi...)</li>
+<li>Nếu layer đã đặt tên chuẩn (mục 1) thì bước <span style="font-weight:bold;">🧩</span> đã tạo sẵn phần lớn. Bạn chỉ cần kiểm tra lại</li>
+</ul>
+<div class="post-image"><img src="/post/photo/ezymaker-tab-bieu-cam-nhom-trang-thai-emote-mvukgb48.webp" alt="Tab Biểu cảm hiển thị Nhóm Mắt, Nhóm Miệng, các nút thêm nhóm và mục Emote" loading="lazy"></div>
+<h3>Tạo và sửa nhóm, trạng thái</h3>
+<ol>
+<li>Ô <span style="font-weight:bold;">Chỉ hiện layer đúng trạng thái đã chọn bên dưới</span>: bật khi thiết kế từng trạng thái, canvas chỉ hiện đúng layer của trạng thái đó</li>
+<li>Mỗi hàng trạng thái có: <span style="font-weight:bold;">★</span> đặt làm <span style="font-weight:bold;">mặc định</span>, ô tên, <span style="font-weight:bold;">số</span> = số layer đang gắn, <span style="font-weight:bold;">⬇</span> gán layer đang chọn vào trạng thái, <span style="font-weight:bold;">☑</span> chọn các layer của trạng thái, <span style="font-weight:bold;">✕</span> xoá</li>
+<li>Ô <span style="font-weight:bold;">Tên trạng thái mới (vd: Cười, Nhắm mắt)…</span> rồi bấm <span style="font-weight:bold;">＋</span> để thêm trạng thái</li>
+<li>Các nút <span style="font-weight:bold;">＋ Nhóm Mắt</span>, <span style="font-weight:bold;">＋ Nhóm Miệng</span>, <span style="font-weight:bold;">＋ Nhóm khác…</span> để tạo nhóm. Giới hạn: <span style="color:#FFFF55;">8</span> nhóm, mỗi nhóm <span style="color:#FFFF55;">32</span> trạng thái</li>
+<li><span style="font-weight:bold;">Emote</span>: nhập tên vào ô <span style="font-weight:bold;">Tên emote mới</span> rồi <span style="font-weight:bold;">＋</span>. Mỗi emote có <span style="font-weight:bold;">tự tắt (giây)</span> (để 0 là không tự tắt), <span style="font-weight:bold;">nhóm</span> (các emote cùng nhóm loại trừ lẫn nhau) và nút <span style="font-weight:bold;">⬇ Gán layer đang chọn</span>. Tối đa <span style="color:#FFFF55;">32</span> emote</li>
+</ol>
+<h3>Cho layer thuộc trạng thái nào</h3>
+<p>Chọn một hoặc nhiều layer (Ctrl + bấm), xuống mục <span style="font-weight:bold;">Hiển thị theo biểu cảm / emote</span> trong tab Layer và tick các trạng thái được phép hiện. <span style="font-weight:bold;">Không tick gì = luôn hiện</span>. Ví dụ dưới đây là hai layer lông mày, mình tick thêm trạng thái <span style="font-weight:bold;">Vui</span> để khi nhân vật cười thì lông mày vẫn còn:</p>
+<div class="post-image"><img src="/post/photo/ezymaker-tick-trang-thai-vui-cho-long-may-mvukga5v.webp" alt="Hai layer lông mày được chọn, mục Hiển thị theo biểu cảm có Nhóm Mắt với Bình thường và Vui được tick" loading="lazy"></div>
+<p>Bật ô <span style="font-weight:bold;">Chỉ hiện layer đúng trạng thái</span> và chọn trạng thái <span style="font-weight:bold;">Vui</span> là thấy ngay kết quả: mắt cười, lông mày còn, lòng trắng và mi mắt biến mất.</p>
+<div class="post-image"><img src="/post/photo/ezymaker-xem-canvas-theo-trang-thai-vui-mvukgc2l.webp" alt="Canvas khi bật chỉ hiện layer đúng trạng thái Vui, nhân vật cười nhắm mắt" loading="lazy"></div>
+<h3>Quy tắc thiết kế để khỏi mất mắt, mất miệng</h3>
+<ul>
+<li><span style="font-weight:bold;">Layer da/mặt không gắn</span> vào trạng thái nào, để luôn hiện</li>
+<li><span style="color:#FF5555;">Mỗi trạng thái phải có ít nhất 1 layer</span>, nếu không mắt hoặc miệng sẽ <span style="color:#FF5555;">trống</span> khi chọn trạng thái đó</li>
+<li>Hiệu ứng chớp mắt chỉ gắn cho trạng thái <span style="font-weight:bold;">gốc</span></li>
+<li>Trạng thái <span style="font-weight:bold;">Cười</span> của miệng trong demo chỉ có miệng đóng. Muốn nhép miệng khi đang cười thì cần thêm layer kiểu <span style="color:#FFFF55;">mouth_smile_open</span></li>
+</ul>
+<p><span style="color:#AAAAAA;">Phím tắt đổi biểu cảm và bật emote được gán </span><span style="color:#AAAAAA;font-weight:bold;">bên trong Ezy Tuber</span><span style="color:#AAAAAA;">, không phải trong Ezy Maker (xem mục 12).</span></p>
+<hr>
+<h2>9. Tab Model</h2>
+<p>Tab <span style="font-weight:bold;">Model</span> bên phải chứa các cài đặt chung khi xuất:</p>
+<div class="post-image"><img src="/post/photo/ezymaker-tab-model-ten-dinh-dang-khung-xuat-mvukgd0y.webp" alt="Tab Model với Tên model, Định dạng ảnh khi xuất, Tự sinh thanh kéo tinh chỉnh, Khung xuất tự tính và lề" loading="lazy"></div>
+<ol>
+<li><span style="font-weight:bold;">Tên model</span> (cũng là tên thư mục khi xuất)</li>
+<li><span style="font-weight:bold;">Định dạng ảnh khi xuất</span>: <span style="font-weight:bold;">PNG (chính xác, file lớn hơn)</span> hoặc <span style="font-weight:bold;">WebP chất lượng cao (nhỏ hơn)</span>. Muốn đẹp tuyệt đối thì chọn PNG, muốn file nhẹ thì WebP</li>
+<li><span style="font-weight:bold;">Tự sinh thanh kéo tinh chỉnh từ các khớp</span>: tạo ra tab Tinh chỉnh trong Ezy Tuber (mục 12). Bỏ tick nếu không muốn</li>
+<li><span style="font-weight:bold;">Khung xuất (crop)</span>: tick <span style="font-weight:bold;">Tự tính theo layer + lề</span> thì app tự tính khung bao quanh nhân vật. Khung hiện tại trong demo là <span style="color:#FFFF55;">446×1006</span></li>
+<li><span style="font-weight:bold;">Lề trên</span> và <span style="font-weight:bold;">Lề hai bên</span> (demo là <span style="color:#FFFF55;">28</span> và <span style="color:#FFFF55;">20</span> px): chừa chỗ để <span style="font-weight:bold;">đầu nảy lên</span> và <span style="font-weight:bold;">tóc/tay áo đung đưa</span> không bị cắt mất ở mép khung</li>
+</ol>
+<p>Cuối tab còn có phần <span style="font-weight:bold;">Thống kê</span>: số layer sẽ xuất, số khớp, kích thước canvas gốc.</p>
+<hr>
+<h2>10. ▶ Xem thử</h2>
+<p>Bấm <span style="font-weight:bold;">▶ Xem thử</span>. App chạy <span style="font-weight:bold;">đúng engine của Ezy Tuber</span> nên những gì thấy ở đây chính là kết quả cuối. Nút đổi thành <span style="font-weight:bold;">✎ Quay lại chỉnh sửa</span> (hoặc bấm Esc) để trở về.</p>
+<div class="post-image"><img src="/post/photo/ezymaker-xem-thu-vui-cuoi-trai-tim-mvukgdzb.webp" alt="Chế độ Xem thử với nhân vật nhắm mắt cười, bật trái tim, bên phải là bảng Giả lập giọng nói và biểu cảm" loading="lazy"></div>
+<ol>
+<li><span style="font-weight:bold;">Âm lượng (nói)</span>: kéo thanh để giả lập giọng nói, miệng mở theo. Có ô <span style="font-weight:bold;">Tự nói liên tục</span>, <span style="font-weight:bold;">Bật emote</span>, <span style="font-weight:bold;">Tự chớp mắt</span> và nút <span style="font-weight:bold;">👁 Chớp ngay</span></li>
+<li><span style="font-weight:bold;">Biểu cảm &amp; Emote</span>: chọn trạng thái <span style="font-weight:bold;">Mắt</span>, <span style="font-weight:bold;">Miệng</span> và tick emote (ví dụ <span style="font-weight:bold;">Trái tim</span>) để thử</li>
+<li><span style="font-weight:bold;">Mức chuyển động (nhân chung)</span>: bốn thanh <span style="font-weight:bold;">Theo chuột</span>, <span style="font-weight:bold;">Nảy khi nói</span>, <span style="font-weight:bold;">Nhịp thở</span>, <span style="font-weight:bold;">Đung đưa tóc/tay/váy</span>. Đây là thanh nhân chung, kéo lên là mọi khớp mạnh hơn, giống tab Tinh chỉnh trong Ezy Tuber</li>
+</ol>
+<p>Cuối bảng có <span style="font-weight:bold;">Nền xem thử</span>: <span style="font-weight:bold;">Màu nền</span> gồm Tối, Xanh lá, Xanh dương, Hồng, Sáng, Ca rô hoặc <span style="font-weight:bold;">🖼 Ảnh từ máy…</span>. Bạn cũng kéo thả ảnh vào khung để làm nền. Ảnh nền chỉ để xem, <span style="font-weight:bold;">không đưa vào model</span>.</p>
+<h3>Checklist kiểm tra trước khi xuất</h3>
+<ul>
+<li><span style="font-weight:bold;">Di chuột</span>: đầu có xoay riêng khỏi thân và cổ không?</li>
+<li><span style="font-weight:bold;">Tóc, tay áo, váy</span> có đung đưa quá đà hoặc cứng đơ không?</li>
+<li><span style="font-weight:bold;">Kéo Âm lượng</span>: miệng có mở theo tiếng và đóng lại khi im không?</li>
+<li><span style="font-weight:bold;">Chớp ngay</span>: mắt có chớp gọn, mi có hạ đúng chỗ không?</li>
+<li><span style="font-weight:bold;">Chọn từng biểu cảm</span>: mắt và miệng có hiện đủ, không bị trống không?</li>
+<li><span style="font-weight:bold;">Bật từng emote</span>: hiện đúng chỗ, có tự tắt đúng giờ không?</li>
+<li>Đầu, tóc có bị <span style="font-weight:bold;">cắt ở mép khung</span> không? Nếu có, tăng <span style="font-weight:bold;">Lề</span> ở tab Model</li>
+</ul>
+<hr>
+<h2>11. 📦 Xuất zip</h2>
+<p>Hài lòng rồi thì bấm <span style="font-weight:bold;">📦 Xuất zip</span>, chọn nơi lưu trong hộp thoại. Thanh trạng thái báo kết quả:</p>
+<div class="post-image"><img src="/post/photo/ezymaker-xuat-zip-thanh-cong-mvukgexo.webp" alt="Thanh trên có nút Xuất zip và thanh trạng thái báo Đã xuất Shikiri.zip cùng số layer, khớp, thanh kéo, nhóm biểu cảm, emote" loading="lazy"></div>
+<p>Thông báo ghi <span style="color:#55FF55;">✔ Đã xuất ... giải nén thư mục "Shikiri" vào thư mục model của Ezy Tuber</span>, kèm số liệu của model (demo: 28 layer, 13 khớp, 42 thanh kéo, 2 nhóm biểu cảm, 1 emote).</p>
+<h3>Bên trong file zip</h3>
+<ul>
+<li><span style="color:#FFFF55;">Shikiri/model.json</span>: toàn bộ thông tin rig (khớp, chuyển động, biểu cảm, khung xuất...)</li>
+<li><span style="color:#FFFF55;">Shikiri/settings.json</span>: cài đặt riêng của model (tên, phím chuyển model, cỡ model, thanh kéo, phím biểu cảm)</li>
+<li><span style="color:#FFFF55;">Shikiri/assets/layer/</span>: các layer đã cắt gọn, tên có số thứ tự (ví dụ <span style="color:#FFFF55;">000_back_hair.png</span>)</li>
+<li><span style="color:#FFFF55;">Shikiri/assets/emo/</span>: layer chỉ hiện khi nói hoặc khi bật emote (ví dụ <span style="color:#FFFF55;">mouth_open.png</span>)</li>
+</ul>
+<p><span style="color:#FF5555;">Lưu ý tên model:</span> tên không được chứa ký tự cấm của Windows (như <span style="color:#FFFF55;">&lt; &gt; : " / \ | ? *</span>). App tự thay chúng khi đặt tên thư mục và giới hạn tối đa 60 ký tự, nhưng cứ đặt tên đơn giản cho an toàn.</p>
+<h3>Mở lại để sửa tiếp</h3>
+<p>Bấm <span style="font-weight:bold;">📂 Nhập model để chỉnh sửa</span> và chọn file zip hoặc thư mục model đã làm (kể cả thư mục trong <span style="color:#FFFF55;">model/</span> của Ezy Tuber). App giữ nguyên layer, khớp, chuyển động, thanh kéo và <span style="color:#FFFF55;">settings.json</span>. Lưu ý app sẽ hỏi vì việc mở model <span style="font-weight:bold;">thay thế dự án hiện tại</span> (phần chưa xuất sẽ mất).</p>
+<hr>
+<h2>12. Đưa model vào Ezy Tuber và dùng</h2>
+<h3>Nhập model</h3>
+<ol>
+<li>Mở <span style="font-weight:bold;">Ezy Tuber</span>, bấm <span style="font-weight:bold;">Win + F12</span> để mở cửa sổ <span style="font-weight:bold;">Cài đặt</span>. <span style="color:#AAAAAA;">(Luôn có phím dự phòng </span><span style="color:#AAAAAA;font-weight:bold;">Ctrl + Alt + F12</span><span style="color:#AAAAAA;">, phòng khi quên phím đã gán.)</span></li>
+<li>Vào tab <span style="font-weight:bold;">🧍 Model</span>, bấm <span style="font-weight:bold;">📥 Import model (.zip)</span> và chọn file zip vừa xuất. Có thể kéo thả file zip vào tab này. App tự tìm đúng thư mục model trong zip</li>
+<li>Thông báo <span style="color:#55FF55;">✔ Đã import 1 model: Shikiri</span> hiện ra. Bấm <span style="font-weight:bold;">Dùng</span> ở model muốn chuyển sang. Model đang dùng có nhãn <span style="font-weight:bold;">ĐANG DÙNG</span></li>
+</ol>
+<div class="post-image"><img src="/post/photo/ezytuber-tab-model-import-zip-mvukgfw1.webp" alt="Tab Model của Ezy Tuber với nút Import model, thông báo import thành công, nhãn ĐANG DÙNG và ô gán phím chuyển model" loading="lazy"></div>
+<p>Cách thủ công: giải nén thư mục <span style="color:#FFFF55;">Shikiri</span> vào thư mục <span style="color:#FFFF55;">model\</span> cạnh <span style="color:#FFFF55;">EzyTuber.exe</span>, rồi bấm <span style="font-weight:bold;">🔄 Quét lại</span>. Nút <span style="font-weight:bold;">📂 Mở thư mục model</span> mở nhanh thư mục này. Mỗi model có ô phím riêng để chuyển nhanh sang nó (kể cả khi đang chơi game).</p>
+<h3>Gán phím cho biểu cảm và emote</h3>
+<p>Vào tab <span style="font-weight:bold;">😀 Biểu cảm</span>. Mỗi trạng thái và emote có nút <span style="font-weight:bold;">Chọn</span> (hoặc <span style="font-weight:bold;">Bật</span>) và ô phím. Bấm vào ô phím rồi nhấn tổ hợp phím bạn muốn. Với ví dụ bên dưới mình gán <span style="font-weight:bold;">Ctrl + Alt + 2</span> cho mắt Vui và <span style="font-weight:bold;">Ctrl + Alt + 1</span> bật trái tim <span style="color:#AAAAAA;">(phím ở ảnh chỉ là ví dụ, bạn gán phím nào cũng được)</span>.</p>
+<div class="post-image"><img src="/post/photo/ezytuber-tab-bieu-cam-gan-phim-mvukggue.webp" alt="Tab Biểu cảm của Ezy Tuber, nhóm Mắt và Miệng với nút Chọn, emote Trái tim có nút Bật và ô gán phím" loading="lazy"></div>
+<ul>
+<li>Phím phải kèm <span style="font-weight:bold;">Ctrl / Alt / Shift / Win</span>. Riêng <span style="font-weight:bold;">F1 đến F24</span> thì dùng một mình được</li>
+<li><span style="font-weight:bold;">Esc</span> để huỷ gán, <span style="font-weight:bold;">Backspace</span> để xoá phím</li>
+<li>Bấm lại phím của biểu cảm đang bật là <span style="font-weight:bold;">về mặc định</span>. Emote có thể tự tắt sau vài giây nếu bạn đặt ở Maker</li>
+<li>Mỗi model có bộ phím riêng. Nút <span style="font-weight:bold;">Đặt lại</span> đưa mọi thứ về mặc định và tắt hết emote</li>
+</ul>
+<h3>Tinh chỉnh chuyển động</h3>
+<p>Tab <span style="font-weight:bold;">🎛️ Tinh chỉnh</span> có các thanh kéo để chỉnh chuyển động riêng cho từng model, thay đổi áp dụng và lưu ngay. Thanh kéo này được sinh tự động từ các khớp (nhờ tick ở mục 9).</p>
+<div class="post-image"><img src="/post/photo/ezytuber-tab-tinh-chinh-thanh-keo-mvukghsr.webp" alt="Tab Tinh chỉnh của Ezy Tuber với hàng Cài sẵn Nhẹ Vừa Mạnh, các nhóm thanh kéo và nút đặt lại" loading="lazy"></div>
+<ul>
+<li><span style="font-weight:bold;">Cài sẵn:</span> ba nút <span style="font-weight:bold;">😌 Nhẹ</span>, <span style="font-weight:bold;">🙂 Vừa (mặc định)</span>, <span style="font-weight:bold;">😆 Mạnh</span> chỉnh nhanh bốn thanh nhân chung</li>
+<li>Các nhóm <span style="font-weight:bold;">Theo dõi chuột &amp; phản hồi</span>, <span style="font-weight:bold;">Đầu &amp; cổ</span>, <span style="font-weight:bold;">Mắt &amp; miệng</span>, <span style="font-weight:bold;">Thân &amp; nảy khi nói</span>, <span style="font-weight:bold;">Tóc</span>, <span style="font-weight:bold;">Tay áo &amp; váy</span> để chỉnh chi tiết</li>
+<li>Nút <span style="font-weight:bold;">↺</span> cạnh từng thanh trả thanh đó về mặc định, nút <span style="font-weight:bold;">↺ Đặt lại tất cả thanh kéo về mặc định</span> ở cuối</li>
+</ul>
+<h3>Tab Cơ bản, kéo di chuyển và OBS</h3>
+<div class="post-image"><img src="/post/photo/ezytuber-tab-co-ban-nen-co-model-mvukgir4.webp" alt="Tab Cơ bản của Ezy Tuber gồm Micro, Độ nhạy mic, Nền, Cỡ model và Phím mở Cài đặt" loading="lazy"></div>
+<ul>
+<li><span style="font-weight:bold;">🎤 Bật mic</span> và <span style="font-weight:bold;">Độ nhạy mic</span>: để model mở miệng theo giọng nói của bạn</li>
+<li><span style="font-weight:bold;">Nền</span>: <span style="font-weight:bold;">Trong suốt (alpha)</span>, <span style="font-weight:bold;">Nền xanh lá (chroma)</span>, xanh dương, hồng, tối hoặc sáng. <span style="font-weight:bold;">Cỡ model</span> lưu riêng cho từng model</li>
+<li>Cửa sổ model không có thanh tiêu đề: <span style="font-weight:bold;">kéo thả thân nhân vật</span> để di chuyển, vị trí được nhớ cho lần sau</li>
+<li>Nút <span style="font-weight:bold;">Thoát ứng dụng</span> nằm trong cửa sổ Cài đặt</li>
+</ul>
+<p><span style="font-weight:bold;">Dùng với OBS:</span> thêm nguồn <span style="font-weight:bold;">Window Capture</span> (Windows 10 bản 1903 trở lên) và chọn cửa sổ <span style="font-weight:bold;">Ezy Tuber</span>. Model vẫn chạy khi bị che. Nền <span style="font-weight:bold;">Trong suốt</span> sẽ có alpha. Nếu OBS không lấy được alpha, chọn <span style="font-weight:bold;">Nền xanh lá</span> trong Cài đặt rồi dùng bộ lọc <span style="font-weight:bold;">Chroma Key</span>. Nếu máy báo CPU cao, vào tab Cơ bản: đặt <span style="font-weight:bold;">Nhịp thở</span> thành <span style="font-weight:bold;">Tiết kiệm</span> hoặc <span style="font-weight:bold;">Tắt</span>, hoặc giảm <span style="font-weight:bold;">FPS</span> xuống.</p>
+<hr>
+<h2>13. Lỗi thường gặp</h2>
+<h3>Tất cả layer bị chồng ở góc trên trái</h3>
+<p>Đây là lỗi hay gặp nhất. Nguyên nhân: các layer đã bị <span style="font-weight:bold;">cắt gọn</span> (mỗi ảnh chỉ vừa khít phần có hình) và <span style="font-weight:bold;">không có layers.json</span> nên app không biết mỗi mảnh nằm ở đâu. Thanh trạng thái sẽ báo màu vàng: <span style="color:#FFFF55;">"⚠ ... ảnh có kích thước khác canvas và không có vị trí — được đặt ở góc trên trái"</span>.</p>
+<div class="post-image"><img src="/post/photo/ezymaker-loi-layer-chong-goc-tren-trai-mvukg2iz.webp" alt="Nhập layer đã cắt gọn và không có vị trí nên các mảnh chồng lên nhau ở góc, thanh trạng thái hiện cảnh báo màu vàng" loading="lazy"></div>
+<ul>
+<li><span style="font-weight:bold;">Cách sửa:</span> xuất lại layer <span style="font-weight:bold;">KHÔNG cắt</span>, mọi ảnh cùng kích thước canvas. Hoặc kèm file <span style="color:#FFFF55;">layers.json</span> chứa vị trí từng layer</li>
+<li>Ảnh trên là bộ layer Shikiri gốc (đã cắt gọn, không có layers.json) khi nhập thẳng vào app. Để làm bài này, mình đã xếp từng mảnh vào canvas 1024×1024. Lưu ý tên model lúc này có thể bị đặt theo tên thư mục (ở đây là “emo”), nhớ đổi lại ô Tên model</li>
+</ul>
+<h3>Layer đã có nhưng không thấy trên model</h3>
+<ul>
+<li>Layer bị <span style="font-weight:bold;">ẩn</span> (👁): bật lại, vì layer ẩn không được xuất</li>
+<li>Layer bị <span style="font-weight:bold;">tự rig ẩn</span> vì bị che hoàn toàn: xem hộp Kết quả tự rig hoặc dùng <span style="font-weight:bold;">🔍 Tìm layer bị che</span>. Nên nhớ thứ tự chồng lớp quyết định ai che ai. Ví dụ layer miệng mở nằm <span style="font-weight:bold;">dưới</span> layer mặt thì bị mặt che hết, nên sẽ bị coi là bị che</li>
+<li>Layer được gán vào trạng thái biểu cảm chưa được chọn: kiểm tra ô <span style="font-weight:bold;">Hiển thị theo biểu cảm / emote</span></li>
+</ul>
+<h3>Mắt hoặc miệng bị trống khi đổi biểu cảm</h3>
+<ul>
+<li>Trạng thái đó <span style="font-weight:bold;">chưa có layer nào</span> (số ở hàng trạng thái là 0). Dùng ⬇ để gán layer</li>
+<li>Trạng thái Vui mà lông mày, mi mắt vẫn mất: các layer đó chỉ được tick cho trạng thái Bình thường. Tick thêm Vui ở mục <span style="font-weight:bold;">Hiển thị theo biểu cảm / emote</span> (xem mục 8)</li>
+</ul>
+<h3>Miệng không mở theo tiếng</h3>
+<ul>
+<li>Thiếu layer <span style="font-weight:bold;">miệng mở</span> hoặc nó không có điều kiện <span style="font-weight:bold;">Chỉ hiện khi đang nói</span></li>
+<li>Miệng đóng và miệng mở chưa gắn <span style="font-weight:bold;">cùng một khớp</span> mouth</li>
+<li>Khi xem thử, hãy kéo thanh <span style="font-weight:bold;">Âm lượng (nói)</span>, vì không có tiếng thì miệng không mở</li>
+</ul>
+<h3>Đầu hoặc tóc bị cắt ở mép khung</h3>
+<ul>
+<li>Tăng <span style="font-weight:bold;">Lề trên</span> và <span style="font-weight:bold;">Lề hai bên</span> ở tab Model rồi xuất lại</li>
+<li>Bật lại ô <span style="font-weight:bold;">Khung xuất</span> ở thanh công cụ canvas để nhìn khung nét đứt, rồi kiểm tra trong <span style="font-weight:bold;">▶ Xem thử</span> khi kéo âm lượng và di chuột mạnh</li>
+</ul>
+<h3>Thông báo lỗi khi nhập hoặc xuất</h3>
+<ul>
+<li><span style="color:#FF5555;">"layers.json bị lỗi cú pháp — bỏ qua, dùng thứ tự theo tên file"</span>: file <span style="color:#FFFF55;">layers.json</span> sai định dạng, app bỏ qua nó. Sửa lại file hoặc đặt tên theo số thứ tự</li>
+<li><span style="color:#FF5555;">"model.json bị lỗi cú pháp"</span> hoặc <span style="color:#FF5555;">"model.json không hợp lệ: thiếu sprites"</span>: khi mở model, file model.json trong zip hỏng hoặc không phải model của Ezy Maker</li>
+<li><span style="color:#FF5555;">"Không tìm thấy ảnh nào của model (kiểm tra thư mục assets)"</span>: zip thiếu thư mục <span style="color:#FFFF55;">assets</span> hoặc ảnh</li>
+<li><span style="color:#FFFF55;">"Chưa có layer nào để xuất."</span>: chưa nhập layer hoặc đã ẩn hết. Nhập lại hoặc bật 👁</li>
+<li><span style="color:#FF5555;">"Không xuất được: ..."</span>: thường do không ghi được vào nơi đã chọn, thử lưu sang thư mục khác</li>
+<li>Trong Ezy Tuber, model hỏng vẫn nằm trong tab <span style="font-weight:bold;">Model</span> kèm dòng <span style="color:#FF5555;">⚠ Không dùng được: ...</span> nêu lý do. Đọc dòng đó rồi sửa hoặc xuất lại từ Ezy Maker</li>
+</ul>
+<hr>
+<h2>14. Kết bài</h2>
+<p>Quy trình gói gọn là: <span style="font-weight:bold;">chuẩn bị layer cùng canvas, đặt tên có nghĩa → nhập → 🧩 tự rig → kiểm tra và chỉnh → ▶ xem thử → 📦 xuất zip → import vào Ezy Tuber</span>. Phần lớn công việc nặng đã do bước tự rig làm sẵn, bạn chỉ cần chỉnh những chỗ chưa vừa ý.</p>
+<a class="btn" href="https://moeshinn.github.io/product/ezy-software/" target="_blank" rel="noopener noreferrer">Tải EzyMaker và EzyTuber</a>
+<hr>
+<p><span style="color:#55FF55;font-weight:bold;">Chúc bạn có một model PNGTuber thật xinh!</span> <span style="font-style:italic;">Nếu làm theo mà gặp lỗi hoặc thấy bước nào chưa rõ, cứ để lại bình luận bên dưới, mình sẽ trả lời và cập nhật bài.</span></p></div></article></div>
+
+  <footer class="site-footer" data-global-footer>© 2026 Moe Shinn (@MoeShinn). All rights reserved.</footer>
+
+  <script src="/post/js/render.js"></script>
+  <script src="/post/js/main.js"></script>
+</body>
+</html>
