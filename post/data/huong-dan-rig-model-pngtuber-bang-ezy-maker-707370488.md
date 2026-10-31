@@ -376,7 +376,7 @@ Bài này viết cho người §lmới hoàn toàn§r, chưa từng rig bao gi�
 <li>Thông báo §a✔ Đã import 1 model: Shikiri§r hiện ra. Bấm §lDùng§r ở model muốn chuyển sang. Model đang dùng có nhãn §lĐANG DÙNG§r</li>
 </ol>
 
-![Tab Model của Ezy Tuber với nút Import model, thông báo import thành công, nhãn ĐANG DÙNG và ô gán phím chuyển model](/post/photo/ezymaker-tab-model-ten-dinh-dang-khung-xuat-mvvl6olf-mvvmcm6f.webp)
+![Tab Model của Ezy Tuber với nút Import model, thông báo import thành công, nhãn ĐANG DÙNG và ô gán phím chuyển model](/post/photo/ezytuber-tab-model-import-zip-mvvl6rgi-mvvnrhs1.webp)
 
 <p>Cách thủ công: giải nén thư mục §eShikiri§r vào thư mục §emodel\§r cạnh §eEzyTuber.exe§r, rồi bấm §l🔄 Quét lại§r. Nút §l📂 Mở thư mục model§r mở nhanh thư mục này. Mỗi model có ô phím riêng để chuyển nhanh sang nó (kể cả khi đang chơi game).</p>
 
