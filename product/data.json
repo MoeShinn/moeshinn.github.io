@@ -156,6 +156,16 @@
       "order": 4,
       "updated": "2026-10-29",
       "price": "79.000đ"
+    },
+    {
+      "id": "ezy-model-commission",
+      "type": "product",
+      "parent": "ezy",
+      "title": "Commission model Ezy Tuber: vẽ, tách layer, rig",
+      "thumb": "/image/6mwxw12x.webp",
+      "order": 3,
+      "updated": "2026-10-31",
+      "price": "Liên hệ"
     }
   ]
 }
