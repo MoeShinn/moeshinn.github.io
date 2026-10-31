@@ -473,6 +473,8 @@ Bài này viết cho người §lmới hoàn toàn§r, chưa từng rig bao gi�
 <a href="https://moeshinn.github.io/product/ezy-model-free/" target="_blank" rel="noopener noreferrer">§aNhận model free (nếu tui có đăng bán)§r</a>
 <br>
 <a href="https://moeshinn.github.io/product/ezy-model-paid/" target="_blank" rel="noopener noreferrer">§cMua model trả phí (đang có sẵn, giá từ 45k-79k)§r</a>
+<br>
+<a href="https://moeshinn.github.io/product/ezy-model-commission/" target="_blank" rel="noopener noreferrer">§bCommission model Ezy Tuber: vẽ, tách layer, rig§r</a>
 
 <hr>
 §a§lChúc bạn có một model PNGTuber thật xinh!§r §oNếu làm theo mà gặp lỗi hoặc thấy bước nào chưa rõ, cứ để lại bình luận bên dưới, mình sẽ trả lời và cập nhật bài.§r
