@@ -10,6 +10,12 @@ name: Unzip update
 
 on:
   workflow_dispatch:
+    inputs:
+      prerender:
+        description: 'Chạy prerender luôn (chậm hơn). Bỏ tick = chỉ giải nén + deploy, prerender để chạy riêng sau'
+        required: true
+        type: boolean
+        default: false
 
 concurrency:
   group: prerender        # dùng chung nhóm với workflow Prerender → không chạy chồng, tránh đụng commit
@@ -21,6 +27,8 @@ permissions:
 jobs:
   unzip:
     runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.push.outputs.changed }}
     steps:
       - uses: actions/checkout@v4
 
@@ -110,14 +118,11 @@ jobs:
       - name: Xóa update.zip
         run: rm -f update.zip
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
       # Dựng lại HTML tĩnh / sitemap / llms.txt theo file vừa cập nhật.
       # Nếu prerender lỗi thì vẫn commit phần giải nén (không còn cron tự chạy lại: nếu lỗi, vào tab Actions bấm Run workflow ở Prerender, hoặc commit lại một file .json/.html bất kỳ).
       - name: Prerender
         id: prerender
+        if: inputs.prerender
         continue-on-error: true
         run: node tools/prerender.js
 
@@ -126,19 +131,35 @@ jobs:
         run: echo "::warning::Prerender LỖI — phần giải nén vẫn được commit. Vào tab Actions → Prerender → Run workflow để dựng lại."
 
       - name: Commit và push
+        id: push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           if git diff --cached --quiet; then
             echo "Không có thay đổi nào để commit (file trong zip giống hệt bản đang có)."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git commit -m "Update: giải nén update.zip ($(cat /tmp/unzip_count) file)"
           for i in 1 2 3; do
-            git pull --rebase origin main && git push && exit 0
+            if git pull --rebase origin main && git push; then
+              echo "changed=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
             echo "Push lần $i lỗi, thử lại…"
             sleep 5
           done
           echo "::error::Push thất bại sau 3 lần"
           exit 1
+
+  deploy:
+    needs: unzip
+    if: needs.unzip.outputs.changed == 'true'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/deploy.yml
+    with:
+      ref: main

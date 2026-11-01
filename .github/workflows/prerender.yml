@@ -1,0 +1,68 @@
+name: Prerender
+
+# Chạy tay: tab Actions → "Prerender" → Run workflow.
+# Hoặc tự chạy mỗi ngày lúc 12:00 giờ Việt Nam (05:00 UTC; GitHub có thể trễ vài phút). Không muốn tự chạy thì xóa khối schedule.
+# Dựng xong có thay đổi → commit → deploy luôn. Không có thay đổi → không commit, không deploy.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 5 * * *"
+
+concurrency:
+  group: prerender
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  prerender:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      changed: ${{ steps.commit.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      # Runner có sẵn Node (prerender chỉ cần 18+) nên khỏi setup-node, đỡ vài giây
+      - run: node tools/prerender.js
+      - name: Commit nếu có thay đổi
+        id: commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for i in 1 2 3 4; do
+            git add -A
+            if git diff --cached --quiet; then
+              echo "Không có thay đổi để commit."
+              echo "changed=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            git commit -m "Prerender: cập nhật nội dung dựng sẵn"
+            if git pull --rebase origin main && git push; then
+              echo "changed=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Push lần $i lỗi (có commit mới chen vào)."
+            if [ "$i" -eq 4 ]; then break; fi
+            git rebase --abort 2>/dev/null || true
+            git fetch origin main
+            git reset --hard origin/main
+            node tools/prerender.js
+            sleep $((i * 3))
+          done
+          echo "::error::Push thất bại sau 4 lần"
+          exit 1
+
+  deploy:
+    needs: prerender
+    if: needs.prerender.outputs.changed == 'true'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/deploy.yml
+    with:
+      ref: main
