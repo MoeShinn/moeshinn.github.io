@@ -1,8 +1,12 @@
 name: Deploy Pages
 
-# Deploy nhanh: 1 job duy nhất (checkout → upload → deploy), không chờ 5 phút.
-# Chạy khi: push lên main (trừ commit chỉ đụng file không ảnh hưởng site), bấm tay, hoặc được workflow khác gọi
-# (Prerender / Unzip update gọi vào đây vì commit của bot không tự kích hoạt được workflow push).
+# Deploy nhanh: 1 job duy nhất (checkout → upload → deploy), không chờ gì cả.
+# Tự chạy khi:
+#  • push lên main (trừ commit chỉ đụng file không ảnh hưởng site)
+#  • Prerender / Unzip update chạy xong thành công (commit của bot không kích hoạt được push nên phải bắt qua workflow_run)
+#  • bấm tay: tab Actions → "Deploy Pages" → Run workflow
+# Luôn deploy bản main MỚI NHẤT. Push mới sẽ hủy deploy đang chạy dở (hiện màu xám "cancelled", không phải lỗi);
+# Prerender / Unzip update thì không hủy ai mà xếp hàng chờ.
 # Settings → Pages → Source phải là "GitHub Actions".
 
 on:
@@ -14,34 +18,32 @@ on:
       - "worker/**"
       - "update.zip"
       - "site-notify-state.json"   # Worker ghi mỗi giờ, site không đọc file này
+  workflow_run:
+    workflows: ["Prerender", "Unzip update"]
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
-  workflow_call:
-    inputs:
-      ref:
-        description: Nhánh hoặc commit cần deploy
-        type: string
-        default: main
 
 jobs:
   deploy:
+    # workflow_run chỉ deploy khi workflow trước đó thành công
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
       contents: read
       pages: write
       id-token: write
-    # Hàng chờ chung: đang deploy dở thì không ngắt; nhiều lần chạy xếp hàng sẽ chỉ giữ lần MỚI NHẤT
-    # → commit dồn dập chỉ tốn 2 lần deploy (1 đang chạy + 1 bản mới nhất), không cần chờ yên tĩnh.
     concurrency:
       group: pages
-      cancel-in-progress: false
+      cancel-in-progress: ${{ github.event_name == 'push' }}
     environment:
       name: github-pages
       url: ${{ steps.d2.outputs.page_url || steps.d1.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref || github.sha }}
+          ref: main
           fetch-depth: 1
 
       - name: Chặn deploy bản rỗng
@@ -60,7 +62,7 @@ jobs:
         uses: actions/deploy-pages@v4
         continue-on-error: true
 
-      # Lỗi thì thử lại 1 lần ngay trong job này (dùng lại artifact, không tốn thêm runner)
+      # Lỗi thật thì thử lại 1 lần ngay trong job này (bị hủy do push mới thì KHÔNG tính là lỗi)
       - name: Chờ rồi thử lại
         if: steps.d1.outcome == 'failure'
         run: sleep 20
