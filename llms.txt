@@ -35,6 +35,7 @@
 
 ## Bài đăng
 
+- [Hướng dẫn rig model PNGTuber bằng Ezy Maker](https://moeshinn.github.io/post/huong-dan-rig-model-pngtuber-bang-ezy-maker-707370488/) (2026-10-31): Hướng dẫn chi tiết cách rig model PNGTuber bằng Ezy Maker cho người mới bắt đầu. Tự động tạo khung xương, chớp mắt và nhép miệng nhanh chóng.
 - [Moe Shinn debut: Kênh Vtuber/PNGtuber Việt Nam](https://moeshinn.github.io/post/shinju-ch-vner-chinh-thuc-debut-kenh-youtube-vtuber-pngtuber-180563779/) (2026-10-19): Kênh YouTube Vtuber/PNGtuber Việt Nam gaming, reaction & stream 20h hằng ngày
 - [Music Box – Plugin phát nhạc cho server Minecraft](https://moeshinn.github.io/post/music-box-plugin-phat-nhac-ngay-trong-server-minecraft-cua-b-072268664/) (2026-10-16): Giới thiệu Music Box: plugin cho phép người chơi lưu playlist và phát nhạc từ link trong game qua Simple Voice Chat. Xem tính năng, lệnh và cách cài trên Paper, Purpur, Leaf 1.21+.
 - [Hướng dẫn cài Optimized.zip cho Launcher](https://moeshinn.github.io/post/huong-dan-cai-optimized-zip-cho-launcher-699363013/) (2026-10-16): Hướng dẫn cài Optimized Fabric cho Minecraft bằng Legacy Launcher, Fabric Launcher, Prism Launcher
@@ -55,6 +56,7 @@
     - [Kira Model](https://moeshinn.github.io/product/kira-model/): Kira Gothic Baron là mẫu EzyTuber model độc đáo phong cách quý tộc bóng tối cho stream. Thiết kế lạnh lùng với tông đen đỏ, chuyển động mượt mà. Giá: 52.000đ.
     - [Mae Yuki Model](https://moeshinn.github.io/product/mae-yuki-model/): Mua model Mae Yuki cho EzyTuber - Cô nàng tóc đỏ rượu vang phong cách idol, có chút cá tính, có chút ngọt ngào! Giá: 64.000đ.
     - [Lumie Model](https://moeshinn.github.io/product/lumie-model/): Sở hữu ngay Lumie, mẫu PNGTuber hồ ly ánh trăng phong cách gaming cho EzyTuber. Thiết kế anime độc đáo giúp bạn bắt đầu hành trình livestream chuyên Giá: 79.000đ.
+  - [Commission model Ezy Tuber: vẽ, tách layer, rig](https://moeshinn.github.io/product/ezy-model-commission/): Commission model Ezy Tuber trọn gói hoặc riêng lẻ gồm vẽ nhân vật đơn giản, tách layer PNG và rig chuyển động mượt mà. Đảm bảo bản quyền thuộc về bạn. Giá: Liên hệ.
 - [Công cụ ảnh](https://moeshinn.github.io/product/photo-tools/) (danh mục): Bộ công cụ ảnh online miễn phí giúp nén ảnh giảm dung lượng, cắt ảnh theo tỷ lệ tùy chọn và đổi định dạng JPG, PNG, WebP. Xử lý nhanh, an toàn, không cần đăng ký.
   - [Chuyển đổi định dạng ảnh](https://moeshinn.github.io/product/convert-image/): Chuyển đổi định dạng ảnh online miễn phí: đổi JPG, PNG, WebP, AVIF hàng loạt ngay trên trình duyệt, không tải ảnh lên máy chủ, xuất zip một lần. Giá: Miễn phí.
   - [Cắt ảnh theo tỉ lệ](https://moeshinn.github.io/product/crop-image/): Cắt ảnh online miễn phí theo tỉ lệ tùy chọn (1:1, 4:3, 16:9, 9:16, 4:5…), chọn nhiều ảnh, chỉnh vùng cắt từng ảnh trực tiếp và xuất zip. Chạy ngay trên trình duyệt. Giá: Miễn phí.
@@ -64,7 +66,7 @@
 
 - [Model Shinn](https://moeshinn.github.io/album/model-png-tuber-vtuber/): 2 ảnh
 - [art-shinn](https://moeshinn.github.io/album/art-shinn/): 2 ảnh
-- [Sản phẩm](https://moeshinn.github.io/album/san-pham/): 27 ảnh
+- [Sản phẩm](https://moeshinn.github.io/album/san-pham/): 28 ảnh
 
 ## Tải xuống
 
