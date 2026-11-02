@@ -44,7 +44,7 @@
     "pitch": 1,
     "volume": 100,
     "voiceURI": "",
-    "delay": 2,
+    "delay": 1.5,
     "min": 8000,
     "maxChars": 100,
     "text": "{DISPLAY NAME} đã tặng bạn 1 ly kem giá {AMOUNT} đồng.",
