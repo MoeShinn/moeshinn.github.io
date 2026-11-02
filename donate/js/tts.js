@@ -1,10 +1,11 @@
 /* ShinjuTTS — đọc donate bằng tiếng Việt, dùng chung cho overlay và admin.
-   Thứ tự: Google TTS (translate_tts, không cần key) → nếu bị chặn/lỗi/quá chậm thì tự chuyển sang speechSynthesis của trình duyệt.
-   Không gọi Worker, không tốn API key. */
+   Chỉ dùng đúng MỘT nguồn giọng theo cấu hình tts.engine, không tự chuyển nguồn khi lỗi:
+   "google" = Google TTS (translate_tts, không cần key) | "browser" = speechSynthesis của trình duyệt.
+   Giá trị cũ "auto" (hoặc bất kỳ giá trị lạ nào) được hiểu là "google". Không gọi Worker, không tốn API key. */
 (() => {
   const DEF = {
     on: true,
-    engine: "auto",        // auto = Google rồi dự phòng trình duyệt | browser = chỉ dùng giọng trình duyệt
+    engine: "google",      // google = Google TTS | browser = giọng trình duyệt (chỉ chọn một nguồn, không dự phòng)
     rate: 1,               // 0.5 – 2
     pitch: 1,              // 0 – 2 (chỉ giọng trình duyệt)
     volume: 100,           // 0 – 100
@@ -15,7 +16,7 @@
     text: "{DISPLAY NAME} đã tặng bạn 1 ly cà phê giá {AMOUNT} đồng.",
     textMsg: "{DISPLAY NAME} đã tặng bạn 1 ly cà phê giá {AMOUNT} đồng. Lời nhắn gửi từ {DISPLAY NAME}: {MESSENGER}",
   };
-  const cfgOf = (t) => ({ ...DEF, ...(t || {}) });
+  const cfgOf = (t) => { const c = { ...DEF, ...(t || {}) }; c.engine = c.engine === "browser" ? "browser" : "google"; return c; }; // "auto" cũ → "google"
   const clamp = (v, a, b, d) => { v = +v; return Number.isFinite(v) ? Math.min(b, Math.max(a, v)) : d; };
 
   /* ---------- Số → chữ tiếng Việt ---------- */
@@ -98,13 +99,13 @@
   }
 
   /* ---------- Phát ---------- */
-  let token = 0, curAudio = null;
+  let token = 0, curAudio = null, gain = 1, baseVol = 1, fadeTimer = 0; // gain: hệ số fade-out 1 → 0, áp lên mọi đoạn Google TTS (kể cả đoạn kế tiếp)
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
   const gUrl = (q) => "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=vi&q=" + encodeURIComponent(q);
   function playGoogle(q, o, my) {
     return new Promise((res, rej) => {
-      const a = new Audio(); curAudio = a; a.preload = "auto"; a.volume = o.volume; a.playbackRate = o.rate;
+      const a = new Audio(); curAudio = a; a.preload = "auto"; a.volume = o.volume * gain; a.playbackRate = o.rate;
       let started = false;
       const to = setTimeout(() => { if (!started) { a.pause(); rej(new Error("Google TTS quá chậm")); } }, 7000);
       a.onplaying = () => { started = true; clearTimeout(to); };
@@ -140,23 +141,35 @@
     });
   }
 
-  // speak(text, tts): trả về "google" | "browser" | "none". Không bao giờ ném lỗi.
+  // speak(text, tts): trả về "google" | "browser" | "none" (nguồn đã chọn phát được hay không). Không bao giờ ném lỗi.
   async function speak(text, t) {
-    t = cfgOf(t); const my = ++token;
+    t = cfgOf(t); const my = ++token; clearInterval(fadeTimer); gain = 1;
     const o = { rate: clamp(t.rate, 0.5, 2, 1), pitch: clamp(t.pitch, 0, 2, 1), volume: clamp(t.volume, 0, 100, 100) / 100, voiceURI: t.voiceURI };
+    baseVol = o.volume;
     const chunks = split(text); if (!chunks.length) return "none";
-    let i = 0, used = "none";
-    if (t.engine !== "browser") {
-      try {
-        for (; i < chunks.length; i++) { if (my !== token) return used; await playGoogle(chunks[i], o, my); used = "google"; }
-        return used;
-      } catch (e) { console.warn("[TTS] Google lỗi, chuyển sang giọng trình duyệt:", e.message || e); }
+    if (t.engine === "browser") {
+      try { await playBrowser(chunks.join(" "), o, my); return "browser"; }
+      catch (e) { console.warn("[TTS] speechSynthesis lỗi:", e.message || e); return "none"; }
     }
-    if (my !== token) return used;
-    try { await playBrowser(chunks.slice(i).join(" "), o, my); return used === "google" ? "google+browser" : "browser"; }
-    catch (e) { console.warn("[TTS] speechSynthesis lỗi:", e.message || e); return used; }
+    try {
+      for (const c of chunks) { if (my !== token) return "google"; await playGoogle(c, o, my); }
+      return "google";
+    } catch (e) { console.warn("[TTS] Google TTS lỗi:", e.message || e); return "none"; }
   }
-  function cancel() { token++; try { curAudio && curAudio.pause(); } catch {} try { "speechSynthesis" in window && speechSynthesis.cancel(); } catch {} }
+  // Giảm dần âm lượng giọng đọc về 0 trong `ms` mili-giây (đồng bộ với hiệu ứng mờ dần của overlay).
+  // Chỉ có tác dụng với Google TTS; speechSynthesis của trình duyệt không cho đổi volume khi đang đọc.
+  function fade(ms = 500) {
+    clearInterval(fadeTimer);
+    return new Promise((res) => {
+      const t0 = Date.now();
+      fadeTimer = setInterval(() => {
+        const k = Math.min(1, (Date.now() - t0) / ms); gain = 1 - k;
+        try { if (curAudio) curAudio.volume = baseVol * gain; } catch {}
+        if (k >= 1) { clearInterval(fadeTimer); res(); }
+      }, 30);
+    });
+  }
+  function cancel() { clearInterval(fadeTimer); token++; try { curAudio && curAudio.pause(); } catch {} try { "speechSynthesis" in window && speechSynthesis.cancel(); } catch {} }
 
-  window.ShinjuTTS = { DEF, cfg: cfgOf, num, normalize, build, split, speak, cancel, voices, sleep };
+  window.ShinjuTTS = { DEF, cfg: cfgOf, num, normalize, build, split, speak, cancel, fade, voices, sleep };
 })();

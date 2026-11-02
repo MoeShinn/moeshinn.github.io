@@ -39,7 +39,7 @@
   },
   "tts": {
     "on": true,
-    "engine": "auto",
+    "engine": "google",
     "rate": 1,
     "pitch": 1,
     "volume": 100,

@@ -26,6 +26,16 @@
   const apply = (c) => { cfg = c; $("#usercss").textContent = c.alert.css || ""; const s = $("#stage").style, a = c.alert;
     s.justifyContent = { left: "flex-start", center: "center", right: "flex-end" }[a.posX]; s.alignItems = { top: "flex-start", middle: "center", bottom: "flex-end" }[a.posY]; };
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const FADE = 500; // phải khớp transition .5s của .alert.out
+  function fadeSound(a, base, ms) { // giảm dần volume của một Audio; dùng setInterval vì rAF bị dừng khi nguồn OBS ẩn
+    return new Promise((res) => {
+      if (!a || a.paused || a.ended) return res();
+      const t0 = Date.now(), id = setInterval(() => {
+        const k = Math.min(1, (Date.now() - t0) / ms); try { a.volume = base * (1 - k); } catch {}
+        if (k >= 1) { clearInterval(id); res(); }
+      }, 30);
+    });
+  }
   async function show(al) {
     const a = cfg.alert, t = cfg.tts, vars = { "DISPLAY NAME": al.name, AMOUNT: Number(al.amount).toLocaleString("vi-VN"), MESSENGER: al.msg || "" };
     const el = document.createElement("div"); el.className = "alert " + (a.layout === "h" ? "h" : "v");
@@ -34,20 +44,24 @@
     if (a.layout === "h") { const i = el.querySelector("img"); if (i) i.style.alignSelf = "stretch"; }
     $("#stage").replaceChildren(el);
     const t0 = Date.now(), max = (+a.duration || 15) * 1000; let end = (+a.minShow || 6) * 1000;
-    if (a.sound) { const s = new Audio(a.sound); s.volume = Math.min(1, (+a.volume || 80) / 100); s.play().catch(() => {}); }
+    const sndVol = Math.min(1, (+a.volume || 80) / 100); let snd = null;
+    if (a.sound) { snd = new Audio(a.sound); snd.volume = sndVol; snd.play().catch(() => {}); }
     const T = window.ShinjuTTS, tc = T.cfg(t);
-    // Giọng đọc: Google TTS → tự chuyển speechSynthesis nếu Google lỗi/bị chặn. al.audio === "mute" = alert thử không đọc.
+    // Giọng đọc: dùng đúng nguồn đã chọn trong admin (Google TTS hoặc giọng trình duyệt), không tự đổi nguồn. al.audio === "mute" = alert thử không đọc.
     if (tc.on && al.audio !== "mute" && Number(al.amount) >= (+tc.min || 0)) {
       await sleep((+tc.delay || 0) * 1000);
       const left = max - (Date.now() - t0);
       if (left > 500) {
         const spoken = T.build(tc, al);
-        await Promise.race([T.speak(spoken, tc), sleep(left)]); T.cancel(); // quá thời gian tối đa thì cắt
+        await Promise.race([T.speak(spoken, tc), sleep(left)]); // quá thời gian tối đa thì để fade-out bên dưới giảm dần rồi mới cắt
         end = Math.max(end, Date.now() - t0 + 1000);
       }
     }
     await sleep(Math.max(0, Math.min(max, end) - (Date.now() - t0)));
-    el.classList.add("out"); await sleep(500); el.remove();
+    // Mờ hình/chữ (CSS .out, 0.5s) đồng thời giảm dần âm thanh alert + giọng đọc về 0, xong mới dừng hẳn.
+    el.classList.add("out");
+    await Promise.all([fadeSound(snd, sndVol, FADE), T.fade(FADE)]);
+    T.cancel(); if (snd) snd.pause(); el.remove();
   }
   async function pump() { if (busy) return; busy = true; while (queue.length) { try { await show(queue.shift()); } catch {} } busy = false; }
   window.addEventListener("message", (e) => { if (!PREVIEW || !e.data) return; if (e.data.cfg) apply(e.data.cfg); if (e.data.alert) { queue.push(e.data.alert); pump(); } });
