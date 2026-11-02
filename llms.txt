@@ -46,8 +46,8 @@
 
 - [Ezy Software và Model build sẵn](https://moeshinn.github.io/product/ezy/) (danh mục): Xem kho sản phẩm Ezy Software và Model EzyTuber build và rig sẵn free trên website Moe Shinn
   - [Ezy Software](https://moeshinn.github.io/product/ezy-software/) (danh mục): Ezy Software bao gồm phần mềm giúp đơn giản hóa các quy trình chạy, rig, build model PNG Tuber nâng cao nhưng được đơn giản hóa thuộc Moe Shinn [VNer]
-    - [Ezy All in 1](https://moeshinn.github.io/product/ezy-all-in-1/): Tải về Ezy Software All in 1 Giá: Miễn phí.
-    - [Ezy Tuber](https://moeshinn.github.io/product/ezy-tuber/): Ezy Tuber là phần mềm chạy model PNGTuber theo thời gian thực: khuôn mặt theo dõi chuột, phản hồi giọng nói và biểu cảm để bạn lên hình, livestream dễ dàng. Giá: Miễn phí.
+    - [Ezy All in 1](https://moeshinn.github.io/product/ezy-all-in-1/): Tải miễn phí Ezy All in 1 từ Moe Shinn bao gồm trọn bộ công cụ Ezy Tuber và Ezy Maker hỗ trợ sáng tạo nội dung cho Vtuber và PNGTuber. Giá: Miễn phí.
+    - [Ezy Tuber](https://moeshinn.github.io/product/ezy-tuber/): Ezy Tuber là phần mềm chạy model PNGTuber và Vtuber miễn phí bằng tiếng Việt, giúp theo dõi giọng nói và chuyển động chuột để bạn livestream dễ dàng. Giá: Miễn phí.
     - [Ezy Maker](https://moeshinn.github.io/product/ezy-maker/): Ezy Maker là công cụ rig layer để biến tranh nhân vật nhiều lớp (PSD, PNG) thành model PNGTuber hoàn chỉnh, thao tác trực quan, không cần kỹ năng kỹ thuật phức tạp. Giá: Miễn phí.
   - [Ezy Model Free](https://moeshinn.github.io/product/ezy-model-free/) (danh mục): Nhận Ezy Model Free sử dụng cho phần mềm Ezy Tuber với các chính sách & giấy phép liên quan
   - [Ezy Model Trả phí](https://moeshinn.github.io/product/ezy-model-paid/) (danh mục): Sở hữu ngay Ezy Model Trả Phí dùng cho Ezy Tuber
