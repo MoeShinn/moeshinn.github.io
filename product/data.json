@@ -166,6 +166,25 @@
       "order": 3,
       "updated": "2026-10-31",
       "price": "Liên hệ"
+    },
+    {
+      "id": "software",
+      "type": "category",
+      "parent": "",
+      "title": "Software",
+      "thumb": "/image/mr4do1k0.webp",
+      "order": 2,
+      "updated": "2026-11-18"
+    },
+    {
+      "id": "my-server-manager",
+      "type": "product",
+      "parent": "software",
+      "title": "My Server Manager",
+      "thumb": "/image/mr4do1k0.webp",
+      "order": 0,
+      "updated": "2026-11-18",
+      "price": "Miễn phí"
     }
   ]
 }

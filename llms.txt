@@ -61,12 +61,14 @@
   - [Chuyển đổi định dạng ảnh](https://moeshinn.github.io/product/convert-image/): Chuyển đổi định dạng ảnh online miễn phí: đổi JPG, PNG, WebP, AVIF hàng loạt ngay trên trình duyệt, không tải ảnh lên máy chủ, xuất zip một lần. Giá: Miễn phí.
   - [Cắt ảnh theo tỉ lệ](https://moeshinn.github.io/product/crop-image/): Cắt ảnh online miễn phí theo tỉ lệ tùy chọn (1:1, 4:3, 16:9, 9:16, 4:5…), chọn nhiều ảnh, chỉnh vùng cắt từng ảnh trực tiếp và xuất zip. Chạy ngay trên trình duyệt. Giá: Miễn phí.
   - [Nén ảnh giảm dung lượng](https://moeshinn.github.io/product/compress-image/): Nén ảnh online miễn phí: giảm dung lượng JPG, PNG, WebP hàng loạt theo chất lượng hoặc theo dung lượng mục tiêu (KB), thu nhỏ kích thước, xuất zip. Chạy ngay trên trình duyệt. Giá: Miễn phí.
+- [Software](https://moeshinn.github.io/product/software/) (danh mục): Danh mục phần mềm miễn phí cho máy tính của Moe Shinn, như My Server Manager giúp tạo và quản lí server Minecraft Java trên Windows và Linux.
+  - [My Server Manager](https://moeshinn.github.io/product/my-server-manager/): My Server Manager là phần mềm miễn phí giúp tạo và quản lí nhiều server Minecraft Java trên Windows và Linux: Paper, Purpur, Leaf, Fabric, nhập server từ file .jar, tên và mô tả có màu, không cần dòng lệnh. Giá: Miễn phí.
 
 ## Album ảnh
 
 - [Model Shinn](https://moeshinn.github.io/album/model-png-tuber-vtuber/): 2 ảnh
 - [art-shinn](https://moeshinn.github.io/album/art-shinn/): 7 ảnh
-- [Sản phẩm](https://moeshinn.github.io/album/san-pham/): 29 ảnh
+- [Sản phẩm](https://moeshinn.github.io/album/san-pham/): 33 ảnh
 
 ## Tải xuống
 

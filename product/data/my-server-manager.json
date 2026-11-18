@@ -1,0 +1,38 @@
+{
+  "description": "My Server Manager là phần mềm miễn phí giúp tạo và quản lí nhiều server Minecraft Java trên Windows và Linux: Paper, Purpur, Leaf, Fabric, nhập server từ file .jar, tên và mô tả có màu, không cần dòng lệnh.",
+  "keywords": "My Server Manager, phần mềm tạo server Minecraft, quản lí server Minecraft, Minecraft server manager, tạo server Minecraft Java, server Paper, server Purpur, server Leaf, server Fabric, phần mềm Minecraft miễn phí, Moe Shinn",
+  "licenses": [
+    {
+      "title": "GIẤY PHÉP MIT (MIT LICENSE) - MY SERVER MANAGER",
+      "text": "Bản quyền (c) 2026 MoeShinn.\nBằng văn bản này, quyền cho phép được cấp miễn phí cho bất kỳ ai có được bản sao của phần mềm này và các tệp tài liệu liên quan (gọi chung là \"Phần mềm\"), để xử lý Phần mềm mà không bị hạn chế, bao gồm nhưng không giới hạn ở quyền sử dụng, sao chép, sửa đổi, hợp nhất, xuất bản, phân phối, cấp phép lại và/hoặc bán các bản sao của Phần mềm, tùy thuộc vào điều kiện: thông báo bản quyền và thông báo cấp phép này phải được đưa vào tất cả các bản sao hoặc các phần quan trọng của Phần mềm.\nPHẦN MỀM ĐƯỢC CUNG CẤP \"NGUYÊN TRẠNG\", KHÔNG CÓ BẤT KỲ BẢO ĐẢM NÀO, DÙ LÀ RÕ RÀNG HOẶC NGỤ Ý. TRONG BẤT KỲ TRƯỜNG HỢP NÀO, CÁC TÁC GIẢ HOẶC NGƯỜI NẮM GIỮ BẢN QUYỀN SẼ KHÔNG CHỊU TRÁCH NHIỆM CHO BẤT KỲ KHIẾU NẠI, THIỆT HẠI HOẶC TRÁCH NHIỆM PHÁP LÝ NÀO PHÁT SINH TỪ VIỆC SỬ DỤNG PHẦN MỀM.\nBản đầy đủ bằng tiếng Anh nằm trong kho mã nguồn: https://github.com/MoeShinn/My-Server-Manager"
+    },
+    {
+      "title": "CHÍNH SÁCH QUYỀN RIÊNG TƯ VÀ LƯU Ý",
+      "text": "1. Dữ liệu cá nhân\nỨng dụng không thu thập dữ liệu cá nhân, không phân tích, không theo dõi, không gửi số liệu sử dụng, không quảng cáo và không cần tài khoản. Mọi dữ liệu (server, cài đặt, nhật ký, bản Java đã tải) được lưu ngay trên máy của bạn.\n\n2. Kết nối mạng\nỨng dụng chỉ kết nối tới các dịch vụ cần thiết cho việc bạn yêu cầu: GitHub (cập nhật app, tệp dữ liệu, ngôn ngữ), Mojang, PaperMC, Purpur, Leaf, Fabric (danh sách phiên bản và tải server), Modrinth (plugin, mod), Adoptium (tải Java) và playit.gg (chỉ khi bạn bật). Các dịch vụ này có thể thấy địa chỉ IP của bạn như mọi yêu cầu qua internet.\n\n3. Minecraft EULA\nServer chỉ chạy được sau khi bạn chấp nhận Minecraft EULA. Ứng dụng mở EULA để bạn đọc và không tự chấp nhận thay bạn.\n\n4. Không liên kết\nĐây không phải sản phẩm chính thức của Minecraft, không được Mojang hay Microsoft phê duyệt hay liên kết. Mọi tên sản phẩm được nhắc đến thuộc về chủ sở hữu tương ứng.\n\n5. Gỡ cài đặt\nGỡ cài đặt ứng dụng không xóa server của bạn, trừ khi bạn chọn xóa toàn bộ dữ liệu."
+    }
+  ],
+  "price": "Miễn phí",
+  "body": "<h2>Giới thiệu My Server Manager</h2>\n§l§aMy Server Manager§r là phần mềm giúp bạn §ltạo và quản lí nhiều server Minecraft Java§r ngay trên máy tính của mình, §l§bkhông cần dùng dòng lệnh§r. Chọn phần mềm server, chọn phiên bản, bấm tạo là app tự tải mọi thứ cần thiết, kể cả đúng bản Java cho từng server, nên bạn không phải cài Java.\n\n<h2>Điểm nổi bật</h2>\n<ul><li>§l§aTạo server nhanh§r: Vanilla, Paper, Purpur, Folia, Leaf, Fabric, Velocity hoặc file .jar tự chọn.</li><li>§l§bNhập server từ file .jar§r: chọn file, chọn phần mềm (Paper, Purpur, Leaf…) và phiên bản là xong.</li><li>§l§dTên và mô tả có màu§r: gõ mã màu §l&§r hoặc §l§§r để tô màu tên và mô tả (MOTD) server, có bảng chọn màu và xem trước ngay.</li><li>§l§eĐiều khiển và theo dõi§r: chạy, dừng, khởi động lại, console realtime có gợi ý lệnh, Dashboard cho nhiều server cùng lúc.</li><li>§l§aPlugin và mod§r: tìm, cài và gỡ trực tiếp từ Modrinth.</li><li>§l§bQuản lí tệp§r: duyệt, đổi tên hàng loạt, di chuyển, xóa và sửa tệp bằng trình sửa tích hợp.</li><li>§l§dCho bạn bè vào chơi§r: hướng dẫn IP tùy chỉnh và hỗ trợ playit.gg.</li><li>§l§eChạy ổn định§r: thu xuống khay hệ thống, tự khởi động server, tự khởi động lại khi crash, thoát an toàn.</li><li>§l§aĐa ngôn ngữ§r: tiếng Anh, tiếng Việt và song ngữ Việt-Anh.</li><li>§l§bRiêng tư§r: không tài khoản, không thu thập dữ liệu.</li></ul>\n\n<h2>Cài đặt</h2>\n<table><thead><tr><th>Hệ điều hành</th><th>Tệp tải</th><th>Ghi chú</th></tr></thead><tbody><tr><td>Windows 10/11 (64-bit)</td><td>mc-server-manager-Setup-1.0.0.exe</td><td>Chạy tệp và làm theo hướng dẫn.</td></tr><tr><td>Linux (64-bit)</td><td>mc-server-manager-1.0.0-linux-x64.AppImage</td><td>Bản thử nghiệm. Cấp quyền chạy bằng <code>chmod +x</code> rồi mở tệp. Ubuntu 22.04 trở lên có thể cần cài <code>libfuse2</code>.</td></tr></tbody></table>\n\n<h2>Bắt đầu nhanh</h2>\n<ol><li>Mở app, bấm §l§aTạo server§r (hoặc §l§aNhập máy chủ từ tệp .jar§r nếu bạn đã có file server).</li><li>Đặt tên, chọn phần mềm và phiên bản, chọn RAM rồi tạo.</li><li>Đồng ý Minecraft EULA khi app hỏi, sau đó bấm §l§aStart§r.</li><li>Muốn bạn bè vào chơi cùng, mở trang §lĐịa chỉ IP§r để thêm địa chỉ tùy chỉnh hoặc dùng playit.gg.</li></ol>\n\n<hr>\n\n§7Đây không phải sản phẩm chính thức của Minecraft, không được Mojang hay Microsoft phê duyệt hay liên kết.§r\n§7Liên hệ & hỗ trợ: [Liên hệ](https://moeshinn.github.io/channel/) · [Báo lỗi trên GitHub](https://github.com/MoeShinn/My-Server-Manager/issues/new/choose)§r",
+  "gallery": [
+    "/image/zqfwfpbc.webp",
+    "/image/a8b7pdt6.webp",
+    "/image/2438frsx.webp"
+  ],
+  "buttons": [
+    {
+      "label": "Tải cho Windows",
+      "url": "https://github.com/MoeShinn/My-Server-Manager/releases/download/v1.0.0/mc-server-manager-Setup-1.0.0.exe",
+      "style": "blue"
+    },
+    {
+      "label": "Tải cho Linux (AppImage)",
+      "url": "https://github.com/MoeShinn/My-Server-Manager/releases/download/v1.0.0/mc-server-manager-1.0.0-linux-x64.AppImage",
+      "style": "green"
+    },
+    {
+      "label": "Mã nguồn GitHub",
+      "url": "https://github.com/MoeShinn/My-Server-Manager",
+      "style": "gray"
+    }
+  ]
+}
