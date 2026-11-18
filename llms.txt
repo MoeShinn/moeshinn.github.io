@@ -65,8 +65,8 @@
 ## Album ảnh
 
 - [Model Shinn](https://moeshinn.github.io/album/model-png-tuber-vtuber/): 2 ảnh
-- [art-shinn](https://moeshinn.github.io/album/art-shinn/): 6 ảnh
-- [Sản phẩm](https://moeshinn.github.io/album/san-pham/): 28 ảnh
+- [art-shinn](https://moeshinn.github.io/album/art-shinn/): 7 ảnh
+- [Sản phẩm](https://moeshinn.github.io/album/san-pham/): 29 ảnh
 
 ## Tải xuống
 
