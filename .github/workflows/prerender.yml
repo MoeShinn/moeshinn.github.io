@@ -26,6 +26,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
+          fetch-depth: 0   # đủ lịch sử git để sitemap.xml lấy lastmod = ngày commit gần nhất của file dữ liệu
       # Runner có sẵn Node (prerender chỉ cần 18+) nên khỏi setup-node, đỡ vài giây
       - run: node tools/prerender.js
       - name: Commit nếu có thay đổi
