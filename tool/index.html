@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- seo:start -->
+  <title>Tool — Moe Shinn</title>
+  <meta name="description" content="Các tool do Moe Shinn tự làm: menu hỗ trợ, tiện ích cho game offline và phần mềm nhỏ, kèm hướng dẫn và link tải." />
+  <meta name="keywords" content="tool, menu hỗ trợ game, tiện ích game offline, Moe Shinn, tải tool" />
+  <link rel="canonical" href="https://moeshinn.github.io/tool/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Moe Shinn" />
+  <meta property="og:title" content="Tool — Moe Shinn" />
+  <meta property="og:description" content="Các tool do Moe Shinn tự làm: menu hỗ trợ, tiện ích cho game offline và phần mềm nhỏ, kèm hướng dẫn và link tải." />
+  <meta property="og:url" content="https://moeshinn.github.io/tool/" />
+  <meta property="og:image" content="https://moeshinn.github.io/assets/avatar/avatar.webp" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32.png?v=mvdx4gck" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon/favicon-192.png?v=mvdx4gck" />
+  <link rel="apple-touch-icon" href="/assets/favicon/favicon-180.png?v=mvdx4gck" />
+  <!-- seo:end -->
+  <!-- Cờ 18+ đọc từ sessionStorage trước khi vẽ trang: tool-18ok = đã xác nhận (bỏ làm mờ ảnh), tool-locked = chưa xác nhận (trang tool 18+ hiện cổng xác nhận) -->
+  <script>try{document.documentElement.classList.add(sessionStorage.getItem("tool18")==="1"?"tool-18ok":"tool-locked")}catch(e){document.documentElement.classList.add("tool-locked")}</script>
+  <link rel="stylesheet" href="/css/header.css" />
+  <link rel="stylesheet" href="/post/css/style.css" />
+  <link rel="stylesheet" href="/tool/css/style.css" />
+<script src="/js/theme.js" defer></script>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#050b16" />
+  <script src="/js/pwa.js" defer></script>
+</head>
+<body>
+
+  <header class="site-header">
+    <a href="/" class="site-header-logo" data-nav-home aria-label="Về trang chủ">
+      <img src="/assets/avatar/avatar-336.webp" alt="Moe Shinn" width="36" height="36" srcset="/assets/avatar/avatar-168.webp 1x, /assets/avatar/avatar-336.webp 2x" data-nav-logo />
+    </a>
+    <div class="site-header-menu-wrap">
+      <button type="button" class="site-header-menu-btn" data-nav-menu-toggle aria-haspopup="true" aria-expanded="false" aria-label="Menu">☰</button>
+      <nav class="site-header-menu" data-nav-menu role="menu"><!--pre:nav--><a href="/" role="menuitem">Trang chủ</a><a href="/channel" role="menuitem">Kênh</a><a href="/donate" role="menuitem">Donate</a><a href="/post" role="menuitem">Bài Đăng</a><a href="/product" role="menuitem">Sản phẩm</a><a href="/tool" role="menuitem">Tool</a><a href="/profile" role="menuitem">Hồ sơ Vtuber</a><!--/pre:nav--></nav>
+    </div>
+  </header>
+  <script src="/js/site-chrome.js"></script>
+
+  <div id="app" class="page"><!--pre:toollist--><div class="tool-hub" data-tool-hub><header class="blog-title-bar"><h1>Tool</h1></header><p class="tool-empty">Chưa có tool nào.</p></div><!--/pre:toollist--></div>
+
+  <footer class="site-footer" data-global-footer>© 2026 Moe Shinn (@MoeShinn). All rights reserved.</footer>
+
+  <script src="/tool/js/toolgen.js"></script>
+  <script src="/tool/js/main.js"></script>
+</body>
+</html>

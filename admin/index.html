@@ -12,7 +12,8 @@ Admin.boot({ id: "dashboard", title: "Dashboard", async render(main) {
     <div class="card"><h3>Nội dung</h3><div class="grid" id="stats"><span class="hint">Đang tải…</span></div></div>
     <div class="card"><h3>Lối tắt</h3><a class="btn" href="/admin/setting/">Cài đặt</a>
       <a class="btn ghost" href="/post/" target="_blank" style="margin-left:6px">Xem /post</a>
-      <a class="btn ghost" href="/download/" target="_blank" style="margin-left:6px">Xem /download</a></div>`;
+      <a class="btn ghost" href="/download/" target="_blank" style="margin-left:6px">Xem /download</a>
+      <a class="btn ghost" href="/tool/" target="_blank" style="margin-left:6px">Xem /tool</a></div>`;
   const t0 = performance.now();
   try {
     const r = await Admin.api("/ping?deep=1"), g = r.github || {};

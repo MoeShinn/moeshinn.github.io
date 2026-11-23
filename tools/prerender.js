@@ -12,10 +12,12 @@
         danh sách bài ở /post/, JSON-LD (WebSite + Person) ở trang chủ.
      2b. Trang /profile (hồ sơ Vtuber): dựng sẵn nội dung thật từ profile/data.json + JSON-LD ProfilePage + biến màu (dùng chung profile/js/profilegen.js).
      3. Tạo llms.txt (mục lục dạng văn bản cho các công cụ AI).
+   3c. Trang Tool: dựng lại /tool/ và từng /tool/<id>/ từ tool/data.json + tool/data/<id>.json (dùng chung tool/js/toolgen.js với admin).
+   5. sitemap.xml: dựng LẠI HOÀN TOÀN từ dữ liệu trong repo (Worker admin-api không ghi sitemap nữa).
    3b. Dựng lại trang tĩnh /post/<id>/ từ post/data/<id>.md (dùng chung admin/js/postgen.js + post/js/render.js) để sửa bộ render
        là mọi bài cũ tự cập nhật theo, không phải mở admin bấm lưu lại từng bài; dựng danh sách /download/ từ download/data/*.json.
      4. Trang Sản phẩm: dựng sẵn HTML thật (+ SEO, JSON-LD) cho /product/ và từng /product/<id>/ từ product/data.json,
-        dọn thư mục mục đã xóa, và giữ các địa chỉ /product/… trong sitemap.xml (dùng chung product/js/productgen.js với admin).
+        dọn thư mục mục đã xóa (dùng chung product/js/productgen.js với admin).
 
    Chạy:   node tools/prerender.js           (ghi file)
            node tools/prerender.js --check   (không ghi; thoát mã 1 nếu có file cần cập nhật)
@@ -29,6 +31,7 @@ const vm = require("vm");
 const PG = require("../product/js/productgen.js");
 const AG = require("../assets/album/albumgen.js");
 const POSTGEN = require("../admin/js/postgen.js");
+const TG = require("../tool/js/toolgen.js");
 let PF = null; try { PF = require("../profile/js/profilegen.js"); } catch (e) { console.warn("Bỏ qua trang /profile: " + e.message); }
 
 const ROOT = path.resolve(__dirname, "..");
@@ -115,6 +118,20 @@ const orphans = !exists("product") ? [] : fs.readdirSync(path.join(ROOT, "produc
   .filter((e) => e.isDirectory() && !PG.RESERVED.includes(e.name) && !pnodes.some((n) => n.id === e.name))
   .filter((e) => fs.readdirSync(path.join(ROOT, "product", e.name)).every((f) => f === "index.html")).map((e) => `product/${e.name}`);
 
+/* ---- Tool: danh sách ở tool/data.json (thứ tự hiển thị), chi tiết ở tool/data/<id>.json → /tool/ và /tool/<id>/ ---- */
+const toolIdx = json("tool/data.json", { tools: [] });
+const toolList = (Array.isArray(toolIdx.tools) ? toolIdx.tools : [])
+  .map((x) => ({ ...x, ...json(`tool/data/${x.id}.json`, {}), id: x.id })).filter((x) => x && x.id && exists(`tool/data/${x.id}.json`)).map((x) => TG.norm(x));
+const toolSummaries = toolList.map(TG.summary);
+const toolHub = { title: toolIdx.title || "Tool", intro: toolIdx.intro || "" };
+if (exists("tool/index.html")) {
+  const tshell = rd("tool/index.html");
+  toolList.forEach((x) => {
+    try { VFS[`tool/${x.id}/index.html`] = TG.buildToolPage(tshell, { id: x.id, data: x, seo: { ...seo, siteUrl: SITE, siteName: SITE_NAME }, bodyHtml: renderPostBody(x.body) }); }
+    catch (e) { console.warn(`Bỏ qua tool ${x.id}: ${e.message}`); }
+  });
+}
+
 /* ---- Album: ảnh ở image/index.json (admin "Kho ảnh"), album = trường "album" của từng ảnh → /album/ và /album/<id>/ ---- */
 const albumIdx = AG.normalize(json("image/index.json", { albums: [], images: [] }));
 if (exists("album/index.html")) {
@@ -126,6 +143,13 @@ if (exists("album")) {
   fs.readdirSync(path.join(ROOT, "album"), { withFileTypes: true })
     .filter((e) => e.isDirectory() && !albumIdx.albums.some((al) => al.id === e.name))
     .filter((e) => fs.readdirSync(path.join(ROOT, "album", e.name)).every((f) => f === "index.html")).forEach((e) => orphans.push(`album/${e.name}`));
+}
+
+// Thư mục /tool/<id>/ không còn trong dữ liệu (tool đã xóa) → dọn, nhưng chỉ khi trong đó chỉ có index.html
+if (exists("tool")) {
+  fs.readdirSync(path.join(ROOT, "tool"), { withFileTypes: true })
+    .filter((e) => e.isDirectory() && !TG.RESERVED.includes(e.name) && !toolList.some((x) => x.id === e.name))
+    .filter((e) => fs.readdirSync(path.join(ROOT, "tool", e.name)).every((f) => f === "index.html")).forEach((e) => orphans.push(`tool/${e.name}`));
 }
 
 /* ---- Bài đăng: dựng lại /post/<id>/ (giống hệt admin "Lưu bài" nhưng chạy tự động) ---- */
@@ -227,15 +251,9 @@ const postCard = (p) =>
 const postListHtml = `<div class="page" data-prerender><header class="blog-title-bar"><h1>Bài viết &amp; hướng dẫn</h1></header>` +
   `<section class="post-section"><h2>📝 Bài đăng</h2><div class="post-grid">${publicPosts.map(postCard).join("")}</div></section></div>`;
 
-// Trang chủ: khối "Bài viết mới" có link thẳng tới từng bài (bot thấy bài ngay từ trang chủ, không phải qua /post/).
-const homePostsHtml = publicPosts.length
-  ? `<section class="home-posts" aria-labelledby="home-posts-title"><h2 id="home-posts-title">Bài viết mới</h2><ul>` +
-    publicPosts.slice(0, 6).map((p) => `<li><a href="/post/${encodeURIComponent(p.id)}/">${t(p.title)}</a>${p.date ? ` <time datetime="${a(isoDate(p.date))}">${t(p.date)}</time>` : ""}</li>`).join("") +
-    `</ul><a class="home-posts-all" href="/post/">Xem tất cả bài viết →</a></section>`
-  : "";
-
 const productListHtml = `<div class="page" data-prerender>${PG.bodyHub({ nodes: pnodes, hub: phub })}</div>`;
 const productLd = `<script type="application/ld+json" id="product-jsonld">${ld(PG.ldFor({ seo: pseo, node: null, nodes: pnodes, details: {}, hub: phub }))}</script>`;
+const toolListHtml = TG.hubBody({ tools: toolSummaries, hub: toolHub });
 const albumListHtml = AG.bodyHub({ idx: albumIdx });
 const albumLd = `<script type="application/ld+json" id="album-jsonld">${ld(AG.ldFor({ seo: pseo, idx: albumIdx, album: null }))}</script>`;
 
@@ -350,7 +368,8 @@ function transform(rel, html) {
     html = html.replace(/(<h1 class="display-name" data-name>)[^<]*(<\/h1>)/, (_m, h, c) => h + t(profile.name || SITE_NAME) + c);
     html = slotAfter(html, /<h1 class="display-name" data-name>[^<]*<\/h1>/, "tagline", homeDesc ? `<p class="site-tagline">${t(homeDesc)}</p>` : "");
     html = slotAfter(html, '<div class="link-list" data-link-list>', "links", homeButtons);
-    html = slotAfter(html, /<!--\/pre:links--><\/div>/, "homeposts", homePostsHtml);
+    // Trang chủ KHÔNG liệt kê tiêu đề bài mới nữa: gỡ khối homeposts còn sót từ lần dựng cũ (không gắn lại).
+    html = html.replace(/<!--pre:homeposts-->[\s\S]*?<!--\/pre:homeposts-->/g, "");
     html = slotAfter(html, "<!-- seo:end -->", "jsonld", jsonLd);
     html = slotAfter(html, "<!--/pre:jsonld-->", "css", inlineCss());
   } else if (rel === "channel/index.html") {
@@ -371,6 +390,8 @@ function transform(rel, html) {
     html = slotAfter(html, "<!-- seo:end -->", "jsonld", productLd);
     // Chưa có sản phẩm nào → trang hub rỗng (nội dung mỏng): báo noindex. Có sản phẩm → tự gỡ. (Đặt SAU khối jsonld để slot jsonld không bị chen ngang.)
     html = slotAfter(html, "<!--/pre:jsonld-->", "robots", pnodes.length ? "" : '<meta name="robots" content="noindex, follow" />');
+  } else if (rel === "tool/index.html") {
+    html = slotAfter(html, '<div id="app" class="page">', "toollist", toolListHtml);
   } else if (rel === "download/index.html") {
     html = slotAfter(html, '<div id="app" class="page">', "downloadlist", downloadListHtml);
   } else if (rel === "album/index.html") {
@@ -415,6 +436,11 @@ function buildLlms() {
     });
     line("", 0);
   }
+  const llmsTools = toolList.filter((x) => !x.adult); // tool 18+ không đưa vào mục lục cho AI
+  if (llmsTools.length) {
+    L.push("", "## Tool", "");
+    llmsTools.forEach((x) => L.push(`- [${TG.plain(x.title)}](${SITE}${TG.toolUrl(x.id)})${x.description || TG.plain(x.short) ? `: ${x.description || TG.plain(x.short)}` : ""}`));
+  }
   const alist = AG.listed(albumIdx);
   if (alist.length) {
     L.push("", "## Album ảnh", "");
@@ -435,22 +461,40 @@ function put(rel, next) {
   changed.push(rel);
   if (!CHECK) { fs.mkdirSync(path.dirname(path.join(ROOT, rel)), { recursive: true }); fs.writeFileSync(path.join(ROOT, rel), next); }
 }
-// sitemap.xml do Worker admin-api viết lại mỗi lần admin commit (không biết trang Sản phẩm/Album, lại liệt kê cả ảnh) → ở đây:
-//   • bỏ mọi địa chỉ KHÔNG phải trang HTML (ảnh .webp/.png…, /assets/…, trang xem ảnh /assets/viewer/ vốn là noindex, link rút gọn /s/, /admin/)
-//   • bổ sung lại các địa chỉ /product/… và /album/…
-//   • giữ /download/ (đã có trang danh sách thật) và bỏ nếu chưa có mục nào
-const NON_PAGE = /\.(?:webp|png|jpe?g|gif|avif|svg|ico|mp4|webm|zip|exe|pdf|json|txt)(?:\?.*)?$/i;
-function patchSitemap(xml) {
-  const prefixes = [`${SITE}/product/`, `${SITE}/album/`];
-  const dropPath = (loc) => NON_PAGE.test(loc) || ["/assets/", "/s/", "/admin/", "/buy/", "/image/"].some((d) => loc.startsWith(SITE + d));
-  let out = xml.replace(/[ \t]*<url><loc>([^<]*)<\/loc>(?:<lastmod>[^<]*<\/lastmod>)?<\/url>\r?\n?/g, (m, loc) => (dropPath(loc) || (prefixes.some((p) => loc.startsWith(p)) && /\/$/.test(loc)) ? "" : m));
-  if (!downloads.length) out = out.replace(new RegExp(`[ \\t]*<url><loc>${escRe(SITE)}/download/</loc>(?:<lastmod>[^<]*</lastmod>)?</url>\\r?\\n?`), "");
-  else if (!out.includes(`<loc>${SITE}/download/</loc>`)) out = out.replace(/<\/urlset>/, () => `  <url><loc>${SITE}/download/</loc></url>\n</urlset>`);
-  if (PF && exists("profile/index.html") && !out.includes(`<loc>${SITE}/profile/</loc>`)) out = out.replace(/<\/urlset>/, () => `  <url><loc>${SITE}/profile/</loc></url>\n</urlset>`);
-  const urls = (pnodes.length ? PG.allUrls(pseo, pnodes) : []).concat(AG.allUrls(pseo, albumIdx));
-  if (!urls.length) return out;
-  const lines = urls.map((u) => `  <url><loc>${t(u.loc)}</loc>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ""}</url>\n`).join("");
-  return out.replace(/<\/urlset>/, () => lines + "</urlset>");
+// sitemap.xml: dựng LẠI HOÀN TOÀN ở đây từ dữ liệu trong repo (Worker admin-api và trang admin không ghi sitemap nữa).
+// Chỉ liệt kê trang HTML công khai: trang chủ, /post/, /channel/, /donate/…, /profile/, /download/, /tool/, /product/…, /album/… và từng bài/mục.
+// Không có: ảnh, /assets/, /admin/, /buy/, /s/ (link rút gọn), /image/, bài "không liệt kê"/riêng tư.
+// lastmod: ngày commit gần nhất của file dữ liệu nguồn (cần checkout đủ lịch sử: prerender.yml dùng fetch-depth: 0); không có git thì giữ ngày cũ trong sitemap, chưa có thì lấy hôm nay (giờ VN).
+function gitDay(paths) {
+  try {
+    const out = require("child_process").execFileSync("git", ["log", "-1", "--format=%cs", "--", ...paths], { cwd: ROOT, stdio: ["ignore", "pipe", "ignore"] }).toString().trim();
+    return /^\d{4}-\d{2}-\d{2}$/.test(out) ? out : "";
+  } catch (e) { return ""; }
+}
+function buildSitemap(prevXml) {
+  const prev = new Map();
+  String(prevXml || "").replace(/<url><loc>([^<]*)<\/loc>(?:<lastmod>([^<]*)<\/lastmod>)?<\/url>/g, (_m, loc, d) => { prev.set(loc, d || ""); return ""; });
+  const today = new Date(Date.now() + 7 * 3600e3).toISOString().slice(0, 10);
+  const seen = new Set(), rows = [];
+  const add = (loc, lastmod) => { if (seen.has(loc)) return; seen.add(loc); rows.push({ loc, lastmod: lastmod || prev.get(loc) || today }); };
+  const page = (p, files, cond = true) => { if (cond) add(SITE + p, gitDay(files)); };
+  const newest = (ds) => ds.filter(Boolean).sort().pop() || "";
+  page("/", ["data.json"]);
+  page("/post/", ["post/data/posts.json"], exists("post/index.html"));
+  page("/channel/", ["channel/data.json"], exists("channel/index.html"));
+  page("/donate/", ["donate/data.json"], exists("donate/index.html"));
+  page("/donate/privacy/", ["donate/privacy/index.html"], exists("donate/privacy/index.html"));
+  page("/donate/terms/", ["donate/terms/index.html"], exists("donate/terms/index.html"));
+  page("/profile/", ["profile/data.json"], !!PF && exists("profile/index.html"));
+  if (downloads.length) {
+    add(`${SITE}/download/`, newest(downloads.map((d) => (d.createdAt || "").slice(0, 10))));
+    downloads.forEach((d) => add(`${SITE}/download/${encodeURIComponent(d.id)}/`, (d.createdAt || "").slice(0, 10)));
+  }
+  publicPosts.forEach((p) => add(`${SITE}/post/${encodeURIComponent(p.id)}/`, isoDate(p.updated) || isoDate(p.date)));
+  if (exists("tool/index.html")) TG.allUrls({ siteUrl: SITE }, toolList).forEach((u) => add(u.loc, u.lastmod));
+  (pnodes.length ? PG.allUrls(pseo, pnodes) : []).concat(AG.allUrls(pseo, albumIdx)).forEach((u) => add(u.loc, u.lastmod));
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+    rows.map((r) => `  <url><loc>${t(r.loc)}</loc>${r.lastmod ? `<lastmod>${r.lastmod}</lastmod>` : ""}</url>`).join("\n") + `\n</urlset>\n`;
 }
 const pages = new Set(walk("").filter((r) => !orphans.some((o) => r.startsWith(o + "/"))));
 Object.keys(VFS).forEach((k) => pages.add(k));
@@ -458,7 +502,7 @@ Object.keys(VFS).forEach((k) => pages.add(k));
 orphans.forEach((o) => { changed.push(o + "/ (xóa)"); if (!CHECK) fs.rmSync(path.join(ROOT, o), { recursive: true, force: true }); });
 if (priceSynced) put("product/data.json", JSON.stringify({ ...productIdx, nodes: pnodes }, null, 2) + "\n");
 put("llms.txt", buildLlms());
-if (exists("sitemap.xml")) put("sitemap.xml", patchSitemap(rd("sitemap.xml")));
+put("sitemap.xml", buildSitemap(exists("sitemap.xml") ? rd("sitemap.xml") : ""));
 
 console.log(changed.length ? `${CHECK ? "Cần cập nhật" : "Đã cập nhật"} ${changed.length} file:\n  ` + changed.join("\n  ") : "Không có gì thay đổi — nội dung dựng sẵn đã khớp dữ liệu.");
 if (CHECK && changed.length) process.exit(1);

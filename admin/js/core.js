@@ -7,6 +7,7 @@
     ["dashboard", "Dashboard", "/admin/"],
     ["post", "Bài đăng", "/admin/post/"],
     ["product", "Sản phẩm", "/admin/product/"],
+    ["tool", "Tool", "/admin/tool/"],
     ["buy", "Bán hàng", "/admin/buy/"],
     ["download", "Download", "/admin/download/"],
     ["channel", "Kênh", "/admin/channel/"],

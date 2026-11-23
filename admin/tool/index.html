@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Tool</title>
+<link rel="stylesheet" href="/admin/css/admin.css"></head>
+<body><div id="app"></div><div id="toast"></div>
+<script src="/post/js/render.js"></script>
+<script src="/tool/js/toolgen.js"></script>
+<script src="/admin/js/core.js"></script>
+<script src="/admin/js/seo.js"></script>
+<script>
+/* Quản lý /tool: tạo / sửa / xóa. Mỗi lần lưu ghi trong MỘT commit: tool/data/<id>.json, trang tĩnh tool/<id>/index.html, danh sách tool/data.json và ảnh mới.
+   sitemap.xml KHÔNG ghi ở đây: workflow Prerender tự dựng lại. */
+Admin.boot({ id: "tool", title: "Tool", async render(main) {
+  const { esc, $ } = Admin;
+  main.innerHTML = `<h2>Tool</h2><p class="hint">Đang tải…</p>`;
+  let idx, S, tree, SD;
+  try { [idx, S, tree, SD] = await Promise.all([Admin.readJson("tool/data.json", { title: "Tool", intro: "", tools: [] }), Admin.readJson("site-settings.json", {}), Admin.api("/tree").then((r) => r.files.map((f) => f.path)), Admin.readJson("data.json", {})]); }
+  catch (e) { main.innerHTML = `<h2>Tool</h2><p class="err">${esc(e.message)}</p>`; return; }
+  if (!Array.isArray(idx.tools)) idx.tools = [];
+  const seo = AdminSeo.merge(S.seo), site = seo.siteUrl.replace(/\/$/, "");
+  const DEF_AUTHOR = (SD.profile && SD.profile.name) || S.seo?.siteName || ""; // tác giả mặc định cho tool mới
+
+  /* ---------------- Danh sách ---------------- */
+  function showList() {
+    const rows = idx.tools.map((x, i) => `<tr style="border-top:1px solid var(--line)"><td style="padding:8px 0">${esc(ToolGen.plain(x.title))}${x.adult ? ' <b style="color:#ff8b8f">18+</b>' : ""}<br><small class="hint">${esc(x.id)}${x.createdAt ? " · " + new Date(x.createdAt).toLocaleDateString("vi-VN") : ""}</small></td>
+      <td style="text-align:right;white-space:nowrap"><a href="/tool/${encodeURIComponent(x.id)}/" target="_blank">Mở</a> · <a href="#edit/${encodeURIComponent(x.id)}">Sửa</a> · <a href="#" data-del="${i}" style="color:#ff8b8f">Xóa</a></td></tr>`).join("");
+    main.innerHTML = `<h2>Tool</h2><p><a class="btn" href="#new">＋ Tool mới</a> <a class="btn ghost" href="/tool/" target="_blank" style="margin-left:6px">Xem /tool</a></p>
+      <input type="search" id="t_q" placeholder="🔍 Tìm theo tên hoặc ID…" autocomplete="off" style="margin-bottom:12px">
+      <div class="card"><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">${rows || '<tr><td class="hint">Chưa có tool nào. Bấm “Tool mới” để thêm tool đầu tiên.</td></tr>'}</table></div></div>
+      <p class="hint">Sau khi lưu, web cập nhật sau ~1 phút. Sitemap tự cập nhật khi workflow Prerender chạy (hằng ngày, hoặc bấm tay trên GitHub Actions).</p>`;
+    const fold = (s) => String(s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/gi, "d").toLowerCase();
+    const trs = [...main.querySelectorAll("tbody tr, table tr")], keys = idx.tools.map((x) => fold(ToolGen.plain(x.title) + " " + x.id + " " + ToolGen.plain(x.author) + " " + ToolGen.plain(x.game) + " " + (x.subtitle || "")));
+    $("#t_q").oninput = (e) => { const q = fold(e.target.value).trim(); trs.forEach((tr, i) => { if (keys[i] !== undefined) tr.style.display = !q || keys[i].includes(q) ? "" : "none"; }); };
+    main.querySelectorAll("[data-del]").forEach((el) => (el.onclick = async (e) => {
+      e.preventDefault(); const x = idx.tools[+el.dataset.del];
+      if (!confirm(`Xóa tool “${ToolGen.plain(x.title)}”? Trang của tool sẽ bị xóa (ảnh trong tool/photo/ được giữ lại).`)) return;
+      try {
+        const next = { ...idx, tools: idx.tools.filter((y) => y.id !== x.id) };
+        await Admin.commitFiles("Admin: xóa tool " + x.id, [{ path: "tool/data.json", content: JSON.stringify(next, null, 2) + "\n" }], [`tool/data/${x.id}.json`, `tool/${x.id}/index.html`].filter((p) => tree.includes(p)));
+        Admin.toast("Đã xóa. Web cập nhật sau ~1 phút."); setTimeout(() => location.reload(), 1200);
+      } catch (err) { Admin.toast(err.message, true); }
+    }));
+  }
+
+  /* ---------------- Trình soạn ---------------- */
+  async function showEditor(editId) {
+    main.innerHTML = `<h2>${editId ? "Sửa tool" : "Tool mới"}</h2><p class="hint">Đang tải…</p>`;
+    let old = null;
+    if (editId) {
+      try { old = ToolGen.norm({ id: editId, ...JSON.parse(await Admin.readText(`tool/data/${editId}.json`)) }); }
+      catch (e) { main.innerHTML = `<h2>Sửa tool</h2><p class="err">${esc(e.message)}</p><p><a href="#">← Quay lại</a></p>`; return; }
+    }
+    const d = old || ToolGen.norm({});
+    const pending = new Map(); // "tool/photo/x.webp" -> { b64, url }
+    let logo = d.logo || "";
+    let dls = d.downloads.length ? d.downloads.map((x) => ({ ...x })) : [{ label: "", url: "" }];
+
+    main.innerHTML = `<h2>${editId ? "Sửa tool" : "Tool mới"} <a href="#" style="font-size:14px;margin-left:8px">← Danh sách</a></h2>
+    <div class="card">
+      <label>Tên tool <small class="hint">(hỗ trợ màu: §a, §l…, &lt;#ff8800&gt;, &lt;gradient:#ff5555:#5555ff&gt;chữ&lt;/gradient&gt;, &lt;rainbow&gt;chữ&lt;/rainbow&gt;)</small><input id="t_title" value="${esc(d.title === "Tool" && !old ? "" : d.title)}"></label>
+      <div class="tb" id="ctb"></div><div class="sw on" id="csw"></div>
+      <div class="cols">
+        <label>ID / đường dẫn (${esc(site)}/tool/…)<input id="t_id" ${editId ? "readonly" : ""} value="${esc(editId || "")}" placeholder="để trống: tự tạo từ tên tool"></label>
+        <label>Ảnh bìa / logo (tự cắt vuông)<input id="t_logo" type="file" accept="image/*"></label>
+      </div>
+      <div id="logobox" class="hint"></div>
+    </div>
+    <div class="card"><h3>Thông tin hiện cạnh logo</h3><p class="hint" style="margin-top:0">Ô nào để trống thì dòng đó không hiện. Các ô đều hỗ trợ màu (chọn chữ rồi bấm màu ở thanh trên ô Tên; không chọn gì thì áp cho cả ô).</p>
+      <div class="cols">
+        <label><span><b style="color:#fff">Tác giả:</b> tên tác giả</span><input id="t_author" value="${esc(old ? d.author : d.author || DEF_AUTHOR)}"></label>
+        <label><span><b style="color:#55ff55">Game:</b> tên game <small class="hint">(tùy chọn, có thể bỏ trống)</small></span><input id="t_game" value="${esc(d.game)}"></label>
+        <label><span><b style="color:#55ffff">Version:</b> phiên bản</span><input id="t_ver" value="${esc(d.version)}" placeholder="vd: 1.0.2"></label>
+      </div>
+      <label><span><b style="color:#fff">Mô tả:</b> mô tả ngắn</span><textarea id="t_short" rows="2" maxlength="300">${esc(d.short)}</textarea></label>
+      <div class="hint" id="short_cnt"></div>
+    </div>
+    <div class="card"><h3>Tùy chọn</h3>
+      <label class="row"><input type="checkbox" id="t_adult" ${d.adult ? "checked" : ""}>Xác nhận 18+ <small class="hint">(trang hiện cổng “tôi đủ 18 tuổi” bắt buộc tích mới xem được; ảnh logo ngoài danh sách bị làm mờ tới khi người xem xác nhận)</small></label>
+      <label class="row"><input type="checkbox" id="t_donate" ${d.donate ? "checked" : ""}>Hiện nút donate <small class="hint">(ảnh “Buy me a coffee”, bấm sẽ mở trang /donate)</small></label>
+    </div>
+    <div class="card"><h3>Nút tải xuống</h3><p class="hint" style="margin-top:0">Để trống chữ trên nút thì dùng “${esc(ToolGen.DEF_LABEL)}”. Link phải bắt đầu bằng https:// (link getlink, GitHub release, Steam, itch…). Dòng không có link sẽ bị bỏ.</p><div id="dll"></div><button type="button" class="ghost" id="dl_add">＋ Thêm nút tải</button></div>
+    <div class="card">
+      <label>Từ khóa (cách nhau bằng dấu phẩy)<input id="t_kw" value="${esc(d.keywords)}"></label>
+      <label>Mô tả ngắn cho Google (nên ≤ 155 ký tự; để trống sẽ lấy từ nội dung)<textarea id="t_desc" rows="2">${esc(d.description)}</textarea></label>
+      <button type="button" class="ghost" id="t_ai">✨ AI gợi ý mô tả và từ khóa</button>
+    </div>
+    <div class="card"><h3>Nội dung giới thiệu</h3><div class="tb" id="tb"></div><div class="sw" id="sw"></div>
+      <div class="editor"><textarea id="t_body" spellcheck="false" placeholder="Viết hướng dẫn, tính năng, lưu ý… ở đây">${esc(d.body)}</textarea><iframe id="pv" title="Xem trước"></iframe></div>
+      <input id="t_img" type="file" accept="image/*" hidden></div>
+    <button id="t_save">${editId ? "Lưu thay đổi" : "Đăng tool"}</button> <span class="hint" id="t_st"></span>`;
+
+    const ta = $("#t_body"), fire = () => ta.dispatchEvent(new Event("input"));
+    const wrap = (pre, post, ph = "văn bản") => { const s = ta.selectionStart, e = ta.selectionEnd; ta.setRangeText(pre + (ta.value.slice(s, e) || ph) + post, s, e, "end"); ta.focus(); fire(); };
+    const block = (html) => { const s = ta.selectionStart, b = ta.value.slice(0, s), lead = !b ? "" : b.endsWith("\n\n") ? "" : b.endsWith("\n") ? "\n" : "\n\n"; ta.setRangeText(lead + html + "\n\n", s, ta.selectionEnd, "end"); ta.focus(); fire(); };
+    const sel = (ph) => ta.value.slice(ta.selectionStart, ta.selectionEnd) || ph;
+    const lines = (ph) => sel(ph).split("\n").map((x) => x.trim()).filter(Boolean);
+    const q = (s) => String(s).replace(/"/g, "%22");
+    const ask = (m, v = "") => prompt(m, v);
+
+    // Ảnh: resize + đổi sang webp; nằm chờ trong bộ nhớ tới khi bấm Lưu
+    async function prep(file, { square = 0, max = 1600 } = {}) {
+      if (!square && /gif|svg/.test(file.type)) return { blob: file, ext: file.type.includes("gif") ? "gif" : "svg" };
+      const bm = await createImageBitmap(file), c = document.createElement("canvas"), g = c.getContext("2d");
+      if (square) { const s = Math.min(bm.width, bm.height); c.width = c.height = square; g.drawImage(bm, (bm.width - s) / 2, (bm.height - s) / 2, s, s, 0, 0, square, square); }
+      else { const k = Math.min(1, max / bm.width); c.width = Math.round(bm.width * k); c.height = Math.round(bm.height * k); g.drawImage(bm, 0, 0, c.width, c.height); }
+      const w = await new Promise((r) => c.toBlob(r, "image/webp", 0.85));
+      return w && w.type === "image/webp" ? { blob: w, ext: "webp" } : { blob: await new Promise((r) => c.toBlob(r, "image/png")), ext: "png" };
+    }
+    async function addImage(file, opt) {
+      const { blob, ext } = await prep(file, opt), name = `${ToolGen.slugify(file.name.replace(/\.[^.]+$/, ""))}-${Date.now().toString(36)}.${ext}`;
+      const b64 = await new Promise((r) => { const f = new FileReader(); f.onload = () => r(f.result.split(",")[1]); f.readAsDataURL(blob); });
+      pending.set("tool/photo/" + name, { b64, url: URL.createObjectURL(blob) }); return "tool/photo/" + name;
+    }
+
+    const TB = [
+      ["B", "In đậm (§l)", () => wrap("§l", "§r")], ["I", "In nghiêng (§o)", () => wrap("§o", "§r")], ["U", "Gạch chân (§n)", () => wrap("§n", "§r")], ["S", "Gạch ngang (§m)", () => wrap("§m", "§r")],
+      ["🎨 Màu", "Chữ màu", () => $("#sw").classList.toggle("on")],
+      ["🔗 Link", "Link dạng chữ", () => { const u = ask("Dán link (https://…)"); if (u) wrap("[", `](${u.trim()})`); }],
+      ["🔘 Nút", "Link dạng nút (mở ngay)", () => { const l = ask("Chữ trên nút", "Mở link"), u = l && ask("Dán link (https://…)"); if (u) block(`<a class="btn" href="${q(u.trim())}" target="_blank" rel="noopener noreferrer">${esc(l)}</a>`); }],
+      ["🖼 Ảnh", "Chèn ảnh", () => $("#t_img").click()],
+      ["H2", "Tiêu đề lớn", () => block(`<h2>${sel("Tiêu đề")}</h2>`)], ["H3", "Tiêu đề nhỏ", () => block(`<h3>${sel("Tiêu đề")}</h3>`)],
+      ["• Liệt kê", "Danh sách", () => block(`<ul>${lines("Mục 1\nMục 2").map((x) => `<li>${x}</li>`).join("")}</ul>`)],
+      ["❝ Trích", "Trích dẫn", () => block(`<blockquote>${lines("Trích dẫn").join("<br>")}</blockquote>`)],
+      ["― Kẻ", "Đường kẻ ngang", () => block("<hr>")],
+      ["⌫ Xóa định dạng", "Chèn §r", () => wrap("", "§r", "")],
+    ];
+    TB.forEach(([l, t, f]) => { const b = document.createElement("button"); b.type = "button"; b.textContent = l; b.title = t; b.onclick = f; $("#tb").appendChild(b); });
+    Object.entries(MC_COLORS).forEach(([k, c]) => { const i = document.createElement("i"); i.style.background = c; i.title = "§" + k; i.onclick = () => wrap("§" + k, "§r"); $("#sw").appendChild(i); });
+    ta.onkeydown = (e) => { if (e.ctrlKey || e.metaKey) { const m = { b: 0, i: 1, u: 2 }[e.key.toLowerCase()]; if (m !== undefined) { e.preventDefault(); TB[m][2](); } } };
+    $("#t_img").onchange = async (e) => { const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+      try { const p = await addImage(f), alt = (ask("Mô tả ảnh (cho SEO, có thể bỏ trống)") || "").replace(/[\[\]()]/g, ""); block(`![${alt}](/${p})`); } catch (err) { Admin.toast(err.message, true); } };
+
+    const drawLogo = () => { const u = logo && (pending.get(logo)?.url || ToolGen.imgUrl(logo)); $("#logobox").innerHTML = logo ? `<img src="${esc(u)}" style="width:72px;height:72px;object-fit:cover;border-radius:16px;vertical-align:middle"> <a href="#" id="logo_rm">Bỏ ảnh</a>` : "Chưa có ảnh bìa."; const rm = $("#logo_rm"); if (rm) rm.onclick = (e) => { e.preventDefault(); logo = ""; drawLogo(); preview(); }; };
+    $("#t_logo").onchange = async (e) => { const f = e.target.files[0]; if (!f) return; try { logo = await addImage(f, { square: 512 }); drawLogo(); preview(); } catch (err) { Admin.toast(err.message, true); } };
+
+    function drawDls() {
+      $("#dll").innerHTML = dls.map((x, i) => `<div class="cols" style="align-items:end"><label>Chữ trên nút<input data-f="${i}:label" placeholder="${esc(ToolGen.DEF_LABEL)}" value="${esc(x.label)}"></label>
+        <label>Link tải <span style="display:flex;gap:6px"><input data-f="${i}:url" placeholder="https://…" value="${esc(x.url)}"><button type="button" class="ghost" data-rm="${i}">✕</button></span></label></div>`).join("");
+      $("#dll").querySelectorAll("[data-f]").forEach((el) => (el.oninput = () => { const [i, k] = el.dataset.f.split(":"); dls[+i][k] = el.value; preview(); }));
+      $("#dll").querySelectorAll("[data-rm]").forEach((el) => (el.onclick = () => { dls.splice(+el.dataset.rm, 1); if (!dls.length) dls.push({ label: "", url: "" }); drawDls(); preview(); }));
+    }
+    $("#dl_add").onclick = () => { dls.push({ label: "", url: "" }); drawDls(); };
+
+    const collect = () => ToolGen.norm({ id: editId || "xem-truoc", title: $("#t_title").value.trim() || "Tên tool", logo, author: $("#t_author").value.trim(), game: $("#t_game").value.trim(), version: $("#t_ver").value.trim(), short: $("#t_short").value.trim(), description: $("#t_desc").value.trim(), keywords: $("#t_kw").value.trim(),
+      body: ta.value, adult: $("#t_adult").checked, donate: $("#t_donate").checked, downloads: dls });
+    function preview() {
+      const data = collect();
+      let html = ToolGen.cardHtml(data) + '<div style="height:16px"></div>' + ToolGen.detailBody({ data, bodyHtml: renderPostBody(ta.value) });
+      for (const [p, { url }] of pending) html = html.split("/" + p).join(url);
+      $("#pv").srcdoc = `<!doctype html><html class="tool-18ok"><meta charset="utf-8"><base target="_blank"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/post/css/style.css"><link rel="stylesheet" href="/tool/css/style.css"><body style="padding:12px"><div class="tool-hub">${html}</div></body></html>`;
+    }
+    let tp; main.querySelectorAll("input,textarea,select").forEach((el) => el.addEventListener("input", () => { clearTimeout(tp); tp = setTimeout(preview, 250); }));
+    $("#t_adult").onchange = $("#t_donate").onchange = preview;
+    $("#t_ai").onclick = () => Admin.aiSeo({ btn: $("#t_ai"), kind: "post", title: ToolGen.plain($("#t_title").value), descEl: $("#t_desc"), kwEl: $("#t_kw"), text: Admin.plainText(ta.value, renderPostBody), done: "đăng" });
+
+    $("#t_save").onclick = async () => {
+      const title = $("#t_title").value.trim(), body = ta.value.trim();
+      if (!title) return Admin.toast("Cần nhập tên tool", true);
+      const downloads = dls.map((x) => ({ label: (x.label || "").trim() || ToolGen.DEF_LABEL, url: (x.url || "").trim() })).filter((x) => x.url);
+      if (downloads.some((x) => !/^https?:\/\/\S+$/i.test(x.url))) return Admin.toast("Link tải phải bắt đầu bằng http:// hoặc https://", true);
+      const used = new Set([...idx.tools.map((x) => x.id), ...tree.map((p) => (p.match(/^tool\/([^/]+)\/index\.html$/) || [])[1]).filter(Boolean), ...ToolGen.RESERVED]);
+      let id = editId;
+      if (!id) {
+        const custom = $("#t_id").value.trim() && ToolGen.slugify($("#t_id").value);
+        if (custom) { if (used.has(custom)) return Admin.toast("ID này đã được dùng", true); id = custom; }
+        else { const base = ToolGen.slugify(title); id = base; for (let n = 2; used.has(id); n++) id = `${base}-${n}`; }
+      }
+      const now = new Date().toISOString();
+      const data = { id, title, logo, author: $("#t_author").value.trim(), game: $("#t_game").value.trim(), version: $("#t_ver").value.trim(), short: $("#t_short").value.trim(), description: $("#t_desc").value.trim(), keywords: $("#t_kw").value.trim(), body,
+        adult: $("#t_adult").checked, donate: $("#t_donate").checked, downloads, createdAt: (old && old.createdAt) || now, updatedAt: now };
+      const files = [];
+      for (const [p, { b64 }] of pending) if (data.logo === p || body.includes("/" + p)) files.push({ path: p, content: b64, encoding: "base64" }); // chỉ đưa lên ảnh còn dùng
+      const next = { ...idx, tools: editId ? idx.tools.map((x) => (x.id === id ? ToolGen.summary(data) : x)) : [ToolGen.summary(data), ...idx.tools] };
+      const b = $("#t_save"); b.disabled = true;
+      try {
+        $("#t_st").textContent = "Đang đăng…";
+        const shell = await Admin.readText("tool/index.html");
+        const page = ToolGen.buildToolPage(shell, { id, data, seo, bodyHtml: renderPostBody(body) });
+        files.push({ path: `tool/data/${id}.json`, content: JSON.stringify(data, null, 2) + "\n" }, { path: `tool/${id}/index.html`, content: page }, { path: "tool/data.json", content: JSON.stringify(next, null, 2) + "\n" });
+        if (files.reduce((n, f) => n + f.content.length, 0) > 3200000) throw new Error("Ảnh quá nặng (tối đa ~3 MB mỗi lần đăng). Dùng ảnh nhỏ hơn hoặc đăng từng phần.");
+        await Admin.commitFiles(`Admin: ${editId ? "sửa" : "đăng"} tool ${id}`, files);
+        Admin.toast(`Đã ${editId ? "lưu" : "đăng"}: ${site}/tool/${id}/ (hoạt động sau ~1 phút)`); setTimeout(() => { location.hash = ""; location.reload(); }, 1800);
+      } catch (e) { $("#t_st").textContent = ""; Admin.toast(e.message, true); b.disabled = false; }
+    };
+    // Thanh màu cho các ô Tên / Tác giả / Game / Version / Mô tả ngắn (áp lên ô đang chọn gần nhất)
+    const FIELDS = ["t_title", "t_author", "t_game", "t_ver", "t_short"]; let curF = "t_title";
+    FIELDS.forEach((f) => $("#" + f).addEventListener("focus", () => (curF = f)));
+    const wrapF = (pre, post) => { const el = $("#" + curF); let s = el.selectionStart, e = el.selectionEnd; if (s === e) { s = 0; e = el.value.length; } el.setRangeText(pre + el.value.slice(s, e) + post, s, e, "end"); el.focus(); el.dispatchEvent(new Event("input")); };
+    const hexAsk = (m, v) => { const x = ToolGen.hex(prompt(m, v) || ""); if (!x) Admin.toast("Màu phải dạng #rrggbb (vd #ff5555)", true); return x; };
+    [["B", "In đậm", () => wrapF("§l", "§r")], ["I", "In nghiêng", () => wrapF("§o", "§r")], ["U", "Gạch chân", () => wrapF("§n", "§r")], ["S", "Gạch ngang", () => wrapF("§m", "§r")],
+      ["🌈 Gradient", "Chuyển màu giữa 2 màu", () => { const a1 = hexAsk("Màu bắt đầu (#rrggbb)", "#ff5555"), a2 = a1 && hexAsk("Màu kết thúc (#rrggbb)", "#5555ff"); if (a2) wrapF(`<gradient:${a1}:${a2}>`, "</gradient>"); }],
+      ["🌈 Cầu vồng", "Màu cầu vồng", () => wrapF("<rainbow>", "</rainbow>")], ["# Màu hex", "Chữ màu tự chọn", () => { const c = hexAsk("Màu (#rrggbb)", "#ff8800"); if (c) wrapF(`<${c}>`, "</" + c + ">"); }],
+      ["⌫ Xóa định dạng", "Chèn §r", () => wrapF("", "§r")]].forEach(([l, t, f]) => { const b = document.createElement("button"); b.type = "button"; b.textContent = l; b.title = t; b.onclick = f; $("#ctb").appendChild(b); });
+    Object.entries(MC_COLORS).forEach(([k, c]) => { const i = document.createElement("i"); i.style.background = c; i.title = "§" + k; i.onclick = () => wrapF("§" + k, "§r"); $("#csw").appendChild(i); });
+    const cnt = () => { const n = ToolGen.plain($("#t_short").value).length; $("#short_cnt").textContent = `${n}/300 ký tự` + (n > ToolGen.SHORT_MAX ? ` · ở danh sách chỉ hiện ${ToolGen.SHORT_MAX} ký tự đầu rồi thêm “…” (trang chi tiết hiện đủ)` : ""); };
+    $("#t_short").addEventListener("input", cnt); cnt();
+    drawLogo(); drawDls(); preview();
+  }
+
+  const show = () => { const h = location.hash; if (h === "#new") showEditor(null); else if (h.startsWith("#edit/")) showEditor(decodeURIComponent(h.slice(6))); else showList(); };
+  addEventListener("hashchange", show); show();
+}});
+</script></body></html>

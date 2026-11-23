@@ -30,6 +30,10 @@
         "url": "/product"
       },
       {
+        "label": "Tool",
+        "url": "/tool"
+      },
+      {
         "label": "Hồ sơ Vtuber",
         "url": "/profile"
       }

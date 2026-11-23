@@ -1,5 +1,5 @@
 /* Tạo lại toàn bộ trang tĩnh: /post/<id>/, /download/<id>/, link rút gọn /s/<mã>/, robots.txt — gom trong MỘT commit.
-   sitemap.xml do Worker (admin-api) tự cập nhật trong cùng commit nên không còn tạo ở đây. */
+   sitemap.xml do tools/prerender.js (workflow Prerender) dựng, admin và Worker không ghi. */
 (function (root, factory) { if (typeof module === "object" && module.exports) module.exports = factory(require("./postgen.js")); else root.Rebuild = factory(root.PostGen); })(typeof window !== "undefined" ? window : this, function (PG) {
   async function all(A, { posts, seo, render, onProgress = () => {} }) {
     const [postShell, dlShell, tree] = await Promise.all([A.readText("post/index.html"), A.readText("download/index.html"), A.api("/tree").then((r) => r.files.map((f) => f.path))]);

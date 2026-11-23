@@ -1,8 +1,8 @@
 /* Dựng khối SEO <head> cho các trang công khai (dùng chung cho admin và script di chuyển). */
 (function (root, factory) { if (typeof module === "object" && module.exports) module.exports = factory(); else root.AdminSeo = factory(); })(typeof window !== "undefined" ? window : this, function () {
-  const PAGES = { home: "Trang chủ", post: "Bài đăng", product: "Sản phẩm", download: "Download", channel: "Mạng xã hội", profile: "Hồ sơ Vtuber", donate: "Donate" };
-  const URLS = { home: "/", post: "/post/", product: "/product/", download: "/download/", channel: "/channel/", profile: "/profile/", donate: "/donate/" };
-  const FILE = { home: "index.html", post: "post/index.html", product: "product/index.html", download: "download/index.html", channel: "channel/index.html", profile: "profile/index.html", donate: "donate/index.html" };
+  const PAGES = { home: "Trang chủ", post: "Bài đăng", product: "Sản phẩm", tool: "Tool", download: "Download", channel: "Mạng xã hội", profile: "Hồ sơ Vtuber", donate: "Donate" };
+  const URLS = { home: "/", post: "/post/", product: "/product/", tool: "/tool/", download: "/download/", channel: "/channel/", profile: "/profile/", donate: "/donate/" };
+  const FILE = { home: "index.html", post: "post/index.html", product: "product/index.html", tool: "tool/index.html", download: "download/index.html", channel: "channel/index.html", profile: "profile/index.html", donate: "donate/index.html" };
   const DEFAULT = {
     siteUrl: "https://moeshinn.github.io", siteName: "Moe Shinn", ogImage: "", shortLength: 10, // shortLength: số ký tự mã rút gọn /s/ tự sinh
     favicon: { icon: "/assets/favicon.png", apple: "", v: "" },
@@ -10,6 +10,7 @@
       home: { title: "Moe Shinn", description: "Trang cá nhân của Moe Shinn (@MoeShinn): mạng xã hội, ủng hộ và các bài đăng mới.", keywords: "Moe Shinn, MoeShinn, mạng xã hội, blog" },
       post: { title: "Moe Shinn — Blog", description: "Blog của Moe Shinn: thông báo, hướng dẫn và các bài viết mới.", keywords: "blog, bài viết, hướng dẫn, Moe Shinn" },
       product: { title: "Sản phẩm — Moe Shinn", description: "Sản phẩm số của Moe Shinn: phần mềm và model PNGTuber/Vtuber (Ezy Tuber), kèm chính sách sử dụng rõ ràng.", keywords: "sản phẩm số, phần mềm, model Ezy Tuber, PNGTuber, Vtuber, Moe Shinn" },
+      tool: { title: "Tool — Moe Shinn", description: "Các tool do Moe Shinn tự làm: menu hỗ trợ, tiện ích cho game offline và phần mềm nhỏ, kèm hướng dẫn và link tải.", keywords: "tool, menu hỗ trợ game, tiện ích game offline, Moe Shinn, tải tool" },
       download: { title: "Tải xuống — Moe Shinn", description: "Tải xuống các tệp và tài nguyên do Moe Shinn chia sẻ.", keywords: "tải xuống, download, Moe Shinn" },
       channel: { title: "Moe Shinn — Channel", description: "Các kênh mạng xã hội của Moe Shinn: YouTube và các nền tảng khác.", keywords: "Moe Shinn, MoeShinn, YouTube, mạng xã hội" },
       profile: { title: "Hồ sơ Vtuber Moe Shinn — Model, fan name, thông tin", description: "Hồ sơ PNGtuber Việt Nam Moe Shinn [VNer] (Shinn Moeji, dùng Ezy Tuber): thông tin cơ bản, lore, fan name, các model và kênh mạng xã hội chính thức.", keywords: "Moe Shinn, MoeShinn, hồ sơ Vtuber, Shinn Moeji, Ezy Tuber, PNGTuber+, Vtuber Việt Nam, PNGtuber, model Vtuber, fan name, lore" },
