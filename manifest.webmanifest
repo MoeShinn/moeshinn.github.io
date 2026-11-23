@@ -1,7 +1,7 @@
 {
-  "name": "Moe Shinn",
-  "short_name": "Moe Shinn",
-  "description": "Moe Shinn cung cấp các liên kết mạng xã hội, thông tin ủng hộ và các bài đăng blog mới nhất trên trang cá nhân chính thức.",
+  "name": "Shinn-K",
+  "short_name": "Shinn-K",
+  "description": "Shinn-K cung cấp các liên kết mạng xã hội, thông tin ủng hộ và các bài đăng blog mới nhất trên trang cá nhân chính thức.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

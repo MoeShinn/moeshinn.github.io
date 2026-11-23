@@ -9,9 +9,9 @@
   },
   "announcement": {
     "enabled": false,
-    "text": "Moe Shinn. đã ra mắt trên Youtube ✨",
+    "text": "",
     "url": "https://www.youtube.com/channel/UCoZR9unQFHLfqoOQ22lPcGA",
-    "expires": "2026-10-23"
+    "expires": "2026-12-31"
   },
   "maintenance": {
     "enabled": false,
@@ -27,6 +27,7 @@
       "home": "stars",
       "post": "fireflies",
       "product": "aurora",
+      "tool": "",
       "download": "aurora",
       "channel": "stars",
       "profile": "",
@@ -35,7 +36,7 @@
   },
   "seo": {
     "siteUrl": "https://shinn.210z.dev",
-    "siteName": "Moe Shinn",
+    "siteName": "Shinn-K",
     "ogImage": "https://shinn.210z.dev/assets/avatar/avatar.webp",
     "shortLength": 6,
     "favicon": {
@@ -50,38 +51,43 @@
     },
     "pages": {
       "home": {
-        "title": "Moe Shinn",
-        "description": "Moe Shinn cung cấp các liên kết mạng xã hội, thông tin ủng hộ và các bài đăng blog mới nhất trên trang cá nhân chính thức.",
+        "title": "Shinn-K",
+        "description": "Shinn-K cung cấp các liên kết mạng xã hội, thông tin ủng hộ và các bài đăng blog mới nhất trên trang cá nhân chính thức.",
         "keywords": "Moe Shinn, MoeShinn, mạng xã hội, blog, trang cá nhân, ủng hộ Moe Shinn"
       },
       "post": {
-        "title": "Bài viết & hướng dẫn Minecraft, OBS, Vtuber — Moe Shinn",
-        "description": "Bài viết và hướng dẫn của Moe Shinn về tối ưu Minecraft, cài đặt OBS cho máy yếu, plugin âm thanh cùng nhiều tin tức Vtuber và PNGtuber hữu ích.",
+        "title": "Bài viết & Chia sẻ — Shinn-K",
+        "description": "Bài viết và Chia sẻ cá nhân của Shinn-K về tối ưu Minecraft, cài đặt OBS cho máy yếu, plugin âm thanh cùng nhiều tin tức Vtuber và PNGtuber hữu ích.",
         "keywords": "bài viết, hướng dẫn, Minecraft, OBS, Vtuber, PNGtuber, plugin, Moe Shinn"
       },
       "product": {
-        "title": "Sản phẩm — Moe Shinn",
-        "description": "Sản phẩm số của Moe Shinn gồm phần mềm và model PNGTuber hoặc Vtuber như Ezy Tuber, kèm theo các chính sách sử dụng dịch vụ rõ ràng.",
+        "title": "Sản phẩm — Shinn-K",
+        "description": "Sản phẩm số của Shinn-K gồm phần mềm và model PNGTuber hoặc Vtuber như Ezy Tuber, kèm theo các chính sách sử dụng dịch vụ rõ ràng.",
         "keywords": "sản phẩm số, phần mềm Ezy Tuber, model PNGTuber, Vtuber Moe Shinn, phần mềm Vtuber, Ezy Tuber"
       },
+      "tool": {
+        "title": "Tool — Shinn-K",
+        "description": "Các tool do Moe Shinn tự làm: menu hỗ trợ, tiện ích cho game offline và phần mềm nhỏ, kèm hướng dẫn và link tải.",
+        "keywords": "tool, menu hỗ trợ game, tiện ích game offline, Moe Shinn, tải tool"
+      },
       "download": {
-        "title": "Tải xuống — Moe Shinn",
+        "title": "Tải xuống — Shinn-K",
         "description": "Tải xuống các tệp tài nguyên và nội dung độc quyền do Moe Shinn chia sẻ chính thức tại trang tải xuống nhanh chóng và tiện lợi.",
         "keywords": "tải xuống, download, Moe Shinn, tài liệu Moe Shinn, tệp chia sẻ, tài nguyên"
       },
       "channel": {
-        "title": "Moe Shinn Channel",
-        "description": "Moe Shinn kênh mạng xã hội cá nhân chính thức cập nhật nhanh chóng các video và hoạt động mới nhất của VTuber Moe Shinn.",
+        "title": "Shinn-K Channel",
+        "description": "Shinn-K kênh mạng xã hội cá nhân chính thức cập nhật nhanh chóng các video và hoạt động mới nhất của VTuber Moe Shinn.",
         "keywords": "Moe Shinn, MoeShinn, YouTube, mạng xã hội, VTuber, kênh cá nhân"
       },
       "profile": {
-        "title": "Hồ sơ Vtuber Moe Shinn — Model, fan name, thông tin",
-        "description": "Hồ sơ Moe Shinn, PNGTuber Việt Nam: thông tin cơ bản, lore, fan name, các model và kênh mạng xã hội chính thức của Shinn Moeji.",
+        "title": "Hồ sơ Vtuber Shinn-K — Model, fan name, thông tin",
+        "description": "Hồ sơ Shinn-K, PNGTuber Việt Nam: thông tin cơ bản, lore, fan name, các model và kênh mạng xã hội chính thức của Shinn-K.",
         "keywords": "Moe Shinn, MoeShinn, hồ sơ Vtuber, Shinn Moeji, Ezy Tuber, PNGTuber Việt Nam, model Vtuber, fan name, lore Vtuber"
       },
       "donate": {
-        "title": "Ủng Hộ — Moe Shinn",
-        "description": "Ủng hộ Moe Shinn để giúp kênh duy trì hoạt động và phát triển thêm nhiều nội dung giải trí hấp dẫn. Mọi đóng góp của bạn là động lực lớn cho tôi.",
+        "title": "Ủng Hộ — Shinn-K",
+        "description": "Ủng hộ Shinn-K để giúp kênh duy trì hoạt động và phát triển thêm nhiều nội dung giải trí hấp dẫn. Mọi đóng góp của bạn là động lực lớn cho tôi.",
         "keywords": "ủng hộ Moe Shinn, đóng góp, donate Moe Shinn, hỗ trợ streamer, Moe Shinn"
       }
     }
