@@ -21,7 +21,7 @@ Tiết kiệm được siêu nhiều thời gian, nhất là mấy dự án đ�
 
 Tải xuống Picture Lite tại đây nè :3
 
-<a class="button-5s" data-seconds="10" href="https://moeshinn.github.io/download/1271266172/" target="_blank" rel="noopener noreferrer">Mở link download</a>
+<a class="button-5s" data-seconds="10" href="https://shinn.210z.dev/download/1271266172/" target="_blank" rel="noopener noreferrer">Mở link download</a>
 
 Anh em cứ tải về xài thử rồi tối ưu lại mớ ảnh trên website cho mượt mà nha!
 §n§l§6Bình luận để tui cải tiến thêm nha!!!§r

@@ -32,7 +32,7 @@ Bài này viết cho người §lmới hoàn toàn§r, chưa từng rig bao gi�
 <h2>1. Chuẩn bị những thứ cần có</h2>
 
 <h3>Phần mềm</h3>
-<p>Bạn cần hai app: §eEzyMaker.exe§r và §eEzyTuber.exe§r. <a href="https://moeshinn.github.io/product/ezy-software/" target="_blank">§7Tải Ezy Software tại đây§r</a></p>
+<p>Bạn cần hai app: §eEzyMaker.exe§r và §eEzyTuber.exe§r. <a href="https://shinn.210z.dev/product/ezy-software/" target="_blank">§7Tải Ezy Software tại đây§r</a></p>
 
 <h3>Bộ layer PNG của nhân vật</h3>
 <p>§lLayer§r là từng mảnh của nhân vật được tách riêng thành ảnh: tóc sau, mặt, mắt, miệng, áo, tay... Khi xếp chồng lên nhau theo đúng thứ tự thì ra nhân vật hoàn chỉnh. Bạn tách layer từ ảnh gốc hoặc file PSD bằng công cụ tách layer như §lSee-through§r. §7Ezy Maker không vẽ lại hay sửa ảnh, nó chỉ cắt gọn vùng trống. Muốn đổi hình thì sửa bằng phần mềm vẽ rồi nhập lại.§r</p>
@@ -470,11 +470,11 @@ Bài này viết cho người §lmới hoàn toàn§r, chưa từng rig bao gi�
 <h2>14. Kết bài</h2>
 <p>Quy trình gói gọn là: §lchuẩn bị layer cùng canvas, đặt tên có nghĩa → nhập → 🧩 tự rig → kiểm tra và chỉnh → ▶ xem thử → 📦 xuất zip → import vào Ezy Tuber§r. Phần lớn công việc nặng đã do bước tự rig làm sẵn, bạn chỉ cần chỉnh những chỗ chưa vừa ý.</p>
 
-<a href="https://moeshinn.github.io/product/ezy-model-free/" target="_blank" rel="noopener noreferrer">§aNhận model free (nếu tui có đăng bán)§r</a>
+<a href="https://shinn.210z.dev/product/ezy-model-free/" target="_blank" rel="noopener noreferrer">§aNhận model free (nếu tui có đăng bán)§r</a>
 <br>
-<a href="https://moeshinn.github.io/product/ezy-model-paid/" target="_blank" rel="noopener noreferrer">§cMua model trả phí (đang có sẵn, giá từ 45k-79k)§r</a>
+<a href="https://shinn.210z.dev/product/ezy-model-paid/" target="_blank" rel="noopener noreferrer">§cMua model trả phí (đang có sẵn, giá từ 45k-79k)§r</a>
 <br>
-<a href="https://moeshinn.github.io/product/ezy-model-commission/" target="_blank" rel="noopener noreferrer">§bCommission model Ezy Tuber: vẽ, tách layer, rig§r</a>
+<a href="https://shinn.210z.dev/product/ezy-model-commission/" target="_blank" rel="noopener noreferrer">§bCommission model Ezy Tuber: vẽ, tách layer, rig§r</a>
 
 <hr>
 §a§lChúc bạn có một model PNGTuber thật xinh!§r §oNếu làm theo mà gặp lỗi hoặc thấy bước nào chưa rõ, cứ để lại bình luận bên dưới, mình sẽ trả lời và cập nhật bài.§r

@@ -4,7 +4,7 @@
   const URLS = { home: "/", post: "/post/", product: "/product/", tool: "/tool/", download: "/download/", channel: "/channel/", profile: "/profile/", donate: "/donate/" };
   const FILE = { home: "index.html", post: "post/index.html", product: "product/index.html", tool: "tool/index.html", download: "download/index.html", channel: "channel/index.html", profile: "profile/index.html", donate: "donate/index.html" };
   const DEFAULT = {
-    siteUrl: "https://moeshinn.github.io", siteName: "Moe Shinn", ogImage: "", shortLength: 10, // shortLength: số ký tự mã rút gọn /s/ tự sinh
+    siteUrl: "https://shinn.210z.dev", siteName: "Moe Shinn", ogImage: "", shortLength: 10, // shortLength: số ký tự mã rút gọn /s/ tự sinh
     favicon: { icon: "/assets/favicon.png", apple: "", v: "" },
     pages: {
       home: { title: "Moe Shinn", description: "Trang cá nhân của Moe Shinn (@MoeShinn): mạng xã hội, ủng hộ và các bài đăng mới.", keywords: "Moe Shinn, MoeShinn, mạng xã hội, blog" },

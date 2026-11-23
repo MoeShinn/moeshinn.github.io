@@ -1,4 +1,4 @@
 User-agent: *
 Disallow: /admin/
 
-Sitemap: https://moeshinn.github.io/sitemap.xml
+Sitemap: https://shinn.210z.dev/sitemap.xml
