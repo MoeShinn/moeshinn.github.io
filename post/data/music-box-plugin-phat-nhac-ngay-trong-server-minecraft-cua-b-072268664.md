@@ -2,11 +2,11 @@
 title: "Music Box – Plugin phát nhạc cho server Minecraft"
 photo: "photo/hoang-hon-voxel-ben-hop-nhac-ky-dieu-mvairvij.webp"
 date: "16/10/2026"
-keywords: "music box, plugin music box, plugin phát nhạc minecraft, plugin nhạc minecraft, phát nhạc từ link, simple voice chat, plugin voicechat, plugin paper, plugin purpur, plugin leaf, minecraft 1.21, nhạc mp3 minecraft, plugin Việt Nam, Moe Shinn"
+keywords: "music box, plugin music box, plugin phát nhạc minecraft, plugin nhạc minecraft, phát nhạc từ link, simple voice chat, plugin voicechat, plugin paper, plugin purpur, plugin leaf, minecraft 1.21, nhạc mp3 minecraft, plugin Việt Nam, Shinn Koe"
 description: "Giới thiệu Music Box: plugin cho phép người chơi lưu playlist và phát nhạc từ link trong game qua Simple Voice Chat. Xem tính năng, lệnh và cách cài trên Paper, Purpur, Leaf 1.21+."
 ---
 §l§dMusic Box§r là plugin §lphát nhạc cá nhân§r dành cho server Minecraft chạy Core Paper như §bPaper§r, §bPurpur§r, §bLeaf§r. Người chơi chỉ cần dán link file nhạc trực tiếp, đặt cho nó một ID ngắn rồi phát bất cứ lúc nào bằng một câu lệnh. Âm thanh được truyền qua §aSimple Voice Chat§r nên nghe như đang bật loa ngay trong game, người ở gần còn nghe được nếu họ cho phép.
-§7Tác giả: §f§lMoe Shinn [VNer]§r
+§7Tác giả: §f§lShinn Koe [VNer]§r
 
 §c§lLƯỚT XUỐNG DƯỚI CÙNG BẤM NÚT §e[LINK TẢI PLUGIN] §c§lRỒI HẲN ĐỌC NHA! :3§r
 

@@ -1,6 +1,6 @@
-# Moe Shinn
+# Shinn Koe
 
-> Moe Shinn cung cấp các liên kết mạng xã hội, thông tin ủng hộ và các bài đăng blog mới nhất trên trang cá nhân chính thức.
+> Shinn Koe cung cấp các liên kết mạng xã hội, thông tin ủng hộ và các bài đăng blog mới nhất trên trang cá nhân chính thức.
 
 ## Trang chính
 
@@ -15,7 +15,7 @@
 ## Hồ sơ Vtuber
 
 - [Hồ sơ Shinn Moeji](https://shinn.210z.dev/profile/): PNGtuber (Ezy Tuber) Việt Nam
-  - Xin chào, mình là Shinn Moeji, người đứng sau kênh Moe Shinn. Mình là một PNGtuber Việt Nam dùng Ezy Tuber, làm nội dung game, trò chuyện, reaction và livestream trên YouTube.
+  - Xin chào, mình là Shinn Moeji, người đứng sau kênh Shinn Koe. Mình là một PNGtuber Việt Nam dùng Ezy Tuber, làm nội dung game, trò chuyện, reaction và livestream trên YouTube.
   - Tên: Shinn Moeji
   - Có thể gọi là: Shinn, ShinnMoe
   - Tuổi: Không xác định
@@ -37,7 +37,7 @@
 ## Bài đăng
 
 - [Hướng dẫn rig model PNGTuber bằng Ezy Maker](https://shinn.210z.dev/post/huong-dan-rig-model-pngtuber-bang-ezy-maker-707370488/) (2026-10-31): Hướng dẫn chi tiết cách rig model PNGTuber bằng Ezy Maker cho người mới bắt đầu. Tự động tạo khung xương, chớp mắt và nhép miệng nhanh chóng.
-- [Moe Shinn debut: Kênh Vtuber/PNGtuber Việt Nam](https://shinn.210z.dev/post/shinju-ch-vner-chinh-thuc-debut-kenh-youtube-vtuber-pngtuber-180563779/) (2026-10-19): Kênh YouTube Vtuber/PNGtuber Việt Nam gaming, reaction & stream 20h hằng ngày
+- [Shinn Koe debut: Kênh Vtuber/PNGtuber Việt Nam](https://shinn.210z.dev/post/shinju-ch-vner-chinh-thuc-debut-kenh-youtube-vtuber-pngtuber-180563779/) (2026-10-19): Kênh YouTube Vtuber/PNGtuber Việt Nam gaming, reaction & stream 20h hằng ngày
 - [Music Box – Plugin phát nhạc cho server Minecraft](https://shinn.210z.dev/post/music-box-plugin-phat-nhac-ngay-trong-server-minecraft-cua-b-072268664/) (2026-10-16): Giới thiệu Music Box: plugin cho phép người chơi lưu playlist và phát nhạc từ link trong game qua Simple Voice Chat. Xem tính năng, lệnh và cách cài trên Paper, Purpur, Leaf 1.21+.
 - [Hướng dẫn cài Optimized.zip cho Launcher](https://shinn.210z.dev/post/huong-dan-cai-optimized-zip-cho-launcher-699363013/) (2026-10-16): Hướng dẫn cài Optimized Fabric cho Minecraft bằng Legacy Launcher, Fabric Launcher, Prism Launcher
 - [Hướng dẫn cài đặt OBS tối ưu cho máy yếu (2026)](https://shinn.210z.dev/post/huong-dan-tai-cai-dat-va-su-dung-obs-toi-uu-cho-may-yeu-2026-948192262/) (2026-10-15): Hướng dẫn tải, cài đặt và sử dụng OBS tối ưu cho máy yếu để quay và stream mượt mà, ổn định dù máy chỉ có cấu hình thấp. Thông số chuẩn để quay video và stream mượt, không giật, không rớt frame.
@@ -45,9 +45,9 @@
 
 ## Sản phẩm
 
-- [Ezy Software và Model build sẵn](https://shinn.210z.dev/product/ezy/) (danh mục): Xem kho sản phẩm Ezy Software và Model EzyTuber build và rig sẵn free trên website Moe Shinn
-  - [Ezy Software](https://shinn.210z.dev/product/ezy-software/) (danh mục): Ezy Software bao gồm phần mềm giúp đơn giản hóa các quy trình chạy, rig, build model PNG Tuber nâng cao nhưng được đơn giản hóa thuộc Moe Shinn [VNer]
-    - [Ezy All in 1](https://shinn.210z.dev/product/ezy-all-in-1/): Tải miễn phí Ezy All in 1 từ Moe Shinn bao gồm trọn bộ công cụ Ezy Tuber và Ezy Maker hỗ trợ sáng tạo nội dung cho Vtuber và PNGTuber. Giá: Miễn phí.
+- [Ezy Software và Model build sẵn](https://shinn.210z.dev/product/ezy/) (danh mục): Xem kho sản phẩm Ezy Software và Model EzyTuber build và rig sẵn free trên website Shinn Koe
+  - [Ezy Software](https://shinn.210z.dev/product/ezy-software/) (danh mục): Ezy Software bao gồm phần mềm giúp đơn giản hóa các quy trình chạy, rig, build model PNG Tuber nâng cao nhưng được đơn giản hóa thuộc Shinn Koe [VNer]
+    - [Ezy All in 1](https://shinn.210z.dev/product/ezy-all-in-1/): Tải miễn phí Ezy All in 1 từ Shinn Koe bao gồm trọn bộ công cụ Ezy Tuber và Ezy Maker hỗ trợ sáng tạo nội dung cho Vtuber và PNGTuber. Giá: Miễn phí.
     - [Ezy Tuber](https://shinn.210z.dev/product/ezy-tuber/): Ezy Tuber là phần mềm chạy model PNGTuber và Vtuber miễn phí bằng tiếng Việt, giúp theo dõi giọng nói và chuyển động chuột để bạn livestream dễ dàng. Giá: Miễn phí.
     - [Ezy Maker](https://shinn.210z.dev/product/ezy-maker/): Ezy Maker là công cụ rig layer để biến tranh nhân vật nhiều lớp (PSD, PNG) thành model PNGTuber hoàn chỉnh, thao tác trực quan, không cần kỹ năng kỹ thuật phức tạp. Giá: Miễn phí.
   - [Ezy Model Free](https://shinn.210z.dev/product/ezy-model-free/) (danh mục): Nhận Ezy Model Free sử dụng cho phần mềm Ezy Tuber với các chính sách & giấy phép liên quan
@@ -62,7 +62,7 @@
   - [Chuyển đổi định dạng ảnh](https://shinn.210z.dev/product/convert-image/): Chuyển đổi định dạng ảnh online miễn phí: đổi JPG, PNG, WebP, AVIF hàng loạt ngay trên trình duyệt, không tải ảnh lên máy chủ, xuất zip một lần. Giá: Miễn phí.
   - [Cắt ảnh theo tỉ lệ](https://shinn.210z.dev/product/crop-image/): Cắt ảnh online miễn phí theo tỉ lệ tùy chọn (1:1, 4:3, 16:9, 9:16, 4:5…), chọn nhiều ảnh, chỉnh vùng cắt từng ảnh trực tiếp và xuất zip. Chạy ngay trên trình duyệt. Giá: Miễn phí.
   - [Nén ảnh giảm dung lượng](https://shinn.210z.dev/product/compress-image/): Nén ảnh online miễn phí: giảm dung lượng JPG, PNG, WebP hàng loạt theo chất lượng hoặc theo dung lượng mục tiêu (KB), thu nhỏ kích thước, xuất zip. Chạy ngay trên trình duyệt. Giá: Miễn phí.
-- [Software](https://shinn.210z.dev/product/software/) (danh mục): Danh mục phần mềm miễn phí cho máy tính của Moe Shinn, như My Server Manager giúp tạo và quản lí server Minecraft Java trên Windows và Linux.
+- [Software](https://shinn.210z.dev/product/software/) (danh mục): Danh mục phần mềm miễn phí cho máy tính của Shinn Koe, như My Server Manager giúp tạo và quản lí server Minecraft Java trên Windows và Linux.
   - [My Server Manager](https://shinn.210z.dev/product/my-server-manager/): My Server Manager là phần mềm miễn phí giúp tạo và quản lí nhiều server Minecraft Java trên Windows và Linux: Paper, Purpur, Leaf, Fabric, nhập server từ file .jar, tên và mô tả có màu, không cần dòng lệnh. Giá: Miễn phí.
 
 ## Album ảnh

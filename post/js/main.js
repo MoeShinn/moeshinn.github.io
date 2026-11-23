@@ -802,7 +802,7 @@ function plainExcerpt(markdown, max) {
 }
 
 function applySeoMeta(meta, body, id) {
-    const siteName = "Moe Shinn";
+    const siteName = "Shinn Koe";
     const title = meta.title ? `${meta.title} — ${siteName}` : `${siteName} — Blog`;
     document.title = title;
 

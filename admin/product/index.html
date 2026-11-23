@@ -284,7 +284,7 @@ Admin.boot({ id: "product", title: "Sản phẩm", async render(main) {
     }
     $("#l_add").onclick = () => { lics.push({ title: "", text: "" }); draw(); };
     // Gửi tiêu đề + mô tả/từ khóa đang nhập + giá (nếu có) + NỘI DUNG THUẦN của phần mô tả sản phẩm (bỏ ảnh/màu/định dạng)
-    $("#e_ai").onclick = () => Admin.aiSeo({ btn: $("#e_ai"), kind: cat ? "category" : "product", title: $("#e_title").value, descEl: $("#e_desc"), kwEl: $("#e_kw"), site: "Moe Shinn",
+    $("#e_ai").onclick = () => Admin.aiSeo({ btn: $("#e_ai"), kind: cat ? "category" : "product", title: $("#e_title").value, descEl: $("#e_desc"), kwEl: $("#e_kw"), site: "Shinn Koe",
       text: [$("#e_price") && $("#e_price").value.trim() ? "Giá: " + $("#e_price").value.trim() : "", $("#e_body") ? Admin.plainText($("#e_body").value, renderPostBody) : ""].filter(Boolean).join("\n\n"), done: "lưu" });
 
     $("#e_save").onclick = async () => {

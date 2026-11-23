@@ -398,7 +398,7 @@
     const details = await loadDetails(nodes, id), d = details[id] || {};
     const bodyHtml = !PG.isCat(node) && d.body && typeof renderPostBody === "function" ? renderPostBody(d.body) : "";
     app.innerHTML = PG.bodyNode({ node, nodes, details, bodyHtml, hub });
-    setTitle(`${node.title} — ${(document.title.split(" — ")[1]) || "Moe Shinn"}`);
+    setTitle(`${node.title} — ${(document.title.split(" — ")[1]) || "Shinn Koe"}`);
     if (PG.isTool(node, d)) await mountTool(d.tool);
     if (window.SiteLoading) window.SiteLoading.ready();
     document.querySelectorAll("[data-gallery]").forEach(initGallery);
