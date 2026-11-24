@@ -392,6 +392,13 @@ function transform(rel, html) {
     html = slotAfter(html, "<!--/pre:jsonld-->", "robots", pnodes.length ? "" : '<meta name="robots" content="noindex, follow" />');
   } else if (rel === "tool/index.html") {
     html = slotAfter(html, '<div id="app" class="page">', "toollist", toolListHtml);
+    // SEO trang /tool: chỉ về tool/mod cho game (không Vtuber/stream/review). Muốn đổi: thêm "seoDescription" / "seoKeywords" vào tool/data.json
+    const hubDesc = String(toolIdx.seoDescription || "Tải tool, mod và menu hỗ trợ cho game (chủ yếu game offline) trên Android và Windows: hướng dẫn cài đặt, phiên bản và link tải.");
+    const hubKw = String(toolIdx.seoKeywords || "tool game, mod game, mod menu, tool hỗ trợ game offline, tải mod game, mod game android, mod game windows");
+    const attr = (v) => t(v).replace(/"/g, "&quot;");
+    html = html.replace(/(<meta name="description" content=")[^"]*(")/, (_m, x, y) => x + attr(hubDesc) + y)
+      .replace(/(<meta name="keywords" content=")[^"]*(")/, (_m, x, y) => x + attr(hubKw) + y)
+      .replace(/(<meta property="og:description" content=")[^"]*(")/, (_m, x, y) => x + attr(hubDesc) + y);
   } else if (rel === "download/index.html") {
     html = slotAfter(html, '<div id="app" class="page">', "downloadlist", downloadListHtml);
   } else if (rel === "album/index.html") {
@@ -504,8 +511,10 @@ if (priceSynced) put("product/data.json", JSON.stringify({ ...productIdx, nodes:
 put("llms.txt", buildLlms());
 // tool/data.json: đồng bộ dòng tóm tắt từng tool theo tool/data/<id>.json (để danh sách và tìm kiếm luôn đủ nền tảng, từ khóa…); giữ nguyên title, intro; platforms = danh sách nền tảng cho /admin/tool (sửa tay ở đây để thêm/bớt)
 if (exists("tool/data.json")) {
-  const { tools: _t, platforms: _p, ...restIdx } = toolIdx;
-  put("tool/data.json", JSON.stringify({ ...restIdx, platforms: Array.isArray(_p) && _p.length ? _p : TG.DEFAULT_PLATFORMS, tools: toolSummaries }, null, 2) + "\n");
+  const { tools: _t, platforms: _p, tags: _g, ...restIdx } = toolIdx;
+  // tags = danh sách thẻ game cho ô gợi ý ở /admin/tool: giữ thẻ đã lưu + thêm mọi thẻ đang dùng ở các tool; chưa có thì dùng bộ thẻ mặc định
+  const masterTags = TG.normTags([...(Array.isArray(_g) ? _g : TG.DEFAULT_TAGS), ...toolList.flatMap((x) => x.tags || [])]);
+  put("tool/data.json", JSON.stringify({ ...restIdx, platforms: Array.isArray(_p) && _p.length ? _p : TG.DEFAULT_PLATFORMS, tags: masterTags.length ? masterTags : TG.DEFAULT_TAGS, tools: toolSummaries }, null, 2) + "\n");
 }
 put("sitemap.xml", buildSitemap(exists("sitemap.xml") ? rd("sitemap.xml") : ""));
 

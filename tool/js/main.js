@@ -13,22 +13,44 @@
     ok.addEventListener("click", function () { if (chk.checked) unlock(); });
   }
 
-  // Mắt gạch chéo trên logo tool 18+: bấm để hiện riêng logo đó (không mở trang tool, không tính là xác nhận 18+). Nhớ trong phiên để vẽ lại danh sách không bị mờ lại.
+  // Logo bị làm mờ (.tool-logo-box[data-blur]): bấm vào lớp .tool-eye để hiện riêng logo đó, không mở trang tool.
+  // Logo 18+ (data-adult): lần đầu trong phiên hiện thông báo, bấm đồng ý mới hiện. Đã xác nhận 18+ ở trang tool thì không hỏi lại. Logo đã hiện được nhớ trong phiên.
+  function flag(k) { try { return sessionStorage.getItem(k) === "1"; } catch (e) { return false; } }
   function revealed() { try { return JSON.parse(sessionStorage.getItem("tool_reveal") || "[]"); } catch (e) { return []; } }
-  function cardId(card) { var m = (card.getAttribute("href") || "").match(/\/tool\/([^/]+)\//); return m ? decodeURIComponent(m[1]) : ""; }
   function applyReveal() {
     var ids = revealed();
-    [].forEach.call(document.querySelectorAll(".tool-card[data-adult]"), function (c) { if (ids.indexOf(cardId(c)) !== -1) c.classList.add("is-revealed"); });
+    [].forEach.call(document.querySelectorAll(".tool-logo-box[data-blur]"), function (b) { if (ids.indexOf(b.getAttribute("data-tid")) !== -1) b.classList.add("is-revealed"); });
+  }
+  function reveal(box) {
+    box.classList.add("is-revealed");
+    var id = box.getAttribute("data-tid");
+    try { var ids = revealed(); if (id && ids.indexOf(id) === -1) { ids.push(id); sessionStorage.setItem("tool_reveal", JSON.stringify(ids)); } } catch (err) { /* bỏ qua */ }
+  }
+  function askAdult(onYes) {
+    var m = document.createElement("div");
+    m.className = "tool-notice"; m.setAttribute("role", "dialog"); m.setAttribute("aria-modal", "true"); m.setAttribute("aria-labelledby", "tool-notice-title");
+    m.innerHTML = '<div class="tool-gate-box"><h2 id="tool-notice-title">Ảnh này có thể chứa nội dung 18+</h2>' +
+      '<p>Hình ảnh của tool này có thể chứa nội dung nhạy cảm, chỉ dành cho người từ 18 tuổi trở lên. Bạn đã đủ 18 tuổi và đồng ý xem ảnh?</p>' +
+      '<div class="tool-gate-actions"><button type="button" class="tool-gate-ok" data-yes>Tôi đã đủ 18 tuổi, hiện ảnh</button><a class="tool-gate-leave" href="#" data-no>Không xem</a></div></div>';
+    function close() { document.removeEventListener("keydown", esc, true); m.remove(); }
+    function esc(e) { if (e.key === "Escape") { e.stopPropagation(); close(); } }
+    m.addEventListener("click", function (e) {
+      if (e.target.closest("[data-yes]")) { try { sessionStorage.setItem("tool18img", "1"); } catch (err) { /* bỏ qua */ } close(); onYes(); }
+      else if (e.target.closest("[data-no]") || e.target === m) { e.preventDefault(); close(); }
+    });
+    document.addEventListener("keydown", esc, true);
+    document.body.appendChild(m);
+    m.querySelector("[data-yes]").focus();
   }
   function onEye(e) {
     var eye = e.target.closest && e.target.closest("[data-eye]");
     if (!eye) return;
     if (e.type === "keydown" && e.key !== "Enter" && e.key !== " ") return;
     e.preventDefault(); e.stopPropagation();
-    var card = eye.closest(".tool-card"), id = card && cardId(card);
-    if (!card) return;
-    card.classList.add("is-revealed");
-    try { var ids = revealed(); if (id && ids.indexOf(id) === -1) { ids.push(id); sessionStorage.setItem("tool_reveal", JSON.stringify(ids)); } } catch (err) { /* bỏ qua */ }
+    var box = eye.closest(".tool-logo-box");
+    if (!box) return;
+    if (box.hasAttribute("data-adult") && !flag("tool18img") && !flag("tool18")) askAdult(function () { reveal(box); });
+    else reveal(box);
   }
   document.addEventListener("click", onEye);
   document.addEventListener("keydown", onEye);

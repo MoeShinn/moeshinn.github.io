@@ -110,7 +110,7 @@
     return prev[b.length];
   };
   const entryFrom = (title, all) => { const T = fold(title), A = fold(all); return { title: T, all: A, words: [...new Set(tokens(A))] }; };
-  const searchText = (x) => { const n = norm(x); return [plain(n.title), plain(n.author), plain(n.game), n.platform, plain(n.version), plain(n.short), n.keywords, n.description].filter(Boolean).join(" "); };
+  const searchText = (x) => { const n = norm(x); return [plain(n.title), plain(n.author), plain(n.game), n.platform, plain(n.version), plain(n.short), n.keywords, n.description, n.tags.join(" ")].filter(Boolean).join(" "); };
   const searchEntry = (x) => entryFrom(plain(norm(x).title), searchText(x));
   // Điểm khớp của một tool với câu tìm; -1 = không khớp; chưa gõ gì = 0
   function score(query, e) {
@@ -127,16 +127,29 @@
 
   const SHORT_MAX = 100; // mô tả ngắn ở danh sách: dài hơn số ký tự này thì cắt và hiện "…"
 
+  // Thẻ game (visual novel, 18+…): chỉ dùng để tìm kiếm, không hiện ra trang. Nhận mảng hoặc chuỗi "a, b, c"; bỏ trùng (không phân biệt hoa/thường/dấu), tối đa 30 thẻ, mỗi thẻ ≤ 30 ký tự
+  const TAG_MAX = 30, TAG_LEN = 30;
+  function normTags(v) {
+    const seen = new Set(), out = [];
+    for (const x of (Array.isArray(v) ? v : [v]).flatMap((i) => String(i ?? "").split(/[,;，；\n\r|]+/))) {
+      const k = x.replace(/\s+/g, " ").replace(/^[\s#"'“”‘’]+|[\s"'“”‘’]+$/g, ""), id = fold(k);
+      if (!k || k.length > TAG_LEN || seen.has(id)) continue;
+      seen.add(id); out.push(k); if (out.length >= TAG_MAX) break;
+    }
+    return out;
+  }
+  const DEFAULT_TAGS = ["Visual Novel", "RPG", "Simulation", "Action", "Adventure", "Roguelike", "Survival", "Horror", "Puzzle", "Strategy", "Casual", "Sandbox", "Open World", "Anime", "2D", "3D", "18+"]; // thẻ gợi ý ban đầu (tool/data.json → "tags" sẽ giữ danh sách thật)
+
   // Điền giá trị mặc định cho dữ liệu một tool
   function norm(d) {
     d = d || {};
     const dl = (Array.isArray(d.downloads) ? d.downloads : []).map((x) => ({ label: String((x && x.label) || "").trim() || DEF_LABEL, url: String((x && x.url) || "").trim() })).filter((x) => x.url);
     return { id: d.id || "", title: d.title || d.id || "Tool", logo: d.logo || "", subtitle: String(d.subtitle || ""), description: d.description || "", keywords: d.keywords || "",
       author: String(d.author || ""), game: String(d.game || ""), platform: String(d.platform || ""), version: String(d.version || ""), short: String(d.short || ""),
-      body: d.body || "", adult: !!d.adult, donate: !!d.donate, downloads: dl, createdAt: d.createdAt || "", updatedAt: d.updatedAt || "" };
+      body: d.body || "", adult: !!d.adult, blurLogo: d.blurLogo === undefined ? !!d.adult : !!d.blurLogo, tags: normTags(d.tags), donate: !!d.donate, downloads: dl, createdAt: d.createdAt || "", updatedAt: d.updatedAt || "" };
   }
   // Dòng tóm tắt lưu trong tool/data.json (đủ để vẽ thẻ ở danh sách)
-  const summary = (d) => { const n = norm(d); return { id: n.id, title: n.title, logo: n.logo, author: n.author, game: n.game, platform: n.platform, version: n.version, short: n.short, keywords: n.keywords, description: n.description, subtitle: n.subtitle, adult: n.adult, createdAt: n.createdAt }; };
+  const summary = (d) => { const n = norm(d); return { id: n.id, title: n.title, logo: n.logo, author: n.author, game: n.game, platform: n.platform, version: n.version, short: n.short, keywords: n.keywords, description: n.description, subtitle: n.subtitle, adult: n.adult, blurLogo: n.blurLogo, tags: n.tags, createdAt: n.createdAt }; };
 
   // Các dòng thông tin: Tác giả / Game / Nền tảng / Version / Mô tả (đủ trường nào hiện trường đó). full=false: mô tả bị cắt ở SHORT_MAX ký tự
   function infoHtml(n, { full = false } = {}) {
@@ -146,15 +159,18 @@
   }
 
   // Biểu tượng "mắt gạch chéo" đặt giữa logo của tool 18+ đang bị làm mờ; bấm vào để xem logo (xử lý ở tool/js/main.js)
-  const EYE = `<span class="tool-eye" data-eye role="button" tabindex="0" aria-label="Bấm để hiện ảnh (nội dung 18+)" title="Bấm để hiện ảnh"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg></span>`;
+  // Logo bị làm mờ (tùy chọn "Làm mờ logo"): phủ lên một lớp bấm được, góc có biểu tượng nhỏ: mắt gạch chéo (tool thường) hoặc chữ 18+ (tool 18+). Xử lý bấm ở tool/js/main.js
+  const EYE_SVG = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+  const eyeBtn = (adult) => `<span class="tool-eye" data-eye role="button" tabindex="0" aria-label="${adult ? "Bấm để xem ảnh (nội dung 18+)" : "Bấm để hiện ảnh"}" title="${adult ? "Ảnh 18+, bấm để xem" : "Bấm để hiện ảnh"}"><span class="tool-eye-badge${adult ? " is-18" : ""}">${adult ? "18+" : EYE_SVG}</span></span>`;
 
   /* ---------- Danh sách /tool/ ---------- */
   function cardHtml(x) {
     const n = norm(x), logo = imgUrl(n.logo);
+    const blur = n.blurLogo && !!logo; // logo bị làm mờ khi người quản trị tích "Làm mờ logo"
     return `<a class="tool-card" href="${a(toolUrl(n.id))}" data-s="${a(searchText(n))}"${n.adult ? " data-adult" : ""}>` +
-      `<span class="tool-card-logo${logo ? "" : " tool-logo-ph"}">${logo ? `<img src="${a(logo)}" alt="${a(plain(n.title))}" width="88" height="88" loading="lazy" />` : "🛠️"}${n.adult && logo ? EYE : ""}</span>` +
+      `<span class="tool-card-logo tool-logo-box${logo ? "" : " tool-logo-ph"}"${blur ? ` data-blur${n.adult ? " data-adult" : ""} data-tid="${a(n.id)}"` : ""}>${logo ? `<img src="${a(logo)}" alt="${a(plain(n.title))}" width="88" height="88" loading="lazy" />` : "🛠️"}${blur ? eyeBtn(n.adult) : ""}</span>` +
       `<span class="tool-card-info"><span class="tool-card-name">${fmt(n.title)}</span>${infoHtml(n) ? `<span class="tool-card-sub">${infoHtml(n)}</span>` : ""}</span>` +
-      (n.adult ? `<span class="tool-badge" title="Nội dung 18+">18+</span>` : "") + `</a>`;
+      (n.adult && !blur ? `<span class="tool-badge" title="Nội dung 18+">18+</span>` : "") + `</a>`;
   }
   function hubBody({ tools = [], hub = {} } = {}) {
     const intro = String(hub.intro || "").trim();
@@ -185,12 +201,20 @@
 
   const plainText = (v) => plain(v).replace(/\s+/g, " ").trim();
   const stripPre = (html) => String(html).replace(/<!--pre:(toollist)-->[\s\S]*?<!--\/pre:\1-->/g, "");
+  // Trang tool chỉ nên lên khi người ta tìm tool/mod cho game: loại mô tả, từ khóa dính Vtuber/stream/review/blog (vd do AI cũ gợi ý)
+  const OFF_TOPIC = /vtuber|pngtuber|stream|review|blog|gameplay|walkthrough|trải nghiệm|đánh giá|let'?s play/i;
+  const clip = (s, max) => (s.length > max ? s.slice(0, max - 1).replace(/\s+\S*$/, "") + "…" : s);
   function buildToolPage(shell, { id, data, seo, bodyHtml }) {
     const n = norm({ ...data, id }), name = seo.siteName, f = seo.favicon || {}, url = siteOf(seo) + toolUrl(id);
     const heading = plain(n.title), title = `${heading} — ${name}`;
     const plainBody = String(n.body || "").replace(/<[^>]*>/g, " ").replace(/!\[[^\]]*\]\([^)]*\)/g, " ").replace(/\[([^\]]+)\]\([^)]*\)/g, "$1").replace(/§[0-9a-fk-or]/gi, "").replace(/\s+/g, " ").trim();
-    const desc = n.description || plainText(n.short) || (plainBody.length > 155 ? plainBody.slice(0, 154).replace(/\s+\S*$/, "") + "…" : plainBody) || `Tool ${heading} của ${name}.`;
-    const kw = String(n.keywords || "").split(",").map((s) => s.trim()).filter(Boolean).join(", ");
+    const gm = plain(n.game).trim() || heading, plats = n.platform.split(/\s*(?:-|,|\/|&|\+)\s*/).map((x) => x.trim()).filter(Boolean);
+    const good = (x) => String(x || "").trim() && !OFF_TOPIC.test(x);
+    const autoDesc = clip(`Tải tool, mod ${gm}${n.platform ? ` cho ${n.platform}` : ""}${n.version ? `, phiên bản ${plain(n.version)}` : ""}: menu hỗ trợ game, hướng dẫn cài đặt và link tải.`, 155);
+    const desc = [n.description, plainText(n.short)].find(good) || autoDesc;
+    let kwList = String(n.keywords || "").split(",").map((s) => s.trim()).filter((s) => s && !OFF_TOPIC.test(s));
+    if (!kwList.length) kwList = [...new Set([`tool ${gm}`, `mod ${gm}`, `${gm} mod menu`, `tải mod ${gm}`, ...plats.map((p) => `${gm} ${p.toLowerCase()}`), "tool game offline", "mod game"])].slice(0, 10);
+    const kw = kwList.join(", ");
     const lg = imgUrl(n.logo), img = lg ? (/^https?:/.test(lg) ? lg : siteOf(seo) + lg) : (seo.ogImage || "");
     const L = ["<!-- seo:start -->", `<title>${t(title)}</title>`, `<meta name="description" content="${a(desc)}" />`];
     if (kw) L.push(`<meta name="keywords" content="${a(kw)}" />`);
@@ -218,5 +242,5 @@
     return [{ loc: site + "/tool/", lastmod: last }].concat(list.map((x) => ({ loc: site + toolUrl(x.id), lastmod: isoDay(x.updatedAt) || isoDay(x.createdAt) })));
   }
 
-  return { slugify, plain, fmt, hex, MC, SHORT_MAX, DEFAULT_PLATFORMS, fold, searchEntry, score, norm, summary, cardHtml, hubBody, detailBody, buildToolPage, allUrls, toolUrl, safeUrl, imgUrl, RESERVED, DEF_LABEL };
+  return { slugify, plain, fmt, hex, MC, SHORT_MAX, DEFAULT_PLATFORMS, DEFAULT_TAGS, normTags, OFF_TOPIC, fold, searchEntry, score, norm, summary, cardHtml, hubBody, detailBody, buildToolPage, allUrls, toolUrl, safeUrl, imgUrl, RESERVED, DEF_LABEL };
 });

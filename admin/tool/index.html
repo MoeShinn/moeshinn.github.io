@@ -18,6 +18,8 @@ Admin.boot({ id: "tool", title: "Tool", async render(main) {
   catch (e) { main.innerHTML = `<h2>Tool</h2><p class="err">${esc(e.message)}</p>`; return; }
   if (!Array.isArray(idx.tools)) idx.tools = [];
   // Danh sách nền tảng nằm ở tool/data.json → "platforms" (sửa file này để thêm/bớt); chưa có thì dùng mặc định
+  // Danh sách thẻ game (visual novel, 18+…) nằm ở tool/data.json → "tags": gồm thẻ đã lưu + mọi thẻ đang dùng ở các tool; thẻ mới tự được thêm vào khi đăng
+  const TAGS_MASTER = (() => { return ToolGen.normTags([...(Array.isArray(idx.tags) ? idx.tags : ToolGen.DEFAULT_TAGS), ...idx.tools.flatMap((x) => x.tags || [])]); })();
   const PLATFORMS = Array.isArray(idx.platforms) && idx.platforms.length ? idx.platforms.map(String) : ToolGen.DEFAULT_PLATFORMS.slice();
   const seo = AdminSeo.merge(S.seo), site = seo.siteUrl.replace(/\/$/, "");
   const DEF_AUTHOR = (SD.profile && SD.profile.name) || S.seo?.siteName || ""; // tác giả mặc định cho tool mới
@@ -78,9 +80,27 @@ Admin.boot({ id: "tool", title: "Tool", async render(main) {
       <div class="hint" id="short_cnt"></div>
     </div>
     <div class="card"><h3>Tùy chọn</h3>
-      <label class="row"><input type="checkbox" id="t_adult" ${d.adult ? "checked" : ""}>Xác nhận 18+ <small class="hint">(trang hiện cổng “tôi đủ 18 tuổi” bắt buộc tích mới xem được; ảnh logo ngoài danh sách bị làm mờ tới khi người xem xác nhận)</small></label>
+      <label class="row"><input type="checkbox" id="t_adult" ${d.adult ? "checked" : ""}>Xác nhận 18+ <small class="hint">(trang tool luôn hiện cổng “tôi đủ 18 tuổi”, bắt buộc tích mới xem được)</small></label>
+      <label class="row"><input type="checkbox" id="t_blur" ${d.blurLogo ? "checked" : ""}>Làm mờ logo <small class="hint">(logo mờ, góc có biểu tượng nhỏ: tool thường là mắt gạch chéo, tool 18+ là “18+”; bấm vào để xem, tool 18+ lần đầu sẽ hỏi xác nhận)</small></label>
       <label class="row"><input type="checkbox" id="t_donate" ${d.donate ? "checked" : ""}>Hiện nút donate <small class="hint">(ảnh “Buy me a coffee”, bấm sẽ mở trang /donate)</small></label>
     </div>
+    <div class="card"><h3>Thẻ game <small class="hint">(vd: visual novel, 18+… dùng để tìm kiếm, không hiện ra trang)</small></h3>
+      <div class="tagbox" id="tagbox"><span id="tagchips"></span><input id="tag_in" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="tag_sug" placeholder="Nhập thẻ, Enter hoặc dấu phẩy để thêm…"></div>
+      <div class="tagsug" id="tag_sug" role="listbox" hidden></div>
+      <p class="hint" style="margin:8px 0">↑ ↓ chọn gợi ý, Tab điền gợi ý đang chọn, Enter/dấu phẩy thêm chữ đang gõ (chưa có thì thành thẻ mới). Dán một loạt thẻ cách nhau bằng dấu phẩy là tự tách.</p>
+      <button type="button" class="ghost" id="tag_ai">✨ AI gợi ý thẻ</button> <span class="hint" id="tag_st"></span></div>
+    <style>
+      .tagbox{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 8px;border:1px solid var(--line,#2a3a52);border-radius:8px;cursor:text}
+      .tagbox:focus-within{border-color:#4f8cff}
+      .tagbox input{flex:1 1 140px;min-width:120px;border:0!important;outline:0!important;background:transparent!important;padding:4px 2px!important;margin:0!important;box-shadow:none!important}
+      .tagchip{display:inline-flex;align-items:center;gap:6px;padding:3px 6px 3px 10px;border-radius:999px;background:#1e3a5f;color:#e6f0ff;border:1px solid #2f5d9a;font-size:14px}
+      .tagchip b{cursor:pointer;width:18px;height:18px;line-height:17px;text-align:center;border-radius:50%;background:rgba(255,255,255,.15)}
+      .tagchip b:hover{background:#c0392b}
+      .tagsug{margin-top:4px;border:1px solid var(--line,#2a3a52);border-radius:8px;background:#0f1b2d;overflow:hidden;max-width:420px}
+      .tagsug div{padding:7px 12px;cursor:pointer;color:#cbd5e1}
+      .tagsug div.on{background:#2563eb;color:#fff;font-weight:700}
+      .tagsug small{opacity:.6;margin-left:8px}
+    </style>
     <div class="card"><h3>Nút tải xuống</h3><p class="hint" style="margin-top:0">Để trống chữ trên nút thì dùng “${esc(ToolGen.DEF_LABEL)}”. Link phải bắt đầu bằng https:// (link getlink, GitHub release, Steam, itch…). Dòng không có link sẽ bị bỏ.</p><div id="dll"></div><button type="button" class="ghost" id="dl_add">＋ Thêm nút tải</button></div>
     <div class="card">
       <label>Từ khóa (cách nhau bằng dấu phẩy)<input id="t_kw" value="${esc(d.keywords)}"></label>
@@ -145,7 +165,7 @@ Admin.boot({ id: "tool", title: "Tool", async render(main) {
     $("#dl_add").onclick = () => { dls.push({ label: "", url: "" }); drawDls(); };
 
     const collect = () => ToolGen.norm({ id: editId || "xem-truoc", title: $("#t_title").value.trim() || "Tên tool", logo, author: $("#t_author").value.trim(), game: $("#t_game").value.trim(), platform: $("#t_plat").value, version: $("#t_ver").value.trim(), short: $("#t_short").value.trim(), description: $("#t_desc").value.trim(), keywords: $("#t_kw").value.trim(),
-      body: ta.value, adult: $("#t_adult").checked, donate: $("#t_donate").checked, downloads: dls });
+      body: ta.value, adult: $("#t_adult").checked, blurLogo: $("#t_blur").checked, tags, donate: $("#t_donate").checked, downloads: dls });
     function preview() {
       const data = collect();
       let html = ToolGen.cardHtml(data) + '<div style="height:16px"></div>' + ToolGen.detailBody({ data, bodyHtml: renderPostBody(ta.value) });
@@ -153,10 +173,27 @@ Admin.boot({ id: "tool", title: "Tool", async render(main) {
       $("#pv").srcdoc = `<!doctype html><html class="tool-18ok"><meta charset="utf-8"><base target="_blank"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/post/css/style.css"><link rel="stylesheet" href="/tool/css/style.css"><body style="padding:12px"><div class="tool-hub">${html}</div></body></html>`;
     }
     let tp; main.querySelectorAll("input,textarea,select").forEach((el) => el.addEventListener("input", () => { clearTimeout(tp); tp = setTimeout(preview, 250); }));
-    $("#t_adult").onchange = $("#t_donate").onchange = preview;
-    $("#t_ai").onclick = () => Admin.aiSeo({ btn: $("#t_ai"), kind: "post", title: ToolGen.plain($("#t_title").value), descEl: $("#t_desc"), kwEl: $("#t_kw"), text: Admin.plainText(ta.value, renderPostBody), done: "đăng" });
+    $("#t_adult").onchange = $("#t_blur").onchange = $("#t_donate").onchange = preview;
+    $("#t_ai").onclick = async () => { // AI viết mô tả + từ khóa CHỈ về tool/mod cho game (không Vtuber/stream/review)
+      const btn = $("#t_ai"), label = btn.textContent, P = ToolGen.plain, off = ToolGen.OFF_TOPIC;
+      if (!P($("#t_title").value).trim()) return Admin.toast("Cần nhập tên tool trước", true);
+      btn.disabled = true; btn.textContent = "✨ AI đang viết…";
+      try {
+        const info = [["Tác giả", P($("#t_author").value)], ["Game", P($("#t_game").value)], ["Nền tảng", $("#t_plat").value], ["Version", P($("#t_ver").value)], ["Thẻ game", tags.join(", ")]].filter((x) => x[1]).map((x) => x.join(": ")).join("; ");
+        const curKw = $("#t_kw").value.split(",").map((x) => x.trim()).filter((x) => x && !off.test(x)).join(", "), curDesc = off.test($("#t_desc").value) ? "" : $("#t_desc").value;
+        const r = await Admin.api("/ai/seo", { kind: "tool", title: P($("#t_title").value), description: curDesc, keywords: curKw, info, text: Admin.plainText(P($("#t_short").value) + "\n" + ta.value, renderPostBody) });
+        let kws = [].concat(r.keywords || []).filter((x) => x && !off.test(x)), desc = String(r.description || ""), warn = [].concat(r.warnings || []);
+        if (r.kind !== "tool") warn.push("Worker admin-api chưa là bản mới nên AI chưa biết đây là tool game; hãy deploy lại Worker. Từ khóa/mô tả lạc đề (Vtuber, stream, review…) đã tự bị loại.");
+        if (off.test(desc)) { desc = ""; warn.push("Mô tả AI viết có từ lạc đề nên đã bỏ, hãy tự viết hoặc bấm lại."); }
+        if (desc) { $("#t_desc").value = desc; $("#t_desc").dispatchEvent(new Event("input", { bubbles: true })); }
+        if (kws.length) { $("#t_kw").value = kws.join(", "); $("#t_kw").dispatchEvent(new Event("input", { bubbles: true })); }
+        Admin.toast(`AI đã điền: mô tả ${desc.length} ký tự, ${kws.length} từ khóa. Xem lại rồi đăng.${warn.length ? " ⚠ " + warn.join(" ") : ""}`, false, warn.length ? 10000 : 5000);
+      } catch (e) { Admin.toast(e.message, true, 8000); }
+      finally { btn.disabled = false; btn.textContent = label; }
+    };
 
     $("#t_save").onclick = async () => {
+      commitTagText(); // chữ đang gõ dở trong ô thẻ cũng được tính
       const title = $("#t_title").value.trim(), body = ta.value.trim();
       if (!title) return Admin.toast("Cần nhập tên tool", true);
       const downloads = dls.map((x) => ({ label: (x.label || "").trim() || ToolGen.DEF_LABEL, url: (x.url || "").trim() })).filter((x) => x.url);
@@ -170,10 +207,11 @@ Admin.boot({ id: "tool", title: "Tool", async render(main) {
       }
       const now = new Date().toISOString();
       const data = { id, title, logo, author: $("#t_author").value.trim(), game: $("#t_game").value.trim(), platform: $("#t_plat").value, version: $("#t_ver").value.trim(), short: $("#t_short").value.trim(), description: $("#t_desc").value.trim(), keywords: $("#t_kw").value.trim(), body,
-        adult: $("#t_adult").checked, donate: $("#t_donate").checked, downloads, createdAt: (old && old.createdAt) || now, updatedAt: now };
+        adult: $("#t_adult").checked, blurLogo: $("#t_blur").checked, tags, donate: $("#t_donate").checked, downloads, createdAt: (old && old.createdAt) || now, updatedAt: now };
       const files = [];
       for (const [p, { b64 }] of pending) if (data.logo === p || body.includes("/" + p)) files.push({ path: p, content: b64, encoding: "base64" }); // chỉ đưa lên ảnh còn dùng
-      const next = { ...idx, platforms: PLATFORMS, tools: editId ? idx.tools.map((x) => (x.id === id ? ToolGen.summary(data) : x)) : [ToolGen.summary(data), ...idx.tools] };
+      const knownTags = new Set(TAGS_MASTER.map(ToolGen.fold)), masterNext = [...TAGS_MASTER, ...tags.filter((x) => !knownTags.has(ToolGen.fold(x)))]; // thẻ mới tự thêm vào tool/data.json
+      const next = { ...idx, platforms: PLATFORMS, tags: masterNext, tools: editId ? idx.tools.map((x) => (x.id === id ? ToolGen.summary(data) : x)) : [ToolGen.summary(data), ...idx.tools] };
       const b = $("#t_save"); b.disabled = true;
       try {
         $("#t_st").textContent = "Đang đăng…";
@@ -197,6 +235,51 @@ Admin.boot({ id: "tool", title: "Tool", async render(main) {
     Object.entries(MC_COLORS).forEach(([k, c]) => { const i = document.createElement("i"); i.style.background = c; i.title = "§" + k; i.onclick = () => wrapF("§" + k, "§r"); $("#csw").appendChild(i); });
     const cnt = () => { const n = ToolGen.plain($("#t_short").value).length; $("#short_cnt").textContent = `${n}/300 ký tự` + (n > ToolGen.SHORT_MAX ? ` · ở danh sách chỉ hiện ${ToolGen.SHORT_MAX} ký tự đầu rồi thêm “…” (trang chi tiết hiện đủ)` : ""); };
     $("#t_short").addEventListener("input", cnt); cnt();
+    /* ---- Thẻ game: ô nhập kiểu GitHub ---- */
+    let tags = ToolGen.normTags(d.tags), sug = [], act = -1, navigated = false;
+    const tin = $("#tag_in"), fold = ToolGen.fold;
+    const canon = (x) => TAGS_MASTER.find((k) => fold(k) === fold(x)) || x; // trùng thẻ đã có (không phân biệt hoa/thường/dấu) thì dùng đúng cách viết cũ
+    const drawChips = () => { $("#tagchips").innerHTML = tags.map((x, i) => `<span class="tagchip">${esc(x)}<b data-rm="${i}" title="Bỏ thẻ">×</b></span>`).join(""); $("#tagchips").querySelectorAll("[data-rm]").forEach((b) => (b.onclick = (e) => { e.stopPropagation(); tags.splice(+b.dataset.rm, 1); drawChips(); tin.focus(); })); };
+    const addTags = (list) => { tags = ToolGen.normTags([...tags, ...list.map(canon)]); drawChips(); }; // gộp thẻ trùng thành 1, giữ thẻ cũ
+    const hideSug = () => { sug = []; act = -1; navigated = false; $("#tag_sug").hidden = true; tin.setAttribute("aria-expanded", "false"); };
+    function drawSug() {
+      $("#tag_sug").innerHTML = sug.map((x, i) => `<div role="option" data-i="${i}" class="${i === act ? "on" : ""}">${esc(x)}</div>`).join("");
+      $("#tag_sug").hidden = !sug.length; tin.setAttribute("aria-expanded", String(!!sug.length));
+      $("#tag_sug").querySelectorAll("[data-i]").forEach((el) => { el.onmousedown = (e) => e.preventDefault(); el.onmouseenter = () => { act = +el.dataset.i; navigated = true; drawSug(); }; el.onclick = () => pick(sug[+el.dataset.i]); });
+    }
+    function updSug() {
+      const q = fold(tin.value.trim()); if (!q) return hideSug();
+      const chosen = new Set(tags.map(fold)), free = TAGS_MASTER.filter((k) => !chosen.has(fold(k)));
+      sug = [...free.filter((k) => fold(k).startsWith(q)), ...free.filter((k) => !fold(k).startsWith(q) && fold(k).includes(q))].slice(0, 8);
+      act = sug.length ? 0 : -1; navigated = false; drawSug();
+    }
+    function pick(x) { addTags([x]); tin.value = ""; hideSug(); tin.focus(); }
+    function commitTagText() { const v = tin.value.trim(); if (v) addTags([v]); tin.value = ""; hideSug(); }
+    tin.addEventListener("input", () => { // gõ hoặc dán "a, b, c": mọi thứ trước dấu phẩy/chấm phẩy/xuống dòng thành thẻ riêng, phần cuối ở lại ô
+      if (/[,;，；\n|]/.test(tin.value)) { const parts = tin.value.split(/[,;，；\n|]+/), rest = parts.pop(); addTags(parts.filter((x) => x.trim())); tin.value = rest.replace(/^\s+/, ""); }
+      updSug();
+    });
+    tin.addEventListener("keydown", (e) => {
+      if ((e.key === "ArrowDown" || e.key === "ArrowUp") && sug.length) { e.preventDefault(); act = (act + (e.key === "ArrowDown" ? 1 : -1) + sug.length) % sug.length; navigated = true; drawSug(); }
+      else if (e.key === "Tab" && sug.length && tin.value.trim()) { e.preventDefault(); pick(sug[act >= 0 ? act : 0]); } // Tab: điền gợi ý đang chọn (mặc định gợi ý đầu)
+      else if (e.key === "Enter") { e.preventDefault(); if (navigated && act >= 0 && sug[act]) pick(sug[act]); else commitTagText(); } // Enter: gợi ý đang chọn bằng ↑↓, nếu không thì thêm đúng chữ đang gõ
+      else if (e.key === "Escape") hideSug();
+      else if (e.key === "Backspace" && !tin.value && tags.length) { tags.pop(); drawChips(); }
+    });
+    tin.addEventListener("blur", () => setTimeout(commitTagText, 120));
+    $("#tagbox").addEventListener("click", () => tin.focus());
+    $("#tag_ai").onclick = async () => { // AI tìm thông tin game trên web rồi gợi ý thẻ; thẻ cũ giữ nguyên, trùng thì gộp
+      const btn = $("#tag_ai"), label = btn.textContent, P = ToolGen.plain;
+      if (!P($("#t_title").value).trim() && !P($("#t_game").value).trim()) return Admin.toast("Cần nhập tên tool hoặc tên game trước", true);
+      btn.disabled = true; btn.textContent = "✨ AI đang tìm thông tin…"; $("#tag_st").textContent = "";
+      try {
+        const r = await Admin.api("/ai/tags", { title: P($("#t_title").value), game: P($("#t_game").value), platform: $("#t_plat").value, known: TAGS_MASTER.slice(0, 200), current: tags });
+        const got = ToolGen.normTags(r.tags), before = tags.length; addTags(got);
+        $("#tag_st").textContent = `AI gợi ý ${got.length} thẻ, thêm mới ${tags.length - before}.${r.grounded === false ? " (không tra được web, chỉ dựa vào tên)" : ""}${r.converted ? " (đã tự chuyển định dạng)" : ""}`;
+      } catch (e) { Admin.toast(e.status === 404 ? "Worker admin-api chưa có tính năng gợi ý thẻ, hãy deploy lại Worker bản mới." : e.message, true, 8000); }
+      finally { btn.disabled = false; btn.textContent = label; }
+    };
+    drawChips();
     drawLogo(); drawDls(); preview();
   }
 
