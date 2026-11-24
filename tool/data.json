@@ -1,6 +1,11 @@
 {
   "title": "Tool",
   "intro": "",
+  "platforms": [
+    "Android",
+    "Windows",
+    "Android - Windows"
+  ],
   "tools": [
     {
       "id": "syahatas",
@@ -8,8 +13,11 @@
       "logo": "tool/photo/icon-mwty10vi.webp",
       "author": "Shinn Koe",
       "game": "Syahatas' bad day",
+      "platform": "",
       "version": "",
       "short": "Mod menu for Syahatas' bad day bản demo v0.79 và bản chính thức v1.0.5",
+      "keywords": "Syahatas bad day, game sinh tồn, review game, Vtuber blog, trải nghiệm game, game hành động",
+      "description": "Syahatas' bad day là bài viết chia sẻ về trải nghiệm chơi game sinh tồn và hành động thú vị, mang lại những giây phút giải trí hấp dẫn cùng Vtuber.",
       "subtitle": "",
       "adult": true,
       "createdAt": "2026-11-24T00:19:33.727Z"

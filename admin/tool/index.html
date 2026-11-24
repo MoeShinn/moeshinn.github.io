@@ -17,6 +17,8 @@ Admin.boot({ id: "tool", title: "Tool", async render(main) {
   try { [idx, S, tree, SD] = await Promise.all([Admin.readJson("tool/data.json", { title: "Tool", intro: "", tools: [] }), Admin.readJson("site-settings.json", {}), Admin.api("/tree").then((r) => r.files.map((f) => f.path)), Admin.readJson("data.json", {})]); }
   catch (e) { main.innerHTML = `<h2>Tool</h2><p class="err">${esc(e.message)}</p>`; return; }
   if (!Array.isArray(idx.tools)) idx.tools = [];
+  // Danh sách nền tảng nằm ở tool/data.json → "platforms" (sửa file này để thêm/bớt); chưa có thì dùng mặc định
+  const PLATFORMS = Array.isArray(idx.platforms) && idx.platforms.length ? idx.platforms.map(String) : ToolGen.DEFAULT_PLATFORMS.slice();
   const seo = AdminSeo.merge(S.seo), site = seo.siteUrl.replace(/\/$/, "");
   const DEF_AUTHOR = (SD.profile && SD.profile.name) || S.seo?.siteName || ""; // tác giả mặc định cho tool mới
 
@@ -25,12 +27,12 @@ Admin.boot({ id: "tool", title: "Tool", async render(main) {
     const rows = idx.tools.map((x, i) => `<tr style="border-top:1px solid var(--line)"><td style="padding:8px 0">${esc(ToolGen.plain(x.title))}${x.adult ? ' <b style="color:#ff8b8f">18+</b>' : ""}<br><small class="hint">${esc(x.id)}${x.createdAt ? " · " + new Date(x.createdAt).toLocaleDateString("vi-VN") : ""}</small></td>
       <td style="text-align:right;white-space:nowrap"><a href="/tool/${encodeURIComponent(x.id)}/" target="_blank">Mở</a> · <a href="#edit/${encodeURIComponent(x.id)}">Sửa</a> · <a href="#" data-del="${i}" style="color:#ff8b8f">Xóa</a></td></tr>`).join("");
     main.innerHTML = `<h2>Tool</h2><p><a class="btn" href="#new">＋ Tool mới</a> <a class="btn ghost" href="/tool/" target="_blank" style="margin-left:6px">Xem /tool</a></p>
-      <input type="search" id="t_q" placeholder="🔍 Tìm theo tên hoặc ID…" autocomplete="off" style="margin-bottom:12px">
+      <input type="search" id="t_q" placeholder="🔍 Tìm theo tên, tác giả, nền tảng, ID…" autocomplete="off" style="margin-bottom:12px">
       <div class="card"><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">${rows || '<tr><td class="hint">Chưa có tool nào. Bấm “Tool mới” để thêm tool đầu tiên.</td></tr>'}</table></div></div>
       <p class="hint">Sau khi lưu, web cập nhật sau ~1 phút. Sitemap tự cập nhật khi workflow Prerender chạy (hằng ngày, hoặc bấm tay trên GitHub Actions).</p>`;
     const fold = (s) => String(s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/gi, "d").toLowerCase();
-    const trs = [...main.querySelectorAll("tbody tr, table tr")], keys = idx.tools.map((x) => fold(ToolGen.plain(x.title) + " " + x.id + " " + ToolGen.plain(x.author) + " " + ToolGen.plain(x.game) + " " + (x.subtitle || "")));
-    $("#t_q").oninput = (e) => { const q = fold(e.target.value).trim(); trs.forEach((tr, i) => { if (keys[i] !== undefined) tr.style.display = !q || keys[i].includes(q) ? "" : "none"; }); };
+    const trs = [...main.querySelectorAll("tbody tr, table tr")], keys = idx.tools.map((x) => ToolGen.searchEntry({ ...x, description: (x.description || "") + " " + x.id }));
+    $("#t_q").oninput = (e) => { const q = e.target.value; trs.forEach((tr, i) => { if (keys[i] !== undefined) tr.style.display = ToolGen.score(q, keys[i]) >= 0 ? "" : "none"; }); };
     main.querySelectorAll("[data-del]").forEach((el) => (el.onclick = async (e) => {
       e.preventDefault(); const x = idx.tools[+el.dataset.del];
       if (!confirm(`Xóa tool “${ToolGen.plain(x.title)}”? Trang của tool sẽ bị xóa (ảnh trong tool/photo/ được giữ lại).`)) return;
@@ -65,10 +67,11 @@ Admin.boot({ id: "tool", title: "Tool", async render(main) {
       </div>
       <div id="logobox" class="hint"></div>
     </div>
-    <div class="card"><h3>Thông tin hiện cạnh logo</h3><p class="hint" style="margin-top:0">Ô nào để trống thì dòng đó không hiện. Các ô đều hỗ trợ màu (chọn chữ rồi bấm màu ở thanh trên ô Tên; không chọn gì thì áp cho cả ô).</p>
+    <div class="card"><h3>Thông tin hiện cạnh logo</h3><p class="hint" style="margin-top:0">Ô nào để trống thì dòng đó không hiện. Nền tảng chọn từ danh sách (muốn thêm: sửa mảng <code>platforms</code> trong <code>tool/data.json</code>). Các ô chữ đều hỗ trợ màu (chọn chữ rồi bấm màu ở thanh trên ô Tên; không chọn gì thì áp cho cả ô).</p>
       <div class="cols">
         <label><span><b style="color:#fff">Tác giả:</b> tên tác giả</span><input id="t_author" value="${esc(old ? d.author : d.author || DEF_AUTHOR)}"></label>
-        <label><span><b style="color:#55ff55">Game:</b> tên game <small class="hint">(tùy chọn, có thể bỏ trống)</small></span><input id="t_game" value="${esc(d.game)}"></label>
+        <label><span><b style="color:#55ff55">Game:</b> tên game <small class="hint">(tùy chọn)</small></span><input id="t_game" value="${esc(d.game)}"></label>
+        <label><span><b style="color:#ffaa00">Nền tảng:</b> chọn trong danh sách</span><select id="t_plat"><option value="">— Không chọn —</option>${(PLATFORMS.includes(d.platform) || !d.platform ? PLATFORMS : [...PLATFORMS, d.platform]).map((p) => `<option value="${esc(p)}"${p === d.platform ? " selected" : ""}>${esc(p)}</option>`).join("")}</select></label>
         <label><span><b style="color:#55ffff">Version:</b> phiên bản</span><input id="t_ver" value="${esc(d.version)}" placeholder="vd: 1.0.2"></label>
       </div>
       <label><span><b style="color:#fff">Mô tả:</b> mô tả ngắn</span><textarea id="t_short" rows="2" maxlength="300">${esc(d.short)}</textarea></label>
@@ -141,7 +144,7 @@ Admin.boot({ id: "tool", title: "Tool", async render(main) {
     }
     $("#dl_add").onclick = () => { dls.push({ label: "", url: "" }); drawDls(); };
 
-    const collect = () => ToolGen.norm({ id: editId || "xem-truoc", title: $("#t_title").value.trim() || "Tên tool", logo, author: $("#t_author").value.trim(), game: $("#t_game").value.trim(), version: $("#t_ver").value.trim(), short: $("#t_short").value.trim(), description: $("#t_desc").value.trim(), keywords: $("#t_kw").value.trim(),
+    const collect = () => ToolGen.norm({ id: editId || "xem-truoc", title: $("#t_title").value.trim() || "Tên tool", logo, author: $("#t_author").value.trim(), game: $("#t_game").value.trim(), platform: $("#t_plat").value, version: $("#t_ver").value.trim(), short: $("#t_short").value.trim(), description: $("#t_desc").value.trim(), keywords: $("#t_kw").value.trim(),
       body: ta.value, adult: $("#t_adult").checked, donate: $("#t_donate").checked, downloads: dls });
     function preview() {
       const data = collect();
@@ -166,11 +169,11 @@ Admin.boot({ id: "tool", title: "Tool", async render(main) {
         else { const base = ToolGen.slugify(title); id = base; for (let n = 2; used.has(id); n++) id = `${base}-${n}`; }
       }
       const now = new Date().toISOString();
-      const data = { id, title, logo, author: $("#t_author").value.trim(), game: $("#t_game").value.trim(), version: $("#t_ver").value.trim(), short: $("#t_short").value.trim(), description: $("#t_desc").value.trim(), keywords: $("#t_kw").value.trim(), body,
+      const data = { id, title, logo, author: $("#t_author").value.trim(), game: $("#t_game").value.trim(), platform: $("#t_plat").value, version: $("#t_ver").value.trim(), short: $("#t_short").value.trim(), description: $("#t_desc").value.trim(), keywords: $("#t_kw").value.trim(), body,
         adult: $("#t_adult").checked, donate: $("#t_donate").checked, downloads, createdAt: (old && old.createdAt) || now, updatedAt: now };
       const files = [];
       for (const [p, { b64 }] of pending) if (data.logo === p || body.includes("/" + p)) files.push({ path: p, content: b64, encoding: "base64" }); // chỉ đưa lên ảnh còn dùng
-      const next = { ...idx, tools: editId ? idx.tools.map((x) => (x.id === id ? ToolGen.summary(data) : x)) : [ToolGen.summary(data), ...idx.tools] };
+      const next = { ...idx, platforms: PLATFORMS, tools: editId ? idx.tools.map((x) => (x.id === id ? ToolGen.summary(data) : x)) : [ToolGen.summary(data), ...idx.tools] };
       const b = $("#t_save"); b.disabled = true;
       try {
         $("#t_st").textContent = "Đang đăng…";

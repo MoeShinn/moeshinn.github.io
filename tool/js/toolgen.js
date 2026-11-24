@@ -91,6 +91,40 @@
     }
     return out + (cut ? "…" : "");
   }
+  const DEFAULT_PLATFORMS = ["Android", "Windows", "Android - Windows"]; // danh sách nền tảng mặc định; thêm bớt ở tool/data.json → "platforms"
+
+  /* ---------- Tìm kiếm ----------
+     Không phân biệt hoa/thường và dấu. Gõ nhiều từ thì tool phải chứa ĐỦ các từ (thứ tự tùy ý, nằm ở trường nào cũng được):
+     tên, tác giả, nền tảng, version, mô tả ngắn (đủ, không bị cắt), từ khóa, mô tả SEO. Từ khớp ở TÊN được điểm cao hơn nên xếp trước.
+     Gõ sai 1 chữ (từ ≥ 5 ký tự; ≥ 9 ký tự sai tối đa 2 chữ) vẫn tìm ra, điểm thấp hơn. */
+  const fold = (s) => String(s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/gi, "d").toLowerCase();
+  const tokens = (s) => fold(s).split(/[\s,;|/\-–—·]+/).filter(Boolean);
+  const lev = (a, b, max) => { // khoảng cách Levenshtein, bỏ sớm khi vượt max
+    if (Math.abs(a.length - b.length) > max) return max + 1;
+    let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+    for (let i = 1; i <= a.length; i++) {
+      const cur = [i]; let min = i;
+      for (let j = 1; j <= b.length; j++) { cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); if (cur[j] < min) min = cur[j]; }
+      if (min > max) return max + 1; prev = cur;
+    }
+    return prev[b.length];
+  };
+  const entryFrom = (title, all) => { const T = fold(title), A = fold(all); return { title: T, all: A, words: [...new Set(tokens(A))] }; };
+  const searchText = (x) => { const n = norm(x); return [plain(n.title), plain(n.author), plain(n.game), n.platform, plain(n.version), plain(n.short), n.keywords, n.description].filter(Boolean).join(" "); };
+  const searchEntry = (x) => entryFrom(plain(norm(x).title), searchText(x));
+  // Điểm khớp của một tool với câu tìm; -1 = không khớp; chưa gõ gì = 0
+  function score(query, e) {
+    const qs = tokens(query); if (!qs.length) return 0;
+    let total = 0;
+    for (const q of qs) {
+      if (e.title.includes(q)) total += e.title.split(/[^a-z0-9]+/).some((w) => w.startsWith(q)) ? 5 : 3;
+      else if (e.all.includes(q)) total += 1.5;
+      else if (q.length >= 5 && e.words.some((w) => lev(q, w, q.length >= 9 ? 2 : 1) <= (q.length >= 9 ? 2 : 1))) total += 0.5;
+      else return -1;
+    }
+    return total;
+  }
+
   const SHORT_MAX = 100; // mô tả ngắn ở danh sách: dài hơn số ký tự này thì cắt và hiện "…"
 
   // Điền giá trị mặc định cho dữ liệu một tool
@@ -98,23 +132,23 @@
     d = d || {};
     const dl = (Array.isArray(d.downloads) ? d.downloads : []).map((x) => ({ label: String((x && x.label) || "").trim() || DEF_LABEL, url: String((x && x.url) || "").trim() })).filter((x) => x.url);
     return { id: d.id || "", title: d.title || d.id || "Tool", logo: d.logo || "", subtitle: String(d.subtitle || ""), description: d.description || "", keywords: d.keywords || "",
-      author: String(d.author || ""), game: String(d.game || ""), version: String(d.version || ""), short: String(d.short || ""),
+      author: String(d.author || ""), game: String(d.game || ""), platform: String(d.platform || ""), version: String(d.version || ""), short: String(d.short || ""),
       body: d.body || "", adult: !!d.adult, donate: !!d.donate, downloads: dl, createdAt: d.createdAt || "", updatedAt: d.updatedAt || "" };
   }
   // Dòng tóm tắt lưu trong tool/data.json (đủ để vẽ thẻ ở danh sách)
-  const summary = (d) => { const n = norm(d); return { id: n.id, title: n.title, logo: n.logo, author: n.author, game: n.game, version: n.version, short: n.short, subtitle: n.subtitle, adult: n.adult, createdAt: n.createdAt }; };
+  const summary = (d) => { const n = norm(d); return { id: n.id, title: n.title, logo: n.logo, author: n.author, game: n.game, platform: n.platform, version: n.version, short: n.short, keywords: n.keywords, description: n.description, subtitle: n.subtitle, adult: n.adult, createdAt: n.createdAt }; };
 
-  // Các dòng thông tin: Tác giả / Game / Version / Mô tả (đủ trường nào hiện trường đó). full=false: mô tả bị cắt ở SHORT_MAX ký tự
+  // Các dòng thông tin: Tác giả / Game / Nền tảng / Version / Mô tả (đủ trường nào hiện trường đó). full=false: mô tả bị cắt ở SHORT_MAX ký tự
   function infoHtml(n, { full = false } = {}) {
     const row = (cls, label, raw, max) => String(raw || "").trim() ? `<span class="tool-line ${cls}"><span class="tool-k">${label}</span> <span class="tool-v">${fmt(String(raw).trim(), { max })}</span></span>` : "";
-    const out = row("l-author", "Tác giả:", n.author) + row("l-game", "Game:", n.game) + row("l-ver", "Version:", n.version) + row("l-desc", "Mô tả:", n.short, full ? 0 : SHORT_MAX);
+    const out = row("l-author", "Tác giả:", n.author) + row("l-game", "Game:", n.game) + row("l-plat", "Nền tảng:", n.platform) + row("l-ver", "Version:", n.version) + row("l-desc", "Mô tả:", n.short, full ? 0 : SHORT_MAX);
     return out || (n.subtitle.trim() ? `<span class="tool-line"><span class="tool-v">${t(n.subtitle.trim())}</span></span>` : ""); // dữ liệu cũ chỉ có subtitle
   }
 
   /* ---------- Danh sách /tool/ ---------- */
   function cardHtml(x) {
     const n = norm(x), logo = imgUrl(n.logo);
-    return `<a class="tool-card" href="${a(toolUrl(n.id))}"${n.adult ? " data-adult" : ""}>` +
+    return `<a class="tool-card" href="${a(toolUrl(n.id))}" data-s="${a(searchText(n))}"${n.adult ? " data-adult" : ""}>` +
       `<span class="tool-card-logo${logo ? "" : " tool-logo-ph"}">${logo ? `<img src="${a(logo)}" alt="${a(plain(n.title))}" width="88" height="88" loading="lazy" />` : "🛠️"}</span>` +
       `<span class="tool-card-info"><span class="tool-card-name">${fmt(n.title)}</span>${infoHtml(n) ? `<span class="tool-card-sub">${infoHtml(n)}</span>` : ""}</span>` +
       (n.adult ? `<span class="tool-badge" title="Nội dung 18+">18+</span>` : "") + `</a>`;
@@ -122,7 +156,7 @@
   function hubBody({ tools = [], hub = {} } = {}) {
     const intro = String(hub.intro || "").trim();
     return `<div class="tool-hub" data-tool-hub><header class="blog-title-bar"><h1>${t(hub.title || "Tool")}</h1>${intro ? `<p class="tool-intro">${t(intro)}</p>` : ""}</header>` +
-      (tools.length ? `<div class="search-wrap"><input type="search" class="search-input" data-tool-search placeholder="Tìm theo tên tool, tác giả, game…" autocomplete="off" aria-label="Tìm tool" /></div>` +
+      (tools.length ? `<div class="search-wrap"><input type="search" class="search-input" data-tool-search placeholder="Tìm theo tên, tác giả, nền tảng, từ khóa…" autocomplete="off" aria-label="Tìm tool" /></div>` +
         `<div class="tool-list">${tools.map(cardHtml).join("")}</div><p class="tool-empty" data-tool-noresult hidden>Không tìm thấy tool phù hợp.</p>` : `<p class="tool-empty">Chưa có tool nào.</p>`) + `</div>`;
   }
 
@@ -142,8 +176,8 @@
       `<article class="post-article tool-article" data-tool-page${n.adult ? " data-adult" : ""}>` +
       `<header class="tool-hero"><span class="tool-hero-logo${logo ? "" : " tool-logo-ph"}">${logo ? `<img src="${a(logo)}" alt="${a(plain(n.title))}" width="112" height="112" />` : "🛠️"}</span>` +
       `<div class="tool-hero-text"><h1 class="post-title tool-title">${fmt(n.title)}${n.adult ? ` <span class="tool-badge">18+</span>` : ""}</h1>${infoHtml(n, { full: true }) ? `<div class="tool-sub">${infoHtml(n, { full: true })}</div>` : ""}</div></header>` +
-      (dls || donate ? `<div class="tool-actions">${dls ? `<div class="tool-dls">${dls}</div>` : ""}${donate}</div>` : "") +
-      (bodyHtml ? `<div class="post-body tool-body">${bodyHtml}</div>` : "") + `</article></div>` + (n.adult ? gateHtml() : "");
+      (bodyHtml ? `<div class="post-body tool-body">${bodyHtml}</div>` : "") + // mô tả trước, nút tải + donate sau
+      (dls || donate ? `<div class="tool-actions">${dls ? `<div class="tool-dls">${dls}</div>` : ""}${donate}</div>` : "") + `</article></div>` + (n.adult ? gateHtml() : "");
   }
 
   const plainText = (v) => plain(v).replace(/\s+/g, " ").trim();
@@ -181,5 +215,5 @@
     return [{ loc: site + "/tool/", lastmod: last }].concat(list.map((x) => ({ loc: site + toolUrl(x.id), lastmod: isoDay(x.updatedAt) || isoDay(x.createdAt) })));
   }
 
-  return { slugify, plain, fmt, hex, MC, SHORT_MAX, norm, summary, cardHtml, hubBody, detailBody, buildToolPage, allUrls, toolUrl, safeUrl, imgUrl, RESERVED, DEF_LABEL };
+  return { slugify, plain, fmt, hex, MC, SHORT_MAX, DEFAULT_PLATFORMS, fold, searchEntry, score, norm, summary, cardHtml, hubBody, detailBody, buildToolPage, allUrls, toolUrl, safeUrl, imgUrl, RESERVED, DEF_LABEL };
 });

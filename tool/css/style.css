@@ -45,6 +45,7 @@
 .tool-line { display: block; white-space: pre-line; }
 .tool-k { font-weight: 700; color: #ffffff; }        /* nhãn: Tác giả / Mô tả (§f) */
 .l-game .tool-k { color: #55ff55; }                   /* Game (§a) */
+.l-plat .tool-k { color: #ffaa00; }                   /* Nền tảng (§6, vàng) */
 .l-ver .tool-k { color: #55ffff; }                    /* Version (§b) */
 .tool-v { color: #aaaaaa; }                           /* giá trị mặc định xám (§7), tên tác giả mặc định trắng */
 .l-author .tool-v { color: #ffffff; }
@@ -72,6 +73,7 @@ html:not(.tool-18ok) .tool-card[data-adult] .tool-card-logo img { filter: blur(1
 
 .tool-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-bottom: 24px; }
 .tool-dls { display: flex; flex-wrap: wrap; gap: 10px; }
+.tool-body + .tool-actions { margin-top: 28px; margin-bottom: 0; }   /* nút tải nằm sau phần mô tả */
 
 /* Nút tải: hình chữ nhật xanh lá đậm 50%, bo góc nhẹ */
 .tool-dl {

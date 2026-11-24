@@ -502,6 +502,11 @@ Object.keys(VFS).forEach((k) => pages.add(k));
 orphans.forEach((o) => { changed.push(o + "/ (xóa)"); if (!CHECK) fs.rmSync(path.join(ROOT, o), { recursive: true, force: true }); });
 if (priceSynced) put("product/data.json", JSON.stringify({ ...productIdx, nodes: pnodes }, null, 2) + "\n");
 put("llms.txt", buildLlms());
+// tool/data.json: đồng bộ dòng tóm tắt từng tool theo tool/data/<id>.json (để danh sách và tìm kiếm luôn đủ nền tảng, từ khóa…); giữ nguyên title, intro; platforms = danh sách nền tảng cho /admin/tool (sửa tay ở đây để thêm/bớt)
+if (exists("tool/data.json")) {
+  const { tools: _t, platforms: _p, ...restIdx } = toolIdx;
+  put("tool/data.json", JSON.stringify({ ...restIdx, platforms: Array.isArray(_p) && _p.length ? _p : TG.DEFAULT_PLATFORMS, tools: toolSummaries }, null, 2) + "\n");
+}
 put("sitemap.xml", buildSitemap(exists("sitemap.xml") ? rd("sitemap.xml") : ""));
 
 console.log(changed.length ? `${CHECK ? "Cần cập nhật" : "Đã cập nhật"} ${changed.length} file:\n  ` + changed.join("\n  ") : "Không có gì thay đổi — nội dung dựng sẵn đã khớp dữ liệu.");

@@ -13,18 +13,24 @@
     ok.addEventListener("click", function () { if (chk.checked) unlock(); });
   }
 
-  // Tìm kiếm: khớp tên + mô tả nhắn của thẻ, không phân biệt hoa/thường và dấu (giống /post). Nhớ từ khóa trong phiên.
-  var fold = function (s) { return String(s == null ? "" : s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D").toLowerCase(); };
+  // Tìm kiếm (logic trong ToolGen.score): nhiều từ thì phải khớp đủ, ưu tiên khớp tên, chịu được gõ sai nhẹ, xếp kết quả theo độ khớp. Nhớ từ khóa trong phiên.
   function bindSearch() {
     var input = document.querySelector("[data-tool-search]");
-    if (!input) return;
+    if (!input || !window.ToolGen) return;
     var cards = [].slice.call(document.querySelectorAll(".tool-card")), none = document.querySelector("[data-tool-noresult]");
-    var haystack = cards.map(function (c) { return fold(c.textContent); });
+    var entries = cards.map(function (c) { // tên lấy từ thẻ, toàn bộ chữ tìm được nằm sẵn trong data-s (đủ mô tả, từ khóa…)
+      var nm = c.querySelector(".tool-card-name");
+      return ToolGen.searchEntry({ title: nm ? nm.textContent : "", description: c.getAttribute("data-s") || c.textContent });
+    });
     function run() {
-      var q = fold(input.value).trim(), shown = 0;
-      cards.forEach(function (c, i) { var ok = !q || haystack[i].indexOf(q) !== -1; c.hidden = !ok; if (ok) shown++; });
+      var q = input.value, shown = 0;
+      cards.forEach(function (c, i) {
+        var sc = ToolGen.score(q, entries[i]), ok = sc >= 0;
+        c.hidden = !ok; c.style.order = ok && q.trim() ? String(Math.round(-sc * 10)) : ""; // điểm cao xếp trước, hết tìm thì về thứ tự cũ
+        if (ok) shown++;
+      });
       if (none) none.hidden = shown > 0;
-      try { sessionStorage.setItem("tool_search", input.value); } catch (e) { /* bỏ qua */ }
+      try { sessionStorage.setItem("tool_search", q); } catch (e) { /* bỏ qua */ }
     }
     input.addEventListener("input", run);
     try { input.value = sessionStorage.getItem("tool_search") || ""; } catch (e) { /* bỏ qua */ }
