@@ -6,6 +6,25 @@
     "Windows",
     "Android - Windows"
   ],
+  "tags": [
+    "Visual Novel",
+    "RPG",
+    "Simulation",
+    "Action",
+    "Adventure",
+    "Roguelike",
+    "Survival",
+    "Horror",
+    "Puzzle",
+    "Strategy",
+    "Casual",
+    "Sandbox",
+    "Open World",
+    "Anime",
+    "2D",
+    "3D",
+    "18+"
+  ],
   "tools": [
     {
       "id": "syahatas",
@@ -20,6 +39,8 @@
       "description": "Syahatas bad day là tựa game sinh tồn và hành động trốn thoát khỏi thây ma đầy kịch tính, mang lại trải nghiệm giải trí hấp dẫn.",
       "subtitle": "",
       "adult": true,
+      "blurLogo": true,
+      "tags": [],
       "createdAt": "2026-11-24T00:19:33.727Z"
     }
   ]
