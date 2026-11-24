@@ -1,5 +1,18 @@
 {
   "title": "Tool",
   "intro": "",
-  "tools": []
+  "tools": [
+    {
+      "id": "syahatas",
+      "title": "<gradient:#FFC0CB:#FFFFFF>Syahatas' bad day</gradient>",
+      "logo": "tool/photo/icon-mwty10vi.webp",
+      "author": "Shinn Koe",
+      "game": "Syahatas' bad day",
+      "version": "",
+      "short": "Mod menu for Syahatas' bad day bản demo v0.79 và bản chính thức v1.0.5",
+      "subtitle": "",
+      "adult": true,
+      "createdAt": "2026-11-24T00:19:33.727Z"
+    }
+  ]
 }

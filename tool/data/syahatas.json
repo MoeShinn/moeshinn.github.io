@@ -1,0 +1,26 @@
+{
+  "id": "syahatas",
+  "title": "<gradient:#FFC0CB:#FFFFFF>Syahatas' bad day</gradient>",
+  "logo": "tool/photo/icon-mwty10vi.webp",
+  "author": "Shinn Koe",
+  "game": "Syahatas' bad day",
+  "version": "",
+  "short": "Mod menu for Syahatas' bad day bản demo v0.79 và bản chính thức v1.0.5",
+  "description": "Syahatas' bad day là bài viết chia sẻ về trải nghiệm chơi game sinh tồn và hành động thú vị, mang lại những giây phút giải trí hấp dẫn cùng Vtuber.",
+  "keywords": "Syahatas bad day, game sinh tồn, review game, Vtuber blog, trải nghiệm game, game hành động",
+  "body": "Trong tựa game bạn sẽ điều khiển nhân vật chính trốn thoát khỏi nơi đầy thây ma và cuối cùng là đến được nơi trú ẩn.\nNếu bạn vô tình bị bắt gặp, những điều không thể diễn tả nỗi sẽ xảy ra!\n\n=============================\n\nVui lòng chọn đúng phiên bản mod\n1. §7yahatas' bad day§r DEMO §bv0.79§r\n2. §7Syahatas' bad day§r OFFICIAL §cv1.0.5§r",
+  "adult": true,
+  "donate": true,
+  "downloads": [
+    {
+      "label": "Tải mod cho Syahatas' bad day demo v0.79",
+      "url": "https://github.com/MoeShinn/project/releases/download/tool-menu/SyahataLauncher_Demo_v0.79.exe"
+    },
+    {
+      "label": "Tải mod cho Syahatas' bad day offical v1.0.5",
+      "url": "https://github.com/MoeShinn/project/releases/download/tool-menu/SyahataLauncher_v1.0.5.exe"
+    }
+  ],
+  "createdAt": "2026-11-24T00:19:33.727Z",
+  "updatedAt": "2026-11-24T00:19:33.727Z"
+}
