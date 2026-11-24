@@ -145,11 +145,14 @@
     return out || (n.subtitle.trim() ? `<span class="tool-line"><span class="tool-v">${t(n.subtitle.trim())}</span></span>` : ""); // dữ liệu cũ chỉ có subtitle
   }
 
+  // Biểu tượng "mắt gạch chéo" đặt giữa logo của tool 18+ đang bị làm mờ; bấm vào để xem logo (xử lý ở tool/js/main.js)
+  const EYE = `<span class="tool-eye" data-eye role="button" tabindex="0" aria-label="Bấm để hiện ảnh (nội dung 18+)" title="Bấm để hiện ảnh"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg></span>`;
+
   /* ---------- Danh sách /tool/ ---------- */
   function cardHtml(x) {
     const n = norm(x), logo = imgUrl(n.logo);
     return `<a class="tool-card" href="${a(toolUrl(n.id))}" data-s="${a(searchText(n))}"${n.adult ? " data-adult" : ""}>` +
-      `<span class="tool-card-logo${logo ? "" : " tool-logo-ph"}">${logo ? `<img src="${a(logo)}" alt="${a(plain(n.title))}" width="88" height="88" loading="lazy" />` : "🛠️"}</span>` +
+      `<span class="tool-card-logo${logo ? "" : " tool-logo-ph"}">${logo ? `<img src="${a(logo)}" alt="${a(plain(n.title))}" width="88" height="88" loading="lazy" />` : "🛠️"}${n.adult && logo ? EYE : ""}</span>` +
       `<span class="tool-card-info"><span class="tool-card-name">${fmt(n.title)}</span>${infoHtml(n) ? `<span class="tool-card-sub">${infoHtml(n)}</span>` : ""}</span>` +
       (n.adult ? `<span class="tool-badge" title="Nội dung 18+">18+</span>` : "") + `</a>`;
   }

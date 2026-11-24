@@ -61,8 +61,13 @@
 }
 .tool-card .tool-badge { position: absolute; top: 10px; right: 12px; }
 
-/* Ảnh logo của tool 18+ bị làm mờ cho tới khi người xem xác nhận 18+ (class tool-18ok đặt trên <html>) */
-html:not(.tool-18ok) .tool-card[data-adult] .tool-card-logo img { filter: blur(14px); transform: scale(1.15); }
+/* Logo của tool 18+ bị làm mờ, giữa logo có mắt gạch chéo: bấm vào để hiện logo đó (thẻ được thêm class is-revealed).
+   Người xem đã xác nhận 18+ ở trang tool (class tool-18ok trên <html>) thì logo luôn rõ. */
+.tool-card-logo { position: relative; }
+.tool-eye { display: none; position: absolute; inset: 0; align-items: center; justify-content: center; color: #fff; cursor: pointer; background: rgba(0, 0, 0, .28); filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .8)); }
+.tool-eye:hover, .tool-eye:focus-visible { background: rgba(0, 0, 0, .4); outline: none; }
+html:not(.tool-18ok) .tool-card[data-adult]:not(.is-revealed) .tool-card-logo img { filter: blur(14px); transform: scale(1.15); }
+html:not(.tool-18ok) .tool-card[data-adult]:not(.is-revealed) .tool-eye { display: flex; }
 
 /* ---------- Trang chi tiết ---------- */
 .tool-hero { display: flex; align-items: center; gap: 18px; margin-bottom: 20px; }

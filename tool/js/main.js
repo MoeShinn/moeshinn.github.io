@@ -13,6 +13,26 @@
     ok.addEventListener("click", function () { if (chk.checked) unlock(); });
   }
 
+  // Mắt gạch chéo trên logo tool 18+: bấm để hiện riêng logo đó (không mở trang tool, không tính là xác nhận 18+). Nhớ trong phiên để vẽ lại danh sách không bị mờ lại.
+  function revealed() { try { return JSON.parse(sessionStorage.getItem("tool_reveal") || "[]"); } catch (e) { return []; } }
+  function cardId(card) { var m = (card.getAttribute("href") || "").match(/\/tool\/([^/]+)\//); return m ? decodeURIComponent(m[1]) : ""; }
+  function applyReveal() {
+    var ids = revealed();
+    [].forEach.call(document.querySelectorAll(".tool-card[data-adult]"), function (c) { if (ids.indexOf(cardId(c)) !== -1) c.classList.add("is-revealed"); });
+  }
+  function onEye(e) {
+    var eye = e.target.closest && e.target.closest("[data-eye]");
+    if (!eye) return;
+    if (e.type === "keydown" && e.key !== "Enter" && e.key !== " ") return;
+    e.preventDefault(); e.stopPropagation();
+    var card = eye.closest(".tool-card"), id = card && cardId(card);
+    if (!card) return;
+    card.classList.add("is-revealed");
+    try { var ids = revealed(); if (id && ids.indexOf(id) === -1) { ids.push(id); sessionStorage.setItem("tool_reveal", JSON.stringify(ids)); } } catch (err) { /* bỏ qua */ }
+  }
+  document.addEventListener("click", onEye);
+  document.addEventListener("keydown", onEye);
+
   // Tìm kiếm (logic trong ToolGen.score): nhiều từ thì phải khớp đủ, ưu tiên khớp tên, chịu được gõ sai nhẹ, xếp kết quả theo độ khớp. Nhớ từ khóa trong phiên.
   function bindSearch() {
     var input = document.querySelector("[data-tool-search]");
@@ -37,13 +57,14 @@
     run();
   }
   bindSearch();
+  applyReveal();
 
   // Danh sách: HTML dựng sẵn đã có cho bot; ở đây lấy dữ liệu mới nhất để khỏi phải chờ lần dựng kế tiếp
   var hub = document.querySelector("[data-tool-hub]");
   if (hub && window.ToolGen && window.fetch) {
     fetch("/tool/data.json", { cache: "no-cache" })
       .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (j) { if (j && Array.isArray(j.tools)) hub.outerHTML = ToolGen.hubBody({ tools: j.tools, hub: j }); bindSearch(); })
+      .then(function (j) { if (j && Array.isArray(j.tools)) hub.outerHTML = ToolGen.hubBody({ tools: j.tools, hub: j }); bindSearch(); applyReveal(); })
       .catch(function () { /* giữ bản dựng sẵn */ });
   }
 })();
