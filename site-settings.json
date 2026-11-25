@@ -27,6 +27,7 @@
       "home": "stars",
       "post": "fireflies",
       "product": "aurora",
+      "tool": "",
       "download": "aurora",
       "channel": "stars",
       "profile": "",
@@ -64,6 +65,11 @@
         "description": "Sản phẩm số của Shinn Koe gồm phần mềm và model PNGTuber hoặc Vtuber như Ezy Tuber, kèm theo các chính sách sử dụng dịch vụ rõ ràng.",
         "keywords": "sản phẩm số, phần mềm Ezy Tuber, model PNGTuber, Vtuber Shinn Koe, phần mềm Vtuber, Ezy Tuber"
       },
+      "tool": {
+        "title": "Tool — Moe Shinn",
+        "description": "Tải tool, mod và menu hỗ trợ cho game (chủ yếu game offline) trên Android và Windows: hướng dẫn cài đặt, phiên bản và link tải.",
+        "keywords": "tool game, mod game, mod menu, tool hỗ trợ game offline, tải mod game, mod game android, mod game windows"
+      },
       "download": {
         "title": "Tải xuống — Shinn Koe",
         "description": "Tải xuống các tệp tài nguyên và nội dung độc quyền do Shinn Koe chia sẻ chính thức tại trang tải xuống nhanh chóng và tiện lợi.",
@@ -77,7 +83,7 @@
       "profile": {
         "title": "Hồ sơ Vtuber Shinn Koe — Model, fan name, thông tin",
         "description": "Hồ sơ Shinn Koe, PNGTuber Việt Nam: thông tin cơ bản, lore, fan name, các model và kênh mạng xã hội chính thức của Shinn Moeji.",
-        "keywords": "Shinn Koe, ShinnKoe, hồ sơ Vtuber, Shinn Moeji, Ezy Tuber, PNGTuber Việt Nam, model Vtuber, fan name, lore Vtuber"
+        "keywords": "Shinn Koe, ShinnKoe, hồ sơ Vtuber, Ezy Tuber, PNGTuber Việt Nam, model Vtuber, fan name, lore Vtuber"
       },
       "donate": {
         "title": "Ủng Hộ — Shinn Koe",
