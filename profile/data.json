@@ -15,9 +15,9 @@
   },
   "hero": {
     "avatar": "/assets/avatar/avatar-336.webp",
-    "name": "Shinn Moeji",
+    "name": "Shinn Koe",
     "tagline": "PNGtuber (Ezy Tuber) Việt Nam",
-    "intro": "Xin chào, mình là **Shinn Moeji**, người đứng sau kênh **Shinn Koe**. Mình là một PNGtuber Việt Nam dùng **Ezy Tuber**, làm nội dung game, trò chuyện, reaction và livestream trên **YouTube**."
+    "intro": "Xin chào, mình là **Shinn Koe**, người đứng sau kênh **Shinn Koe**. Mình là một PNGtuber Việt Nam dùng **Ezy Tuber**, làm nội dung game, trò chuyện, reaction và livestream trên **YouTube**."
   },
   "sections": [
     {
@@ -38,11 +38,11 @@
       "rows": [
         {
           "label": "Tên",
-          "value": "Shinn Moeji"
+          "value": "Shinn Koe"
         },
         {
           "label": "Có thể gọi là",
-          "value": "Shinn, ShinnMoe"
+          "value": "Shinn, ShinnKoe"
         },
         {
           "label": "Tuổi",
