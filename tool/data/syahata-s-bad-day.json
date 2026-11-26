@@ -12,7 +12,22 @@
   "body": "=============================\n§c§lLưu ý:§r Game §dSyahatas' bad day§r là game §c18+§r có chứa cảnh §ckhông phù hợp với người dưới 18 tuổi§r\n|| §6CÂN NHẮC TRƯỚC KHI CHƠI§r\n|| §aKHÔNG DÀNH CHO NGƯỜI DƯỚI 18 TUỔI§r\n\n=============================\n§lCách sử dụng tool/mod:§r\nBước 1: Tải Syahata's bad day bản demo (free) hoặc mua Syahata's bad day official (trả phí) trên trang [§ditch§r](https://jashinn4264.itch.io/syahata-a-bad-day-beta) của tác giả\nBước 2: tải đúng phiên bản tool/mod\n   >>> Tải mod cho bản demo\n   >>> Tải tool cho bản official\nBước 3: mở chương trình tool/mod lên và chọn file Syahata's bad day.exe (hoặc tương tự) và bắt đầu thưởng thức\n\n+ Mod Việt Hoá cho §7Syahatas' bad day official v1.0.5§r <a href=\"https://github.com/MoeShinn/project/releases/download/tool-menu/Mod-VH-Syahata-bad-day-v1.0.5.exe\" target=\"_blank\">[Tải Mod VH game tại đây]</a>\n\n§c§lLưu ý:§r \n|| Trang chỉ chia sẻ các bản tool và mod §okhông phải là link tải game chính thức§r, bạn cần lên trang §c§litch§r§r của nhà phát triển để tải bản §nDEMO§r hoặc mua bản §nOFFICIAL§r\n|| Tool không chính thức hay liên quan đến tác giả gốc của game, tool được thực hiện với mục đích chỉ dùng cho bản game offline hợp pháp\n|| [§9Chuyển đến mục liên hệ§r](https://shinn.210z.dev/channel) > Liên hệ để §cyêu cầu gỡ tool/mod§r nếu tác giả (§6§ojashinn4264§r§r) không thích điều này. Xin cảm ơn!\n\n=============================\nTải game tại: [§ditch§r](https://jashinn4264.itch.io/syahata-a-bad-day-beta)",
   "adult": true,
   "blurLogo": false,
-  "tags": [],
+  "tags": [
+    "Hành động",
+    "Sinh tồn",
+    "Kinh dị",
+    "Đi cảnh 2D",
+    "Pixel-art",
+    "Phiêu lưu",
+    "Giải đố",
+    "Bắn súng",
+    "18+",
+    "NSFW",
+    "Zombie",
+    "Quái vật",
+    "Nữ chính",
+    "Indie"
+  ],
   "donate": true,
   "downloads": [
     {
@@ -21,9 +36,9 @@
     },
     {
       "label": "Tải tool menu cho Syahatas' bad day offical v1.0.5",
-      "url": "https://link4m.org/FEITu"
+      "url": "https://github.com/MoeShinn/project/releases/download/tool-menu/SyahataLauncherHack-v1.0.5.exe"
     }
   ],
   "createdAt": "2026-11-25T04:15:27.127Z",
-  "updatedAt": "2026-11-25T08:34:42.894Z"
+  "updatedAt": "2026-11-26T09:20:21.150Z"
 }

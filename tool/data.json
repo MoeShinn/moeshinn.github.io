@@ -23,7 +23,20 @@
     "Anime",
     "2D",
     "3D",
-    "18+"
+    "18+",
+    "Hành động",
+    "Sinh tồn",
+    "Kinh dị",
+    "Đi cảnh 2D",
+    "Pixel-art",
+    "Phiêu lưu",
+    "Giải đố",
+    "Bắn súng",
+    "NSFW",
+    "Zombie",
+    "Quái vật",
+    "Nữ chính",
+    "Indie"
   ],
   "tools": [
     {
@@ -40,7 +53,22 @@
       "subtitle": "",
       "adult": true,
       "blurLogo": false,
-      "tags": [],
+      "tags": [
+        "Hành động",
+        "Sinh tồn",
+        "Kinh dị",
+        "Đi cảnh 2D",
+        "Pixel-art",
+        "Phiêu lưu",
+        "Giải đố",
+        "Bắn súng",
+        "18+",
+        "NSFW",
+        "Zombie",
+        "Quái vật",
+        "Nữ chính",
+        "Indie"
+      ],
       "createdAt": "2026-11-25T04:15:27.127Z"
     }
   ]
