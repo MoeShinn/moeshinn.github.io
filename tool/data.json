@@ -38,38 +38,5 @@
     "Nữ chính",
     "Indie"
   ],
-  "tools": [
-    {
-      "id": "syahata-s-bad-day",
-      "title": "<gradient:#FFC0CB:#FFFFFF>Syahata's bad day</gradient>",
-      "logo": "tool/photo/icon-mwvkxyfk.webp",
-      "author": "§bShinn Koe§r",
-      "game": "Syahata's bad day",
-      "platform": "Windows",
-      "version": "",
-      "short": "Tool/Mod menu for Syahata's bad day bản demo v0.79 và bản chính thức v1.0.5",
-      "keywords": "mod Syahata's bad day, Syahata's bad day mod menu, tool Syahata's bad day, tải mod Syahata's bad day, Syahata's bad day windows, mod game offline, tool game pc",
-      "description": "Tải tool/mod menu Syahata's bad day phiên bản v1.0.5 và demo v0.79 cho Windows.",
-      "subtitle": "",
-      "adult": true,
-      "blurLogo": false,
-      "tags": [
-        "Hành động",
-        "Sinh tồn",
-        "Kinh dị",
-        "Đi cảnh 2D",
-        "Pixel-art",
-        "Phiêu lưu",
-        "Giải đố",
-        "Bắn súng",
-        "18+",
-        "NSFW",
-        "Zombie",
-        "Quái vật",
-        "Nữ chính",
-        "Indie"
-      ],
-      "createdAt": "2026-11-25T04:15:27.127Z"
-    }
-  ]
+  "tools": []
 }
